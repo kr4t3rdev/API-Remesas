@@ -1,0 +1,304 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum TransactionType {
+  COMPRA
+  VENTA
+}
+
+enum ReconciliationStatus {
+  PENDIENTE
+  RECONCILIADO
+}
+
+enum AdjustmentType {
+  INGRESO
+  EGRESO
+}
+
+enum RateType {
+  ACTUAL
+  CUSTOM
+}
+
+enum RateSource {
+  MANUAL
+  SYSTEM
+}
+
+enum ObjectiveStatus {
+  ACTIVO
+  COMPLETADO
+  PAUSADO
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email    String   @unique
+  password String
+  name     String
+  role      Role    @default(USER)
+  
+  exchangeRates     ExchangeRate[]
+  transactions       Transaction[]
+  cashBalances       CashBalance[]
+  cashAudits         CashAudit[]
+  cashAdjustments    CashAdjustment[]
+  bankAccounts       BankAccount[]
+  expenses           Expense[]
+  objectives         Objective[]
+  rateHistory        RateHistory[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("users")
+}
+
+model Currency {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  name      String
+  symbol    String
+  isActive  Boolean  @default(true)
+  
+  exchangeRates      ExchangeRate[]
+  transactions       Transaction[]
+  cashBalances       CashBalance[]
+  cashAudits         CashAudit[]
+  cashAdjustments    CashAdjustment[]
+  bankAccounts       BankAccount[]
+  expenses           Expense[]
+  objectives         Objective[]
+  rateHistoryFrom    RateHistory[]  @relation("RateFrom")
+  rateHistoryTo      RateHistory[]  @relation("RateTo")
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([code])
+  @@map("currencies")
+}
+
+model ExchangeRate {
+  id             Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  currencyId     Int
+  currency       Currency @relation(fields: [currencyId], references: [id])
+  referenceRate  Decimal  @db.Decimal(10, 4)
+  buyMargin      Decimal  @db.Decimal(5, 4)
+  sellMargin     Decimal  @db.Decimal(5, 4)
+  effectiveDate  DateTime @default(now())
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, currencyId])
+  @@index([userId, currencyId, effectiveDate])
+  @@map("exchange_rates")
+}
+
+model Transaction {
+  id            Int                  @id @default(autoincrement())
+  userId        Int
+  user          User                 @relation(fields: [userId], references: [id])
+  type          TransactionType
+  currencyId    Int
+  currency      Currency             @relation(fields: [currencyId], references: [id])
+  amount        Decimal              @db.Decimal(15, 2)
+  rate          Decimal              @db.Decimal(10, 4)
+  totalCup      Decimal              @db.Decimal(15, 2)
+  marginProfit  Decimal              @db.Decimal(15, 2)
+  status        ReconciliationStatus @default(PENDIENTE)
+  notes         String?
+  
+  incomeReconciliation IncomeReconciliation?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId, type, createdAt])
+  @@index([userId, currencyId, createdAt])
+  @@index([userId, status])
+  @@map("transactions")
+}
+
+model CashBalance {
+  id         Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  currencyId Int
+  currency   Currency @relation(fields: [currencyId], references: [id])
+  balance    Decimal  @db.Decimal(15, 2) @default(0)
+  
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, currencyId])
+  @@map("cash_balances")
+}
+
+model CashAudit {
+  id              Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  currencyId      Int
+  currency        Currency @relation(fields: [currencyId], references: [id])
+  expectedBalance Decimal  @db.Decimal(15, 2)
+  actualBalance   Decimal  @db.Decimal(15, 2)
+  difference      Decimal  @db.Decimal(15, 2)
+  notes           String?
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId, currencyId, createdAt])
+  @@map("cash_audits")
+}
+
+model CashAdjustment {
+  id         Int            @id @default(autoincrement())
+  userId    Int
+  user       User           @relation(fields: [userId], references: [id])
+  currencyId Int
+  currency   Currency       @relation(fields: [currencyId], references: [id])
+  amount     Decimal        @db.Decimal(15, 2)
+  type       AdjustmentType
+  reason     String
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId, currencyId, createdAt])
+  @@map("cash_adjustments")
+}
+
+model BankAccount {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  name          String
+  bankName      String
+  currencyId    Int
+  currency      Currency @relation(fields: [currencyId], references: [id])
+  accountNumber String
+  balance       Decimal  @db.Decimal(15, 2) @default(0)
+  isActive      Boolean  @default(true)
+  
+  expenseReconciliations  ExpenseReconciliation[]
+  incomeReconciliations   IncomeReconciliation[]
+  objectives              Objective[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+  @@map("bank_accounts")
+}
+
+model Expense {
+  id          Int                  @id @default(autoincrement())
+  userId      Int
+  user        User                 @relation(fields: [userId], references: [id])
+  description String
+  amount      Decimal              @db.Decimal(15, 2)
+  currencyId  Int
+  currency    Currency             @relation(fields: [currencyId], references: [id])
+  category    String
+  date        DateTime
+  status      ReconciliationStatus @default(PENDIENTE)
+  notes       String?
+  
+  reconciliation ExpenseReconciliation?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId, category, date])
+  @@index([userId, status])
+  @@map("expenses")
+}
+
+model ExpenseReconciliation {
+  id            Int        @id @default(autoincrement())
+  expenseId     Int        @unique
+  expense       Expense    @relation(fields: [expenseId], references: [id])
+  bankAccountId Int
+  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id])
+  amount        Decimal    @db.Decimal(15, 2)
+  appliedRate   Decimal?   @db.Decimal(10, 4)
+  rateType      RateType?
+  notes         String?
+  
+  createdAt DateTime @default(now())
+  
+  @@index([bankAccountId, createdAt])
+  @@map("expense_reconciliations")
+}
+
+model IncomeReconciliation {
+  id            Int         @id @default(autoincrement())
+  transactionId Int         @unique
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  bankAccountId Int
+  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id])
+  amount        Decimal     @db.Decimal(15, 2)
+  appliedRate   Decimal?    @db.Decimal(10, 4)
+  rateType      RateType?
+  notes         String?
+  
+  createdAt DateTime @default(now())
+  
+  @@index([bankAccountId, createdAt])
+  @@map("income_reconciliations")
+}
+
+model RateHistory {
+  id             Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  currencyFromId Int
+  currencyFrom   Currency @relation("RateFrom", fields: [currencyFromId], references: [id])
+  currencyToId   Int
+  currencyTo     Currency @relation("RateTo", fields: [currencyToId], references: [id])
+  rate           Decimal  @db.Decimal(10, 4)
+  source         RateSource
+  referenceType  String?
+  referenceId    Int?
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId, currencyFromId, currencyToId, createdAt])
+  @@map("rate_history")
+}
+
+model Objective {
+  id            Int             @id @default(autoincrement())
+  userId        Int
+  user          User            @relation(fields: [userId], references: [id])
+  name          String
+  description   String?
+  targetAmount  Decimal         @db.Decimal(15, 2)
+  currentAmount Decimal         @db.Decimal(15, 2) @default(0)
+  currencyId    Int
+  currency      Currency        @relation(fields: [currencyId], references: [id])
+  bankAccountId Int?
+  bankAccount   BankAccount?    @relation(fields: [bankAccountId], references: [id])
+  status        ObjectiveStatus @default(ACTIVO)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime?
+  
+  @@index([userId, status])
+  @@map("objectives")
+}
