@@ -7,6 +7,7 @@ import {
   Param,
   ParseIntPipe,
   UseGuards,
+  Delete,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -18,6 +19,7 @@ import { CurrenciesService } from './currencies.service';
 import { CreateCurrencyDto } from './dto/create-currency.dto';
 import { UpdateCurrencyDto } from './dto/update-currency.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @ApiTags('Currencies')
 @ApiBearerAuth()
@@ -31,6 +33,13 @@ export class CurrenciesController {
   @ApiResponse({ status: 200, description: 'Lista de monedas' })
   findAll() {
     return this.currenciesService.findAll();
+  }
+
+  @Get('with-primary')
+  @ApiOperation({ summary: 'Listar monedas con información de moneda principal del usuario' })
+  @ApiResponse({ status: 200, description: 'Lista de monedas con primary currency' })
+  findAllWithPrimary(@CurrentUser('id') userId: number) {
+    return this.currenciesService.findAllWithPrimary(userId);
   }
 
   @Get(':id')
@@ -57,5 +66,14 @@ export class CurrenciesController {
     @Body() updateCurrencyDto: UpdateCurrencyDto,
   ) {
     return this.currenciesService.update(id, updateCurrencyDto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Eliminar moneda' })
+  @ApiResponse({ status: 200, description: 'Moneda eliminada' })
+  @ApiResponse({ status: 404, description: 'Moneda no encontrada' })
+  @ApiResponse({ status: 400, description: 'La moneda es principal de usuarios' })
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.currenciesService.remove(id);
   }
 }

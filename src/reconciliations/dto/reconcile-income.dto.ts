@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsInt, IsNumber, IsEnum, IsOptional, IsString, Min } from 'class-validator';
-import { RateType } from '@prisma/client';
+import { BillingCycle, RateType } from '@prisma/client';
 
 export class ReconcileIncomeDto {
   @ApiProperty({ example: 1 })
@@ -30,4 +30,36 @@ export class ReconcileIncomeDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  @ApiPropertyOptional({ example: 1, description: 'ID de suscripción relacionada al ingreso' })
+  @IsOptional()
+  @IsInt()
+  subscriptionId?: number;
+
+  @ApiPropertyOptional({ example: 1, description: 'ID de licencia relacionada al ingreso' })
+  @IsOptional()
+  @IsInt()
+  userLicenseId?: number;
+
+  @ApiPropertyOptional({ example: 1, description: 'ID del plan de suscripción' })
+  @IsOptional()
+  @IsInt()
+  planId?: number;
+
+  @ApiPropertyOptional({ enum: BillingCycle, example: BillingCycle.MONTHLY })
+  @IsOptional()
+  @IsEnum(BillingCycle)
+  billingCycle?: BillingCycle;
+
+  @ApiPropertyOptional({ example: 15, description: 'Monto nominal en USD' })
+  @IsOptional()
+  @IsNumber()
+  @Min(0.01)
+  amountUsd?: number;
+
+  @ApiPropertyOptional({ example: 350, description: 'Tasa de cambio usada al cobrar (USD->CUP)' })
+  @IsOptional()
+  @IsNumber()
+  @Min(0.0001)
+  exchangeRateUsed?: number;
 }

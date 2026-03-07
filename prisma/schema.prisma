@@ -43,12 +43,48 @@ enum ObjectiveStatus {
   PAUSADO
 }
 
+enum BillingCycle {
+  MONTHLY
+  SEMIANNUAL
+  ANNUAL
+}
+
+enum LicenseState {
+  TRIAL
+  ACTIVE
+  GRACE
+  EXPIRED
+  SUSPENDED
+  CANCELLED
+}
+
+enum NotificationType {
+  NEW_USER_REGISTERED
+  USER_TEMP_BLOCKED
+  USER_BANNED
+  LICENSE_EXPIRING
+}
+
+enum NotificationChannel {
+  IN_APP
+  WEBHOOK
+  EMAIL
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email    String   @unique
   password String
   name     String
   role      Role    @default(USER)
+  isActive            Boolean   @default(true)
+  failedLoginAttempts Int       @default(0)
+  blockedUntil        DateTime?
+  isBanned            Boolean   @default(false)
+  bannedUntil         DateTime?
+  
+  primaryCurrencyId Int?
+  primaryCurrency   Currency? @relation("PrimaryCurrency", fields: [primaryCurrencyId], references: [id])
   
   exchangeRates     ExchangeRate[]
   transactions       Transaction[]
@@ -59,10 +95,17 @@ model User {
   expenses           Expense[]
   objectives         Objective[]
   rateHistory        RateHistory[]
+  licenses           UserLicense[]
+  subscriptionPayments SubscriptionPayment[]
+  notifications      Notification[]
+  adminAuditLogs     AdminAuditLog[] @relation("AdminAuditActor")
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
+  @@index([isActive])
+  @@index([blockedUntil])
+  @@index([isBanned, bannedUntil])
   @@map("users")
 }
 
@@ -83,6 +126,7 @@ model Currency {
   objectives         Objective[]
   rateHistoryFrom    RateHistory[]  @relation("RateFrom")
   rateHistoryTo      RateHistory[]  @relation("RateTo")
+  primaryUsers       User[]         @relation("PrimaryCurrency")
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -301,4 +345,124 @@ model Objective {
   
   @@index([userId, status])
   @@map("objectives")
+}
+
+model Plan {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+
+  monthlyUsd    Decimal  @db.Decimal(10, 2) @default(15.00)
+  semiannualUsd Decimal  @db.Decimal(10, 2) @default(85.50)
+  annualUsd     Decimal  @db.Decimal(10, 2) @default(162.00)
+
+  licenses             UserLicense[]
+  subscriptionPayments SubscriptionPayment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@map("plans")
+}
+
+model UserLicense {
+  id               Int          @id @default(autoincrement())
+  userId           Int
+  user             User         @relation(fields: [userId], references: [id])
+  planId           Int
+  plan             Plan         @relation(fields: [planId], references: [id])
+  state            LicenseState @default(TRIAL)
+  cycle            BillingCycle @default(MONTHLY)
+  startedAt        DateTime     @default(now())
+  expiresAt        DateTime
+  graceUntil       DateTime?
+  cancelledAt      DateTime?
+  lastPaymentAt    DateTime?
+
+  events               LicenseEvent[]
+  subscriptionPayments SubscriptionPayment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, state])
+  @@index([expiresAt, state])
+  @@map("user_licenses")
+}
+
+model LicenseEvent {
+  id            Int          @id @default(autoincrement())
+  userLicenseId Int
+  userLicense   UserLicense  @relation(fields: [userLicenseId], references: [id])
+  fromState     LicenseState?
+  toState       LicenseState
+  reason        String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userLicenseId, createdAt])
+  @@map("license_events")
+}
+
+model SubscriptionPayment {
+  id               Int          @id @default(autoincrement())
+  userId           Int
+  user             User         @relation(fields: [userId], references: [id])
+  userLicenseId    Int?
+  userLicense      UserLicense? @relation(fields: [userLicenseId], references: [id])
+  planId           Int
+  plan             Plan         @relation(fields: [planId], references: [id])
+  cycle            BillingCycle
+  amountUsd        Decimal      @db.Decimal(12, 2)
+  exchangeRateUsed Decimal      @db.Decimal(10, 4)
+  amountCup        Decimal      @db.Decimal(15, 2)
+  paidAt           DateTime
+  notes            String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, paidAt])
+  @@index([planId, cycle])
+  @@map("subscription_payments")
+}
+
+model Notification {
+  id        Int               @id @default(autoincrement())
+  userId    Int?
+  user      User?             @relation(fields: [userId], references: [id])
+  type      NotificationType
+  channel   NotificationChannel
+  title     String
+  message   String
+  payload   Json?
+  readAt    DateTime?
+  sentAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, readAt])
+  @@index([type, createdAt])
+  @@map("notifications")
+}
+
+model AdminAuditLog {
+  id             Int      @id @default(autoincrement())
+  actorUserId    Int
+  actorUser      User     @relation("AdminAuditActor", fields: [actorUserId], references: [id])
+  targetUserId   Int?
+  action         String
+  previousValue  Json?
+  newValue       Json?
+  reason         String?
+  metadata       Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([actorUserId, createdAt])
+  @@index([targetUserId, createdAt])
+  @@map("admin_audit_logs")
 }

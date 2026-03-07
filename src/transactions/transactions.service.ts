@@ -2,15 +2,22 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  forwardRef,
+  Inject,
 } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { QueryTransactionDto } from './dto/query-transaction.dto';
+import { ReconciliationsService } from '../reconciliations/reconciliations.service';
 import { Decimal } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class TransactionsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => ReconciliationsService))
+    private reconciliationsService: ReconciliationsService,
+  ) {}
 
   async create(userId: number, createDto: CreateTransactionDto) {
     const currency = await this.prisma.currency.findUnique({
@@ -78,6 +85,17 @@ export class TransactionsService {
           update: { balance: { increment: totalCup } },
           create: { userId, currencyId: cupCurrency.id, balance: totalCup },
         });
+      }
+
+      if (createDto.bankAccountId) {
+        await this.reconciliationsService.reconcileIncomeWithTransaction(
+          {
+            transactionId: transaction.id,
+            bankAccountId: createDto.bankAccountId,
+            amount: amount.toNumber(),
+          },
+          userId,
+        );
       }
 
       return transaction;

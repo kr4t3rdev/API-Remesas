@@ -14,6 +14,10 @@ import { ReconciliationsModule } from './reconciliations/reconciliations.module'
 import { ObjectivesModule } from './objectives/objectives.module';
 import { ReportsModule } from './reports/reports.module';
 import { RateHistoryModule } from './rate-history/rate-history.module';
+import { PlansModule } from './plans/plans.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -32,6 +36,10 @@ import { RateHistoryModule } from './rate-history/rate-history.module';
     ObjectivesModule,
     ReportsModule,
     RateHistoryModule,
+    PlansModule,
+    SubscriptionsModule,
+    NotificationsModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

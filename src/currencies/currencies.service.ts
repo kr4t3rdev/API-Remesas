@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { CreateCurrencyDto } from './dto/create-currency.dto';
 import { UpdateCurrencyDto } from './dto/update-currency.dto';
@@ -11,6 +11,22 @@ export class CurrenciesService {
     return this.prisma.currency.findMany({
       orderBy: { code: 'asc' },
     });
+  }
+
+  async findAllWithPrimary(userId: number) {
+    const currencies = await this.prisma.currency.findMany({
+      orderBy: { code: 'asc' },
+    });
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { primaryCurrencyId: true },
+    });
+
+    return {
+      currencies,
+      primaryCurrencyId: user?.primaryCurrencyId ?? null,
+    };
   }
 
   async findOne(id: number) {
@@ -38,5 +54,26 @@ export class CurrenciesService {
       where: { id },
       data: updateCurrencyDto,
     });
+  }
+
+  async remove(id: number) {
+    await this.findOne(id);
+
+    const usersWithPrimary = await this.prisma.user.findMany({
+      where: { primaryCurrencyId: id },
+    });
+
+    if (usersWithPrimary.length > 0) {
+      throw new BadRequestException(
+        `No se puede eliminar la moneda porque es la moneda principal de ${usersWithPrimary.length} usuario(s)`
+      );
+    }
+
+    await this.prisma.currency.update({
+      where: { id },
+      data: { isActive: false },
+    });
+
+    return { message: 'Moneda eliminada correctamente' };
   }
 }

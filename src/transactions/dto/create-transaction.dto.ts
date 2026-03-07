@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { TransactionType } from '@prisma/client';
 
@@ -20,6 +20,11 @@ export class CreateTransactionDto {
   @IsNumber()
   @Min(0)
   rate: number;
+
+  @ApiPropertyOptional({ example: 1, description: 'Cuenta bancaria para reconciliación directa' })
+  @IsOptional()
+  @IsInt()
+  bankAccountId?: number;
 
   @ApiProperty({ example: 'Nota opcional', required: false })
   @IsOptional()

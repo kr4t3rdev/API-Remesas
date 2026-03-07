@@ -18,6 +18,7 @@ import {
 import { ReconciliationsService } from './reconciliations.service';
 import { ReconcileExpenseDto } from './dto/reconcile-expense.dto';
 import { ReconcileIncomeDto } from './dto/reconcile-income.dto';
+import { ReconcileIncomeBulkDto } from './dto/reconcile-income-bulk.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
@@ -46,6 +47,17 @@ export class ReconciliationsController {
     @CurrentUser('id') userId: number,
   ) {
     return this.reconciliationsService.reconcileIncome(dto, userId);
+  }
+
+  @Post('income/bulk')
+  @ApiOperation({ summary: 'Reconciliar múltiples ingresos (ventas) en una operación' })
+  @ApiResponse({ status: 201, description: 'Ingresos reconciliados masivamente' })
+  @ApiResponse({ status: 400, description: 'Error de validación' })
+  reconcileIncomeBulk(
+    @Body() dto: ReconcileIncomeBulkDto,
+    @CurrentUser('id') userId: number,
+  ) {
+    return this.reconciliationsService.reconcileIncomeBulk(dto, userId);
   }
 
   @Get()
