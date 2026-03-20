@@ -63,6 +63,8 @@ enum NotificationType {
   USER_TEMP_BLOCKED
   USER_BANNED
   LICENSE_EXPIRING
+  PASSWORD_RESET
+  EMAIL_VERIFICATION
 }
 
 enum NotificationChannel {
@@ -76,12 +78,23 @@ model User {
   email    String   @unique
   password String
   name     String
+  nickname String?
+  avatarUrl String?
   role      Role    @default(USER)
   isActive            Boolean   @default(true)
   failedLoginAttempts Int       @default(0)
   blockedUntil        DateTime?
   isBanned            Boolean   @default(false)
   bannedUntil         DateTime?
+  mustChangePassword  Boolean   @default(false)
+  
+  // Email verification fields
+  emailVerified        Boolean   @default(false)
+  verificationToken    String?
+  verificationExpires DateTime?
+  verificationSentAt  DateTime?
+  passwordResetToken   String?
+  passwordResetExpires DateTime?
   
   primaryCurrencyId Int?
   primaryCurrency   Currency? @relation("PrimaryCurrency", fields: [primaryCurrencyId], references: [id])
@@ -99,6 +112,7 @@ model User {
   subscriptionPayments SubscriptionPayment[]
   notifications      Notification[]
   adminAuditLogs     AdminAuditLog[] @relation("AdminAuditActor")
+  workers            Worker[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -106,6 +120,10 @@ model User {
   @@index([isActive])
   @@index([blockedUntil])
   @@index([isBanned, bannedUntil])
+  @@index([verificationToken])
+  @@index([verificationExpires])
+  @@index([passwordResetToken])
+  @@index([passwordResetExpires])
   @@map("users")
 }
 
@@ -138,7 +156,7 @@ model Currency {
 model ExchangeRate {
   id             Int      @id @default(autoincrement())
   userId        Int
-  user          User     @relation(fields: [userId], references: [id])
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   currencyId     Int
   currency       Currency @relation(fields: [currencyId], references: [id])
   referenceRate  Decimal  @db.Decimal(10, 4)
@@ -157,7 +175,7 @@ model ExchangeRate {
 model Transaction {
   id            Int                  @id @default(autoincrement())
   userId        Int
-  user          User                 @relation(fields: [userId], references: [id])
+  user          User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   type          TransactionType
   currencyId    Int
   currency      Currency             @relation(fields: [currencyId], references: [id])
@@ -182,7 +200,7 @@ model Transaction {
 model CashBalance {
   id         Int      @id @default(autoincrement())
   userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   currencyId Int
   currency   Currency @relation(fields: [currencyId], references: [id])
   balance    Decimal  @db.Decimal(15, 2) @default(0)
@@ -196,7 +214,7 @@ model CashBalance {
 model CashAudit {
   id              Int      @id @default(autoincrement())
   userId        Int
-  user          User     @relation(fields: [userId], references: [id])
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   currencyId      Int
   currency        Currency @relation(fields: [currencyId], references: [id])
   expectedBalance Decimal  @db.Decimal(15, 2)
@@ -213,7 +231,7 @@ model CashAudit {
 model CashAdjustment {
   id         Int            @id @default(autoincrement())
   userId    Int
-  user       User           @relation(fields: [userId], references: [id])
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   currencyId Int
   currency   Currency       @relation(fields: [currencyId], references: [id])
   amount     Decimal        @db.Decimal(15, 2)
@@ -229,7 +247,7 @@ model CashAdjustment {
 model BankAccount {
   id            Int      @id @default(autoincrement())
   userId        Int
-  user          User     @relation(fields: [userId], references: [id])
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name          String
   bankName      String
   currencyId    Int
@@ -252,7 +270,7 @@ model BankAccount {
 model Expense {
   id          Int                  @id @default(autoincrement())
   userId      Int
-  user        User                 @relation(fields: [userId], references: [id])
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   description String
   amount      Decimal              @db.Decimal(15, 2)
   currencyId  Int
@@ -309,7 +327,7 @@ model IncomeReconciliation {
 model RateHistory {
   id             Int      @id @default(autoincrement())
   userId        Int
-  user          User     @relation(fields: [userId], references: [id])
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   currencyFromId Int
   currencyFrom   Currency @relation("RateFrom", fields: [currencyFromId], references: [id])
   currencyToId   Int
@@ -328,7 +346,7 @@ model RateHistory {
 model Objective {
   id            Int             @id @default(autoincrement())
   userId        Int
-  user          User            @relation(fields: [userId], references: [id])
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   name          String
   description   String?
   targetAmount  Decimal         @db.Decimal(15, 2)
@@ -370,7 +388,7 @@ model Plan {
 model UserLicense {
   id               Int          @id @default(autoincrement())
   userId           Int
-  user             User         @relation(fields: [userId], references: [id])
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   planId           Int
   plan             Plan         @relation(fields: [planId], references: [id])
   state            LicenseState @default(TRIAL)
@@ -409,7 +427,7 @@ model LicenseEvent {
 model SubscriptionPayment {
   id               Int          @id @default(autoincrement())
   userId           Int
-  user             User         @relation(fields: [userId], references: [id])
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   userLicenseId    Int?
   userLicense      UserLicense? @relation(fields: [userLicenseId], references: [id])
   planId           Int
@@ -432,7 +450,7 @@ model SubscriptionPayment {
 model Notification {
   id        Int               @id @default(autoincrement())
   userId    Int?
-  user      User?             @relation(fields: [userId], references: [id])
+  user      User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
   type      NotificationType
   channel   NotificationChannel
   title     String
@@ -452,7 +470,7 @@ model Notification {
 model AdminAuditLog {
   id             Int      @id @default(autoincrement())
   actorUserId    Int
-  actorUser      User     @relation("AdminAuditActor", fields: [actorUserId], references: [id])
+  actorUser      User     @relation("AdminAuditActor", fields: [actorUserId], references: [id], onDelete: Cascade)
   targetUserId   Int?
   action         String
   previousValue  Json?
@@ -465,4 +483,47 @@ model AdminAuditLog {
   @@index([actorUserId, createdAt])
   @@index([targetUserId, createdAt])
   @@map("admin_audit_logs")
+}
+
+enum WorkerTransactionType {
+  TRANSACTION
+  BALANCE_ADD
+}
+
+model Worker {
+  id                 Int       @id @default(autoincrement())
+  userId             Int
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name               String
+  phone              String?
+  photoUrl           String?
+  initials           String    // 2 letras nombre + 1era apellido en mayúscula
+  balance            Decimal   @db.Decimal(15, 2) @default(0)
+  accumulatedProfit  Decimal   @db.Decimal(15, 2) @default(0)
+  totalDelivered     Decimal   @db.Decimal(15, 2) @default(0)
+  
+  transactions       WorkerTransaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("workers")
+}
+
+model WorkerTransaction {
+  id             Int                 @id @default(autoincrement())
+  workerId       Int
+  worker         Worker              @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  type           WorkerTransactionType
+  amount         Decimal             @db.Decimal(15, 2)
+  profit         Decimal?            @db.Decimal(15, 2) // Solo para TRANSACTION
+  balanceBefore  Decimal             @db.Decimal(15, 2)
+  balanceAfter   Decimal             @db.Decimal(15, 2)
+  description    String?
+
+  createdAt DateTime @default(now())
+
+  @@index([workerId, createdAt])
+  @@map("worker_transactions")
 }

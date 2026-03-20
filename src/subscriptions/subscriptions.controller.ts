@@ -23,6 +23,12 @@ export class SubscriptionsController {
     return this.subscriptionsService.listLicenses(userId ? Number(userId) : undefined);
   }
 
+  @Get('licenses/:id')
+  @ApiOperation({ summary: 'Obtener detalle de licencia' })
+  getLicense(@Param('id', ParseIntPipe) id: number) {
+    return this.subscriptionsService.getLicense(id);
+  }
+
   @Post('licenses')
   @ApiOperation({ summary: 'Asignar licencia a usuario' })
   assignLicense(@Body() dto: AssignLicenseDto) {

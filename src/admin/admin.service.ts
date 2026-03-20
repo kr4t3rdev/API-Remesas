@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException }
 import { LicenseState, Prisma, Role } from '@prisma/client';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { AuthService } from '../auth/auth.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { UpdateAdminUserDto } from './dto/update-admin-user.dto';
 import { AdminUserActionDto, AdminUserControlActionType } from './dto/admin-user-action.dto';
 import { CreateAdminUserDto } from './dto/create-admin-user.dto';
@@ -13,6 +14,7 @@ export class AdminService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly authService: AuthService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async getKpis(dateFrom?: string, dateTo?: string, planId?: number) {
@@ -404,34 +406,48 @@ export class AdminService {
         return updated;
       }
 
-      case AdminUserControlActionType.FORCE_PASSWORD_RESET: {
-        const temporaryPassword = `tmp-${Math.random().toString(36).slice(-10)}A1!`;
-        const bcrypt = await import('bcrypt');
-        const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
+         case AdminUserControlActionType.FORCE_PASSWORD_RESET: {
+         const temporaryPassword = `tmp-${Math.random().toString(36).slice(-10)}A1!`;
+         const bcrypt = await import('bcrypt');
+         const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
 
-        await this.prisma.user.update({
-          where: { id: userId },
-          data: {
-            password: hashedPassword,
-            failedLoginAttempts: 0,
-            blockedUntil: null,
-          },
-        });
+         await this.prisma.user.update({
+           where: { id: userId },
+           data: {
+             password: hashedPassword,
+             failedLoginAttempts: 0,
+             blockedUntil: null,
+             mustChangePassword: true, // Forzar cambio de contraseña en próximo login
+           },
+         });
 
-        await this.createActionAudit({
-          actorUserId,
-          targetUserId: userId,
-          action: dto.actionType,
-          reason: dto.reason,
-          metadata: { temporaryPasswordIssued: true },
-        });
+         await this.createActionAudit({
+           actorUserId,
+           targetUserId: userId,
+           action: dto.actionType,
+           reason: dto.reason,
+           metadata: { temporaryPasswordIssued: true, mustChangePassword: true },
+         });
 
-        return {
-          success: true,
-          userId,
-          action: dto.actionType,
-        };
-      }
+         // Envío de email con la contraseña temporal
+         const user = await this.prisma.user.findUnique({ where: { id: userId } });
+         if (user?.email) {
+           await this.notificationsService.notifyMixed({
+             userId,
+             type: 'PASSWORD_RESET',
+             title: 'Restablecimiento de Contraseña',
+             message: `Se ha restablecido su contraseña. Use esta contraseña temporal para acceder: ${temporaryPassword}. Se le solicitará cambiarla en su próximo inicio de sesión.`,
+             channels: ['EMAIL'],
+           });
+         }
+
+         return {
+           success: true,
+           userId,
+           action: dto.actionType,
+           temporaryPassword, // Solo para propósitos de testing en desarrollo
+         };
+       }
 
       case AdminUserControlActionType.REVOKE_ALL_SESSIONS: {
         const revokeResult = await this.authService.revokeAllSessions(userId);
@@ -567,5 +583,101 @@ export class AdminService {
       orderBy: { createdAt: 'desc' },
       take: 200,
     });
+  }
+
+  async getServiceMetrics() {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
+    // Current period: last 30 days
+    const currentPeriodStart = thirtyDaysAgo;
+    const currentPeriodEnd = now;
+
+    // Previous period: 30-60 days ago
+    const previousPeriodStart = sixtyDaysAgo;
+    const previousPeriodEnd = thirtyDaysAgo;
+
+    // Active license: state is ACTIVE, TRIAL, or GRACE AND (expiresAt > now() OR expiresAt IS NULL)
+    const activeLicenseStates = [LicenseState.ACTIVE, LicenseState.TRIAL, LicenseState.GRACE];
+
+    // Count active licenses with future expiry
+    const activeLicensesWithExpiry = await this.prisma.userLicense.count({
+      where: {
+        state: { in: activeLicenseStates },
+        expiresAt: { gt: now },
+      },
+    });
+
+    // Count active licenses with null expiresAt (never expire)
+    const activeLicensesNoExpiry = await this.prisma.userLicense.count({
+      where: {
+        state: { in: activeLicenseStates },
+        expiresAt: undefined,
+      },
+    });
+
+    // Total active = those with future expiry + those with no expiry
+    const totalActive = activeLicensesWithExpiry + activeLicensesNoExpiry;
+
+    // Count expired licenses currently
+    const expiredLicensesCurrent = await this.prisma.userLicense.count({
+      where: {
+        OR: [
+          { state: { in: [LicenseState.EXPIRED, LicenseState.CANCELLED, LicenseState.SUSPENDED] } },
+          {
+            state: LicenseState.ACTIVE,
+            expiresAt: { lt: now },
+          },
+        ],
+      },
+    });
+
+    // Count active licenses in previous period (30-60 days ago)
+    const activeLicensesPrevious = await this.prisma.userLicense.count({
+      where: {
+        state: { in: activeLicenseStates },
+        startedAt: { gte: previousPeriodStart, lt: previousPeriodEnd },
+      },
+    });
+
+    // Count expired licenses in previous period
+    const expiredLicensesPrevious = await this.prisma.userLicense.count({
+      where: {
+        OR: [
+          { 
+            state: { in: [LicenseState.EXPIRED, LicenseState.CANCELLED, LicenseState.SUSPENDED] },
+            updatedAt: { gte: previousPeriodStart, lt: previousPeriodEnd },
+          },
+          {
+            state: LicenseState.ACTIVE,
+            expiresAt: { gte: previousPeriodStart, lt: previousPeriodEnd },
+          },
+        ],
+      },
+    });
+
+    // Calculate deltas
+    const activeDelta = this.calculateDelta(totalActive, activeLicensesPrevious);
+    const expiredDelta = this.calculateDelta(expiredLicensesCurrent, expiredLicensesPrevious);
+
+    return {
+      activeCount: totalActive,
+      expiredCount: expiredLicensesCurrent,
+      activeDelta,
+      expiredDelta,
+    };
+  }
+
+  private calculateDelta(current: number, previous: number): string {
+    if (previous === 0) {
+      return current > 0 ? '+100%' : '0%';
+    }
+    const delta = ((current - previous) / previous) * 100;
+    if (delta === 0) {
+      return '0%';
+    }
+    const sign = delta >= 0 ? '+' : '';
+    return `${sign}${Math.round(delta)}%`;
   }
 }

@@ -7,6 +7,10 @@ describe('Admin create user flow (service integration-like)', () => {
     revokeAllSessions: jest.fn().mockResolvedValue({ revoked: false }),
   };
 
+  const notificationsServiceMock = {
+    notifyMixed: jest.fn().mockResolvedValue({}),
+  };
+
   const buildServiceWithStore = () => {
     const users: Array<{ id: number; email: string; name: string; role: Role }> = [];
     const audits: Array<{ action: string; actorUserId: number; targetUserId?: number | null; metadata?: any }> = [];
@@ -58,7 +62,7 @@ describe('Admin create user flow (service integration-like)', () => {
     };
 
     return {
-      service: new AdminService(prismaMock, authServiceMock as any),
+      service: new AdminService(prismaMock, authServiceMock as any, notificationsServiceMock as any),
       prismaMock,
       users,
       audits,

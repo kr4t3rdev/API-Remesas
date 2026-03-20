@@ -1,10 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { NotificationChannel, NotificationType, Prisma } from '@prisma/client';
 import { PrismaService } from '../database/prisma/prisma.service';
+import { EmailService } from '../email/email.service';
+import { getTemplate, TemplateData } from '../email/email-templates';
 
 @Injectable()
 export class NotificationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(NotificationsService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly emailService: EmailService,
+  ) {}
 
   async notifyMixed(params: {
     userId?: number;
@@ -16,7 +23,22 @@ export class NotificationsService {
   }) {
     const channels = params.channels ?? ['IN_APP', 'WEBHOOK', 'EMAIL'];
 
-    const writes = channels.map((channel) =>
+    // Get user email if userId is provided
+    let userEmail: string | undefined;
+    if (params.userId) {
+      const user = await this.prisma.user.findUnique({
+        where: { id: params.userId },
+        select: { email: true },
+      });
+      userEmail = user?.email;
+    }
+
+    // Separate email channel from other channels
+    const emailChannel = channels.includes('EMAIL') ? 'EMAIL' : null;
+    const otherChannels = channels.filter((c) => c !== 'EMAIL');
+
+    // Create database notifications for all channels except EMAIL
+    const writes = otherChannels.map((channel) =>
       this.prisma.notification.create({
         data: {
           userId: params.userId,
@@ -29,6 +51,50 @@ export class NotificationsService {
         },
       }),
     );
+
+    // Send email if channel includes EMAIL and we have a user email
+    if (emailChannel && userEmail) {
+      const templateData: TemplateData = {
+        ...(params.payload as TemplateData || {}),
+        email: userEmail,
+      };
+
+      const template = getTemplate(params.type, templateData);
+
+      const emailResult = await this.emailService.sendEmail({
+        to: userEmail,
+        subject: template.subject,
+        html: template.html,
+        text: template.text,
+      });
+
+      // Log the notification to database regardless of email success
+      const payloadObj = params.payload as Record<string, unknown> || {};
+      writes.push(
+        this.prisma.notification.create({
+          data: {
+            userId: params.userId,
+            type: params.type,
+            channel: 'EMAIL',
+            title: params.title,
+            message: params.message,
+            payload: {
+              ...payloadObj,
+              emailSent: emailResult.success,
+              messageId: emailResult.messageId,
+              error: emailResult.error,
+            } as Prisma.InputJsonValue,
+            sentAt: new Date(),
+          },
+        }),
+      );
+
+      if (!emailResult.success) {
+        this.logger.warn(`Failed to send email notification: ${emailResult.error}`);
+      }
+    } else if (emailChannel && !userEmail) {
+      this.logger.warn(`Cannot send email: user ${params.userId} has no email address`);
+    }
 
     return Promise.all(writes);
   }
@@ -59,7 +125,27 @@ export class NotificationsService {
       type: 'USER_BANNED',
       title: 'Usuario baneado',
       message: reason,
-      payload: { bannedUntil: bannedUntil?.toISOString() ?? null },
+      payload: { reason, bannedUntil: bannedUntil?.toISOString() ?? null },
+    });
+  }
+
+  notifyEmailVerification(userId: number, email: string, name: string, verificationUrl: string) {
+    return this.notifyMixed({
+      userId,
+      type: 'EMAIL_VERIFICATION',
+      title: 'Bienvenido a Casa de Cambio',
+      message: 'Te enviamos las instrucciones para activar tu cuenta',
+      payload: { email, name, verificationUrl, whatsappNumber: '53917705' },
+    });
+  }
+
+  notifyPasswordReset(userId: number, email: string, resetUrl: string) {
+    return this.notifyMixed({
+      userId,
+      type: 'PASSWORD_RESET',
+      title: 'Restablece tu contraseña',
+      message: 'Te enviamos un enlace para restablecer tu contraseña',
+      payload: { email, resetToken: resetUrl.split('token=').pop() ?? '', resetUrl },
     });
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -38,5 +38,12 @@ export class PlansController {
   @ApiOperation({ summary: 'Actualizar plan' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePlanDto) {
     return this.plansService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Eliminar plan' })
+  @ApiResponse({ status: 200, description: 'Plan eliminado' })
+  delete(@Param('id', ParseIntPipe) id: number) {
+    return this.plansService.delete(id);
   }
 }

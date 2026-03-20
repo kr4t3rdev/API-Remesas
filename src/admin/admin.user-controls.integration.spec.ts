@@ -7,6 +7,10 @@ describe('Admin user endpoints integration-like', () => {
     revokeAllSessions: jest.fn().mockResolvedValue({ revoked: false }),
   };
 
+  const notificationsServiceMock = {
+    notifyMixed: jest.fn().mockResolvedValue({}),
+  };
+
   const setup = () => {
     const users = new Map<
       number,
@@ -79,7 +83,7 @@ describe('Admin user endpoints integration-like', () => {
       },
     };
 
-    const service = new AdminService(prismaMock, authServiceMock as any);
+    const service = new AdminService(prismaMock, authServiceMock as any, notificationsServiceMock as any);
     const controller = new AdminController(service);
 
     return { controller, users, audits };

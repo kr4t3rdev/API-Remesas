@@ -17,7 +17,10 @@ import { RateHistoryModule } from './rate-history/rate-history.module';
 import { PlansModule } from './plans/plans.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { EmailModule } from './email/email.module';
 import { AdminModule } from './admin/admin.module';
+import { UploadModule } from './upload/upload.module';
+import { WorkerPaymentsModule } from './worker-payments/worker-payments.module';
 
 @Module({
   imports: [
@@ -39,7 +42,10 @@ import { AdminModule } from './admin/admin.module';
     PlansModule,
     SubscriptionsModule,
     NotificationsModule,
+    EmailModule,
     AdminModule,
+    UploadModule,
+    WorkerPaymentsModule,
   ],
 })
 export class AppModule {}

@@ -2,18 +2,29 @@ import { PrismaClient, Role } from '@prisma/client';
 import { NotificationsService } from '../src/notifications/notifications.service';
 import { SubscriptionsService } from '../src/subscriptions/subscriptions.service';
 import { AdminService } from '../src/admin/admin.service';
+import { EmailService } from '../src/email/email.service';
 
 const prisma = new PrismaClient();
 
+// Mock EmailService for script execution
+const mockEmailService = {
+  sendEmail: async () => ({ success: true, messageId: 'mock' }),
+} as unknown as EmailService;
+
 async function main() {
-  const notificationsService = new NotificationsService(prisma as any);
+  const notificationsService = new NotificationsService(prisma as any, mockEmailService);
   const subscriptionsService = new SubscriptionsService(prisma as any);
-  const adminService = new AdminService(prisma as any, {
+  const authServiceMock = {
     revokeAllSessions: async () => ({
       revoked: false,
       strategy: 'STATELESS_JWT_NO_SESSION_STORE',
     }),
-  } as any);
+  };
+  const adminService = new AdminService(
+    prisma as any,
+    authServiceMock as any,
+    notificationsService as any,
+  );
 
   const now = new Date();
   const probeEmail = `phase6.probe.${Date.now()}@cambios.com`;

@@ -80,6 +80,12 @@ export class AdminController {
     return this.adminService.getExpiringLicenses(Number(windowDays));
   }
 
+  @Get('metrics/services')
+  @ApiOperation({ summary: 'Métricas de servicios activos y expirados' })
+  getServiceMetrics() {
+    return this.adminService.getServiceMetrics();
+  }
+
   @Get('audit-logs')
   @ApiOperation({ summary: 'Bitácora de auditoría admin' })
   getAuditLogs() {

@@ -16,11 +16,10 @@ export class CreatePlanDto {
   @IsBoolean()
   isActive?: boolean;
 
-  @ApiPropertyOptional({ example: 15 })
-  @IsOptional()
+  @ApiProperty({ example: 25 })
   @IsNumber()
   @Min(0)
-  monthlyUsd?: number;
+  monthlyUsd!: number;
 
   @ApiPropertyOptional({ example: 85.5 })
   @IsOptional()

@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AdminUserControlActionType } from './dto/admin-user-action.dto';
-import { Role } from '@prisma/client';
+import { LicenseState, Role } from '@prisma/client';
 
 describe('AdminService user controls', () => {
   const prismaMock: any = {
@@ -31,11 +31,132 @@ describe('AdminService user controls', () => {
     revokeAllSessions: jest.fn().mockResolvedValue({ revoked: false }),
   };
 
+  const notificationsServiceMock = {
+    notifyMixed: jest.fn().mockResolvedValue({}),
+  };
+
   let service: AdminService;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new AdminService(prismaMock, authServiceMock as any);
+    service = new AdminService(prismaMock, authServiceMock as any, notificationsServiceMock as any);
+  });
+
+  // Tests for getServiceMetrics
+  describe('getServiceMetrics', () => {
+    it('returns active and expired counts with deltas', async () => {
+      // Mock active licenses with future expiry
+      prismaMock.userLicense.count
+        .mockResolvedValueOnce(100) // activeLicensesWithExpiry
+        .mockResolvedValueOnce(10)   // activeLicensesNoExpiry
+        .mockResolvedValueOnce(25)   // expiredLicensesCurrent
+        .mockResolvedValueOnce(80)   // activeLicensesPrevious
+        .mockResolvedValueOnce(20);  // expiredLicensesPrevious
+
+      const result = await service.getServiceMetrics();
+
+      expect(result.activeCount).toBe(110);
+      expect(result.expiredCount).toBe(25);
+      // Delta: (110 - 80) / 80 * 100 = +37.5% rounded to +38%
+      expect(result.activeDelta).toBe('+38%');
+      // Delta: (25 - 20) / 20 * 100 = +25%
+      expect(result.expiredDelta).toBe('+25%');
+    });
+
+    it('returns zero deltas when previous period has zero counts', async () => {
+      prismaMock.userLicense.count
+        .mockResolvedValueOnce(50)  // activeLicensesWithExpiry
+        .mockResolvedValueOnce(5)   // activeLicensesNoExpiry
+        .mockResolvedValueOnce(10)  // expiredLicensesCurrent
+        .mockResolvedValueOnce(0)   // activeLicensesPrevious
+        .mockResolvedValueOnce(0);  // expiredLicensesPrevious
+
+      const result = await service.getServiceMetrics();
+
+      expect(result.activeCount).toBe(55);
+      expect(result.expiredCount).toBe(10);
+      expect(result.activeDelta).toBe('+100%'); // previous is 0, current > 0
+      expect(result.expiredDelta).toBe('+100%');
+    });
+
+    it('returns negative delta when counts decrease', async () => {
+      prismaMock.userLicense.count
+        .mockResolvedValueOnce(80)   // activeLicensesWithExpiry
+        .mockResolvedValueOnce(5)    // activeLicensesNoExpiry
+        .mockResolvedValueOnce(30)  // expiredLicensesCurrent
+        .mockResolvedValueOnce(100)  // activeLicensesPrevious
+        .mockResolvedValueOnce(20);  // expiredLicensesPrevious
+
+      const result = await service.getServiceMetrics();
+
+      expect(result.activeCount).toBe(85);
+      expect(result.expiredCount).toBe(30);
+      // Delta: (85 - 100) / 100 * 100 = -15%
+      expect(result.activeDelta).toBe('-15%');
+      // Delta: (30 - 20) / 20 * 100 = +50%
+      expect(result.expiredDelta).toBe('+50%');
+    });
+
+    it('handles empty database (all zeros)', async () => {
+      prismaMock.userLicense.count
+        .mockResolvedValueOnce(0)  // activeLicensesWithExpiry
+        .mockResolvedValueOnce(0)  // activeLicensesNoExpiry
+        .mockResolvedValueOnce(0)  // expiredLicensesCurrent
+        .mockResolvedValueOnce(0)  // activeLicensesPrevious
+        .mockResolvedValueOnce(0); // expiredLicensesPrevious
+
+      const result = await service.getServiceMetrics();
+
+      expect(result.activeCount).toBe(0);
+      expect(result.expiredCount).toBe(0);
+      expect(result.activeDelta).toBe('0%');
+      expect(result.expiredDelta).toBe('0%');
+    });
+  });
+
+  // Tests for calculateDelta (private method via getServiceMetrics)
+  describe('calculateDelta via getServiceMetrics', () => {
+    it('calculates positive delta correctly', async () => {
+      prismaMock.userLicense.count
+        .mockResolvedValueOnce(150) // activeLicensesWithExpiry
+        .mockResolvedValueOnce(0)   // activeLicensesNoExpiry
+        .mockResolvedValueOnce(10)  // expiredLicensesCurrent
+        .mockResolvedValueOnce(100) // activeLicensesPrevious
+        .mockResolvedValueOnce(10); // expiredLicensesPrevious
+
+      const result = await service.getServiceMetrics();
+
+      // (150 - 100) / 100 * 100 = +50%
+      expect(result.activeDelta).toBe('+50%');
+    });
+
+    it('calculates zero delta correctly', async () => {
+      prismaMock.userLicense.count
+        .mockResolvedValueOnce(50)  // activeLicensesWithExpiry
+        .mockResolvedValueOnce(0)   // activeLicensesNoExpiry
+        .mockResolvedValueOnce(20)  // expiredLicensesCurrent
+        .mockResolvedValueOnce(50)  // activeLicensesPrevious
+        .mockResolvedValueOnce(20); // expiredLicensesPrevious
+
+      const result = await service.getServiceMetrics();
+
+      expect(result.activeDelta).toBe('0%');
+      expect(result.expiredDelta).toBe('0%');
+    });
+
+    it('rounds delta to nearest integer', async () => {
+      prismaMock.userLicense.count
+        .mockResolvedValueOnce(133) // activeLicensesWithExpiry
+        .mockResolvedValueOnce(0)  // activeLicensesNoExpiry
+        .mockResolvedValueOnce(10) // expiredLicensesCurrent
+        .mockResolvedValueOnce(100) // activeLicensesPrevious
+        .mockResolvedValueOnce(10); // expiredLicensesPrevious
+
+      const result = await service.getServiceMetrics();
+
+      // (133 - 100) / 100 * 100 = +33%
+      expect(result.activeDelta).toBe('+33%');
+    });
   });
 
   it('requires reason for sensitive action', async () => {

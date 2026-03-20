@@ -42,6 +42,15 @@ export class SubscriptionsService {
     });
   }
 
+  async getLicense(id: number) {
+    const license = await this.prisma.userLicense.findUnique({
+      where: { id },
+      include: { plan: true, user: { select: { id: true, email: true, name: true } } },
+    });
+    if (!license) throw new NotFoundException('Licencia no encontrada');
+    return license;
+  }
+
   async assignLicense(input: { userId: number; planId: number; cycle: BillingCycle; state?: LicenseState; expiresAt?: Date; reason?: string }) {
     await this.assertPlanExists(input.planId);
     const user = await this.prisma.user.findUnique({ where: { id: input.userId } });
