@@ -14,6 +14,7 @@ export class BankAccountsService {
         bankName: createDto.bankName,
         currencyId: createDto.currencyId,
         accountNumber: createDto.accountNumber,
+        balance: createDto.initialBalance !== undefined && createDto.initialBalance !== null ? createDto.initialBalance : 0,
         isActive: createDto.isActive ?? true,
         userId,
       },

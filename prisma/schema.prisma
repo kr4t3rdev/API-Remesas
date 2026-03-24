@@ -113,6 +113,7 @@ model User {
   notifications      Notification[]
   adminAuditLogs     AdminAuditLog[] @relation("AdminAuditActor")
   workers            Worker[]
+  expenseItems       ExpenseItem[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -526,4 +527,20 @@ model WorkerTransaction {
 
   @@index([workerId, createdAt])
   @@map("worker_transactions")
+}
+
+model ExpenseItem {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  amount    Decimal   @db.Decimal(15, 2)
+  category  String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId, createdAt])
+  @@index([userId, category])
+  @@map("expense_items")
 }

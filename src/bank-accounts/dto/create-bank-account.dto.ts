@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsInt, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
+import { IsString, IsInt, IsNotEmpty, IsOptional, IsBoolean, IsNumber } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateBankAccountDto {
   @ApiProperty({ example: 'Cuenta Principal' })
@@ -20,6 +21,12 @@ export class CreateBankAccountDto {
   @IsString()
   @IsNotEmpty()
   accountNumber!: string;
+
+  @ApiProperty({ example: 1000, required: false })
+  @IsOptional()
+  @Transform(({ value }) => value !== undefined && value !== null && value !== "" ? Number(value) : 0)
+  @IsNumber()
+  initialBalance?: number;
 
   @ApiProperty({ example: true, default: true })
   @IsOptional()

@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Put,
+  Delete,
   Body,
   Param,
   ParseIntPipe,
@@ -75,5 +76,17 @@ export class ExchangeRatesController {
     @Body() updateDto: UpdateExchangeRateDto,
   ) {
     return this.exchangeRatesService.update(userId, currencyId, updateDto);
+  }
+
+  @Delete(':currencyId')
+  @ApiOperation({ summary: 'Eliminar tasa de cambio' })
+  @ApiResponse({ status: 200, description: 'Tasa eliminada' })
+  @ApiResponse({ status: 400, description: 'No se puede eliminar la tasa porque tiene transacciones asociadas' })
+  @ApiResponse({ status: 404, description: 'Tasa no encontrada' })
+  remove(
+    @CurrentUser('id') userId: number,
+    @Param('currencyId', ParseIntPipe) currencyId: number,
+  ) {
+    return this.exchangeRatesService.remove(userId, currencyId);
   }
 }

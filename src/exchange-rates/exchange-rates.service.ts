@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { UpdateExchangeRateDto } from './dto/update-exchange-rate.dto';
 import { Decimal } from '@prisma/client/runtime/library';
@@ -154,5 +154,42 @@ export class ExchangeRatesService {
       orderBy: { effectiveDate: 'desc' },
       take: 100,
     });
+  }
+
+  async remove(userId: number, currencyId: number) {
+    const rate = await this.prisma.exchangeRate.findUnique({
+      where: { userId_currencyId: { userId, currencyId } },
+    });
+
+    if (!rate) {
+      throw new NotFoundException(`Tasa de cambio para moneda con ID ${currencyId} no encontrada`);
+    }
+
+    // Attempt to delete. Since ExchangeRate might be linked to RateHistory, 
+    // we need to remove the associated history first if they reference this rate
+    try {
+      await this.prisma.$transaction(async (tx) => {
+        // Delete the history entries that reference this exchange rate
+        await tx.rateHistory.deleteMany({
+          where: { 
+            userId,
+            referenceType: 'exchange_rate',
+            referenceId: rate.id
+          }
+        });
+
+        // Finally, delete the rate
+        await tx.exchangeRate.delete({
+          where: { userId_currencyId: { userId, currencyId } },
+        });
+      });
+      
+      return { success: true, message: 'Tasa de cambio eliminada correctamente' };
+    } catch (error) {
+      // In case there's another foreign key constraint (like Transactions depending on ExchangeRate directly)
+      // Note: If transactions depend on the currency but NOT directly on the exchange rate record, 
+      // deleting the rate is safe. We only catch Prisma FK violations here.
+      throw new BadRequestException('No se puede eliminar la tasa de cambio porque tiene transacciones o movimientos asociados');
+    }
   }
 }
