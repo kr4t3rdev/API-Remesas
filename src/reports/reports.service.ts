@@ -1,12 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
 
 @Injectable()
 export class ReportsService {
   constructor(private prisma: PrismaService) {}
 
+  private parseDate(dateStr: string, paramName: string): Date {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      throw new BadRequestException(
+        `${paramName} inválido: "${dateStr}". Usá formato YYYY-MM-DD`,
+      );
+    }
+    return date;
+  }
+
   async getDailyReport(userId: number, date?: string) {
-    const targetDate = date ? new Date(date) : new Date();
+    const targetDate = date ? this.parseDate(date, 'date') : new Date();
     const startOfDay = new Date(targetDate);
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date(targetDate);
@@ -64,8 +74,8 @@ export class ReportsService {
   }
 
   async getPeriodReport(userId: number, startDate: string, endDate: string) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    const start = this.parseDate(startDate, 'startDate');
+    const end = this.parseDate(endDate, 'endDate');
     end.setHours(23, 59, 59, 999);
 
     const transactions = await this.prisma.transaction.findMany({
@@ -103,8 +113,8 @@ export class ReportsService {
   }
 
   async getProfitReport(userId: number, startDate: string, endDate: string) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    const start = this.parseDate(startDate, 'startDate');
+    const end = this.parseDate(endDate, 'endDate');
     end.setHours(23, 59, 59, 999);
 
     const transactions = await this.prisma.transaction.findMany({
@@ -151,8 +161,8 @@ export class ReportsService {
     const where: any = { userId, currencyId };
     if (startDate || endDate) {
       where.createdAt = {};
-      if (startDate) where.createdAt.gte = new Date(startDate);
-      if (endDate) where.createdAt.lte = new Date(endDate);
+      if (startDate) where.createdAt.gte = this.parseDate(startDate, 'startDate');
+      if (endDate) where.createdAt.lte = this.parseDate(endDate, 'endDate');
     }
 
     const transactions = await this.prisma.transaction.findMany({
@@ -185,8 +195,8 @@ export class ReportsService {
     if (category) where.category = category;
     if (startDate || endDate) {
       where.date = {};
-      if (startDate) where.date.gte = new Date(startDate);
-      if (endDate) where.date.lte = new Date(endDate);
+      if (startDate) where.date.gte = this.parseDate(startDate, 'startDate');
+      if (endDate) where.date.lte = this.parseDate(endDate, 'endDate');
     }
 
     const expenses = await this.prisma.expense.findMany({
@@ -271,8 +281,8 @@ export class ReportsService {
   }
 
   async getCashFlowReport(userId: number, startDate: string, endDate: string) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    const start = this.parseDate(startDate, 'startDate');
+    const end = this.parseDate(endDate, 'endDate');
     end.setHours(23, 59, 59, 999);
 
     const transactions = await this.prisma.transaction.findMany({
@@ -316,8 +326,8 @@ export class ReportsService {
     const where: any = { userId };
     if (startDate || endDate) {
       where.createdAt = {};
-      if (startDate) where.createdAt.gte = new Date(startDate);
-      if (endDate) where.createdAt.lte = new Date(endDate);
+      if (startDate) where.createdAt.gte = this.parseDate(startDate, 'startDate');
+      if (endDate) where.createdAt.lte = this.parseDate(endDate, 'endDate');
     }
 
     const audits = await this.prisma.cashAudit.findMany({
@@ -419,5 +429,18 @@ export class ReportsService {
     }
 
     return days;
+  }
+  async getFxPerformanceReport(userId: number, startDate: string, endDate: string, currencyCode?: string) {
+    let start: Date; let end: Date;
+    try { start = this.parseDate(startDate, 'startDate'); end = this.parseDate(endDate, 'endDate'); } catch (error) { throw new BadRequestException({ code: 'REPORT_INVALID_PERIOD', message: (error as Error).message }); }
+    if (end < start) throw new BadRequestException({ code: 'REPORT_INVALID_PERIOD', message: 'endDate must be on or after startDate' });
+    end.setHours(23, 59, 59, 999);
+    const movements = await this.prisma.currencyMovement.findMany({
+      where: { userId, type: 'SALE', createdAt: { gte: start, lte: end }, ...(currencyCode ? { currency: { code: currencyCode } } : {}) },
+      include: { currency: true }, orderBy: { createdAt: 'asc' },
+    });
+    const sales = movements.map((movement: any) => ({ id: movement.id, currency: movement.currency.code, amount: Number(movement.amount), rate: Number(movement.rate), costoPromedio: Number(movement.costSnapshot ?? 0), rendimiento: Number(movement.realizedProfit ?? 0), createdAt: movement.createdAt }));
+    const positions = await this.prisma.currencyPosition.findMany({ where: { userId, ...(currencyCode ? { currency: { code: currencyCode } } : {}) }, include: { currency: true }, orderBy: { currencyId: 'asc' } });
+    return { period: { startDate, endDate }, currency: currencyCode ?? null, totalRendimiento: sales.reduce((sum: number, sale: any) => sum + sale.rendimiento, 0), movements: sales, positions: positions.map((position: any) => ({ currencyId: position.currencyId, currency: position.currency.code, saldo: Number(position.saldo), costoPromedio: position.costoPromedio == null ? null : Number(position.costoPromedio), availableForSale: position.reviewStatus === 'REVIEWED' && Number(position.saldo) > 0 })) };
   }
 }

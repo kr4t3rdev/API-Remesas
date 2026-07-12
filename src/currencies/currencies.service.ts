@@ -42,6 +42,23 @@ export class CurrenciesService {
   }
 
   async create(createCurrencyDto: CreateCurrencyDto) {
+    const existing = await this.prisma.currency.findUnique({
+      where: { code: createCurrencyDto.code },
+    });
+
+    if (existing) {
+      if (existing.isActive) {
+        throw new BadRequestException(
+          `Ya existe una moneda activa con el código '${createCurrencyDto.code}'`
+        );
+      }
+
+      return this.prisma.currency.update({
+        where: { id: existing.id },
+        data: { ...createCurrencyDto, isActive: true },
+      });
+    }
+
     return this.prisma.currency.create({
       data: createCurrencyDto,
     });

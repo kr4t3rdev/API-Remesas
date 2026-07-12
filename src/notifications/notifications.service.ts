@@ -148,4 +148,46 @@ export class NotificationsService {
       payload: { email, resetToken: resetUrl.split('token=').pop() ?? '', resetUrl },
     });
   }
+
+  async notifyAdminPasswordReset(userId: number, message: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true },
+    });
+
+    if (!user?.email) return [];
+
+    const subject = 'Cambio de contraseña por seguridad';
+    const html = `
+      <p>Hola <strong>${user.email}</strong>,</p>
+      <p>${message}</p>
+      <p>Si necesitas más ayuda, contacta al administrador.</p>
+    `;
+    const text = `Hola ${user.email},\n\n${message}\n\nSi necesitas más ayuda, contacta al administrador.`;
+
+    const notification = await this.prisma.notification.create({
+      data: {
+        userId,
+        type: 'PASSWORD_RESET',
+        channel: 'EMAIL',
+        title: subject,
+        message,
+        payload: { email: user.email, message },
+        sentAt: new Date(),
+      },
+    });
+
+    const emailResult = await this.emailService.sendEmail({
+      to: user.email,
+      subject,
+      html,
+      text,
+    });
+
+    if (!emailResult.success) {
+      this.logger.warn(`Failed to send admin password reset email: ${emailResult.error}`);
+    }
+
+    return [notification, emailResult];
+  }
 }

@@ -9,6 +9,7 @@ describe('Admin user endpoints integration-like', () => {
 
   const notificationsServiceMock = {
     notifyMixed: jest.fn().mockResolvedValue({}),
+    notifyAdminPasswordReset: jest.fn().mockResolvedValue([]),
   };
 
   const setup = () => {
@@ -23,6 +24,7 @@ describe('Admin user endpoints integration-like', () => {
         isBanned: boolean;
         blockedUntil: Date | null;
         failedLoginAttempts: number;
+        mustChangePassword?: boolean;
       }
     >([
       [
@@ -124,6 +126,27 @@ describe('Admin user endpoints integration-like', () => {
       expect.arrayContaining([
         expect.objectContaining({
           action: AdminUserControlActionType.SUSPEND_ACCOUNT,
+          actorUserId: 99,
+          targetUserId: 2,
+        }),
+      ]),
+    );
+  });
+
+  it('POST actions endpoint accepts RESET_PASSWORD with newPassword', async () => {
+    const { controller, users, audits } = setup();
+
+    await controller.applyUserControlAction(2, 99, {
+      actionType: AdminUserControlActionType.RESET_PASSWORD,
+      reason: 'Cambio por seguridad',
+      payload: { newPassword: 'ValidPass123' },
+    } as any);
+
+    expect(users.get(2)?.mustChangePassword).toBe(true);
+    expect(audits).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          action: AdminUserControlActionType.RESET_PASSWORD,
           actorUserId: 99,
           targetUserId: 2,
         }),

@@ -75,6 +75,12 @@ export class ReportsController {
     return this.reportsService.getCurrencyReport(userId, id, startDate, endDate);
   }
 
+  @Get('fx-performance')
+  @ApiOperation({ summary: 'Rendimiento de operaciones FX' })
+  getFxPerformanceReport(@CurrentUser('id') userId: number, @Query('startDate') startDate: string, @Query('endDate') endDate: string, @Query('currency') currency?: string) {
+    return this.reportsService.getFxPerformanceReport(userId, startDate, endDate, currency);
+  }
+
   @Get('expenses')
   @ApiOperation({ summary: 'Reporte de gastos' })
   @ApiQuery({ name: 'startDate', required: false })

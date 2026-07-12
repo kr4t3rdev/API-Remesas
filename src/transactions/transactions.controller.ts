@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   UseGuards,
   Query,
+  UseFilters,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -19,10 +20,12 @@ import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { QueryTransactionDto } from './dto/query-transaction.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { FxDomainExceptionFilter } from '../fx-operations/fx-domain-exception.filter';
 
 @ApiTags('Transactions')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
+@UseFilters(FxDomainExceptionFilter)
 @Controller('transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}

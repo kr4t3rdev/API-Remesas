@@ -73,6 +73,29 @@ enum NotificationChannel {
   EMAIL
 }
 
+enum CurrencyPositionReviewStatus {
+  UNREVIEWED
+  REVIEWED
+}
+
+enum CurrencyMovementType {
+  OPENING
+  PURCHASE
+  SALE
+  ADJUSTMENT
+  REMITTANCE
+}
+
+enum RemittanceStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum CashClosingStatus {
+  CLOSED
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email    String   @unique
@@ -104,6 +127,9 @@ model User {
   cashBalances       CashBalance[]
   cashAudits         CashAudit[]
   cashAdjustments    CashAdjustment[]
+  cashPolicies       CashPolicy[]
+  cashClosings       CashClosing[] @relation("CashClosingOwner")
+  cashClosingsClosed CashClosing[] @relation("CashClosingCloser")
   bankAccounts       BankAccount[]
   expenses           Expense[]
   objectives         Objective[]
@@ -114,6 +140,9 @@ model User {
   adminAuditLogs     AdminAuditLog[] @relation("AdminAuditActor")
   workers            Worker[]
   expenseItems       ExpenseItem[]
+  currencyPositions  CurrencyPosition[]
+  currencyMovements  CurrencyMovement[]
+  remittances        Remittance[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -140,12 +169,16 @@ model Currency {
   cashBalances       CashBalance[]
   cashAudits         CashAudit[]
   cashAdjustments    CashAdjustment[]
+  cashPolicies       CashPolicy[]
+  cashClosings       CashClosing[]
   bankAccounts       BankAccount[]
   expenses           Expense[]
   objectives         Objective[]
   rateHistoryFrom    RateHistory[]  @relation("RateFrom")
   rateHistoryTo      RateHistory[]  @relation("RateTo")
   primaryUsers       User[]         @relation("PrimaryCurrency")
+  positions          CurrencyPosition[]
+  movements          CurrencyMovement[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -188,6 +221,7 @@ model Transaction {
   notes         String?
   
   incomeReconciliation IncomeReconciliation?
+  fxMovements        CurrencyMovement[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -196,6 +230,71 @@ model Transaction {
   @@index([userId, currencyId, createdAt])
   @@index([userId, status])
   @@map("transactions")
+}
+
+model CurrencyPosition {
+  id              Int                         @id @default(autoincrement())
+  userId          Int
+  user            User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currencyId      Int
+  currency        Currency                    @relation(fields: [currencyId], references: [id])
+  saldo           Decimal                     @db.Decimal(15, 6) @default(0)
+  costoPromedio  Decimal?                    @db.Decimal(15, 6)
+  reviewStatus    CurrencyPositionReviewStatus @default(UNREVIEWED)
+  openingSaldo    Decimal?                    @db.Decimal(15, 6)
+  openingCost     Decimal?                    @db.Decimal(15, 6)
+  reviewedAt      DateTime?
+  createdAt       DateTime                    @default(now())
+  updatedAt       DateTime                    @updatedAt
+
+  movements       CurrencyMovement[]
+
+  @@unique([userId, currencyId])
+  @@index([userId, reviewStatus])
+  @@map("currency_positions")
+}
+
+model CurrencyMovement {
+  id                  Int                  @id @default(autoincrement())
+  userId              Int
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currencyId          Int
+  currency            Currency             @relation(fields: [currencyId], references: [id])
+  positionId          Int?
+  position            CurrencyPosition?   @relation(fields: [positionId], references: [id])
+  transactionId       Int?
+  transaction         Transaction?         @relation(fields: [transactionId], references: [id])
+  type                CurrencyMovementType
+  amount              Decimal              @db.Decimal(15, 6)
+  rate                Decimal              @db.Decimal(15, 6)
+  costSnapshot        Decimal?             @db.Decimal(15, 6)
+  realizedProfit      Decimal?             @db.Decimal(15, 6)
+  remittanceId        Int?
+  remittance          Remittance?          @relation(fields: [remittanceId], references: [id])
+  createdAt           DateTime             @default(now())
+
+  @@index([userId, currencyId, createdAt])
+  @@index([userId, type, createdAt])
+  @@map("currency_movements")
+}
+
+model Remittance {
+  id                Int              @id @default(autoincrement())
+  userId            Int
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider          String
+  sourceId          String
+  status            RemittanceStatus @default(PENDING)
+  idempotencyKey    String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  movements         CurrencyMovement[]
+
+  @@unique([provider, sourceId])
+  @@index([userId, status, createdAt])
+  @@index([idempotencyKey])
+  @@map("remittances")
 }
 
 model CashBalance {
@@ -243,6 +342,43 @@ model CashAdjustment {
   
   @@index([userId, currencyId, createdAt])
   @@map("cash_adjustments")
+}
+
+model CashPolicy {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currencyId     Int
+  currency       Currency @relation(fields: [currencyId], references: [id])
+  safetyBuffer   Decimal  @db.Decimal(15, 2) @default(0)
+  insuranceLimit Decimal  @db.Decimal(15, 2) @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([userId, currencyId])
+  @@map("cash_policies")
+}
+
+model CashClosing {
+  id             Int               @id @default(autoincrement())
+  userId         Int
+  user            User              @relation("CashClosingOwner", fields: [userId], references: [id], onDelete: Cascade)
+  currencyId     Int
+  currency       Currency           @relation(fields: [currencyId], references: [id])
+  businessDate   DateTime           @db.Date
+  expectedBalance Decimal           @db.Decimal(15, 2)
+  actualBalance  Decimal            @db.Decimal(15, 2)
+  difference     Decimal            @db.Decimal(15, 2)
+  status         CashClosingStatus  @default(CLOSED)
+  closedById     Int
+  closedBy       User              @relation("CashClosingCloser", fields: [closedById], references: [id])
+  closedAt       DateTime          @default(now())
+  notes          String?
+  createdAt      DateTime          @default(now())
+
+  @@unique([userId, currencyId, businessDate])
+  @@index([userId, businessDate])
+  @@map("cash_closings")
 }
 
 model BankAccount {

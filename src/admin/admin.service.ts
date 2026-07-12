@@ -78,6 +78,70 @@ export class AdminService {
     };
   }
 
+  /**
+   * Get admin profile statistics - simplified stats for admin dashboard
+   * Returns: totalUsers, activeUsers, blockedUsers, expiringLicenses, dailyRevenue, activeLicenses
+   */
+  async getProfileStats() {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+
+    // Total users count
+    const totalUsers = await this.prisma.user.count();
+
+    // Active users (not banned)
+    const activeUsers = await this.prisma.user.count({
+      where: { isBanned: false },
+    });
+
+    // Blocked users
+    const blockedUsers = await this.prisma.user.count({
+      where: {
+        OR: [
+          { isBanned: true },
+          { blockedUntil: { gt: now } },
+        ],
+      },
+    });
+
+    // Expiring licenses (next 7 days)
+    const expiringLicenses = await this.prisma.userLicense.count({
+      where: {
+        state: 'ACTIVE',
+        expiresAt: {
+          gte: now,
+          lt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
+        },
+      },
+    });
+
+    // Active licenses
+    const activeLicenses = await this.prisma.userLicense.count({
+      where: { state: 'ACTIVE' },
+    });
+
+    // Daily revenue (today's payments)
+    const dailyPayments = await this.prisma.subscriptionPayment.findMany({
+      where: {
+        paidAt: {
+          gte: today,
+          lt: tomorrow,
+        },
+      },
+    });
+    const dailyRevenue = dailyPayments.reduce((sum, p) => sum + Number(p.amountCup), 0);
+
+    return {
+      totalUsers,
+      activeUsers,
+      blockedUsers,
+      expiringLicenses,
+      dailyRevenue,
+      activeLicenses,
+    };
+  }
+
   getUsers() {
     return this.prisma.user.findMany({
       select: {
@@ -406,10 +470,16 @@ export class AdminService {
         return updated;
       }
 
-         case AdminUserControlActionType.FORCE_PASSWORD_RESET: {
-         const temporaryPassword = `tmp-${Math.random().toString(36).slice(-10)}A1!`;
-         const bcrypt = await import('bcrypt');
-         const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
+      case AdminUserControlActionType.FORCE_PASSWORD_RESET:
+      case AdminUserControlActionType.RESET_PASSWORD: {
+          const newPassword = dto.payload?.newPassword;
+          if (dto.actionType === AdminUserControlActionType.RESET_PASSWORD && !newPassword) {
+            throw new BadRequestException('newPassword es requerido para RESET_PASSWORD');
+          }
+
+          const passwordToUse = newPassword || `tmp-${Math.random().toString(36).slice(-10)}A1!`;
+          const bcrypt = await import('bcrypt');
+          const hashedPassword = await bcrypt.hash(passwordToUse, 10);
 
          await this.prisma.user.update({
            where: { id: userId },
@@ -421,33 +491,29 @@ export class AdminService {
            },
          });
 
-         await this.createActionAudit({
-           actorUserId,
-           targetUserId: userId,
-           action: dto.actionType,
-           reason: dto.reason,
-           metadata: { temporaryPasswordIssued: true, mustChangePassword: true },
-         });
+          await this.createActionAudit({
+            actorUserId,
+            targetUserId: userId,
+            action: dto.actionType,
+            reason: dto.reason,
+            metadata: { passwordReset: true, mustChangePassword: true },
+          });
 
-         // Envío de email con la contraseña temporal
-         const user = await this.prisma.user.findUnique({ where: { id: userId } });
-         if (user?.email) {
-           await this.notificationsService.notifyMixed({
-             userId,
-             type: 'PASSWORD_RESET',
-             title: 'Restablecimiento de Contraseña',
-             message: `Se ha restablecido su contraseña. Use esta contraseña temporal para acceder: ${temporaryPassword}. Se le solicitará cambiarla en su próximo inicio de sesión.`,
-             channels: ['EMAIL'],
-           });
-         }
+          const user = await this.prisma.user.findUnique({ where: { id: userId } });
+          if (user?.email) {
+            await this.notificationsService.notifyAdminPasswordReset(
+              userId,
+              'Su contraseña ha sido cambiada por motivos de seguridad',
+            );
+          }
 
-         return {
-           success: true,
-           userId,
-           action: dto.actionType,
-           temporaryPassword, // Solo para propósitos de testing en desarrollo
-         };
-       }
+          return {
+            success: true,
+            userId,
+            action: dto.actionType,
+            newPassword: dto.actionType === AdminUserControlActionType.RESET_PASSWORD ? passwordToUse : undefined,
+          };
+        }
 
       case AdminUserControlActionType.REVOKE_ALL_SESSIONS: {
         const revokeResult = await this.authService.revokeAllSessions(userId);

@@ -22,6 +22,9 @@ import { AdminModule } from './admin/admin.module';
 import { UploadModule } from './upload/upload.module';
 import { WorkerPaymentsModule } from './worker-payments/worker-payments.module';
 import { ExpenseItemsModule } from './expense-items/expense-items.module';
+import { FxOperationsModule } from './fx-operations/fx-operations.module';
+import { CashModule } from './cash/cash.module';
+import { RemittancesModule } from './remittances/remittances.module';
 
 @Module({
   imports: [
@@ -48,6 +51,9 @@ import { ExpenseItemsModule } from './expense-items/expense-items.module';
     UploadModule,
     WorkerPaymentsModule,
     ExpenseItemsModule,
+    FxOperationsModule,
+    CashModule,
+    RemittancesModule,
   ],
 })
 export class AppModule {}

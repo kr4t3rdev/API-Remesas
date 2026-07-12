@@ -33,6 +33,7 @@ describe('AdminService user controls', () => {
 
   const notificationsServiceMock = {
     notifyMixed: jest.fn().mockResolvedValue({}),
+    notifyAdminPasswordReset: jest.fn().mockResolvedValue({}),
   };
 
   let service: AdminService;
@@ -279,5 +280,91 @@ describe('AdminService user controls', () => {
 
     expect(prismaMock.user.create).not.toHaveBeenCalled();
     expect(prismaMock.adminAuditLog.create).not.toHaveBeenCalled();
+  });
+
+  it('treats RESET_PASSWORD as a password reset action', async () => {
+    prismaMock.user.findUnique
+      .mockResolvedValueOnce({
+        id: 21,
+        email: 'user@test.com',
+        role: 'USER',
+        isActive: true,
+        isBanned: false,
+        blockedUntil: null,
+        failedLoginAttempts: 0,
+      })
+      .mockResolvedValueOnce({
+        id: 21,
+        email: 'user@test.com',
+      });
+
+    prismaMock.user.update.mockResolvedValue({
+      id: 21,
+      email: 'user@test.com',
+      isActive: true,
+      isBanned: false,
+      blockedUntil: null,
+      failedLoginAttempts: 0,
+      mustChangePassword: true,
+    });
+
+    prismaMock.adminAuditLog.create.mockResolvedValue({ id: 1 });
+
+    const result = await service.applyUserControlAction(21, 1, {
+      actionType: 'RESET_PASSWORD' as any,
+      reason: 'Seguridad',
+      payload: { newPassword: 'ValidPass123' },
+    } as any);
+
+    expect(prismaMock.user.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 21 },
+        data: expect.objectContaining({
+          mustChangePassword: true,
+        }),
+      }),
+    );
+
+    expect(notificationsServiceMock.notifyAdminPasswordReset).toHaveBeenCalledWith(
+      21,
+      'Su contraseña ha sido cambiada por motivos de seguridad',
+    );
+
+    expect(notificationsServiceMock.notifyMixed).not.toHaveBeenCalled();
+
+    expect(prismaMock.adminAuditLog.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          action: 'RESET_PASSWORD',
+        }),
+      }),
+    );
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        success: true,
+        action: 'RESET_PASSWORD',
+      }),
+    );
+  });
+
+  it('rejects RESET_PASSWORD when newPassword is missing', async () => {
+    prismaMock.user.findUnique.mockResolvedValue({
+      id: 21,
+      email: 'user@test.com',
+      role: 'USER',
+      isActive: true,
+      isBanned: false,
+      blockedUntil: null,
+      failedLoginAttempts: 0,
+    });
+
+    await expect(
+      service.applyUserControlAction(21, 1, {
+        actionType: 'RESET_PASSWORD' as any,
+        reason: 'Seguridad',
+        payload: {},
+      } as any),
+    ).rejects.toBeInstanceOf(BadRequestException);
   });
 });

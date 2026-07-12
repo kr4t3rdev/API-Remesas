@@ -27,6 +27,12 @@ export class AdminController {
     return this.adminService.getKpis(dateFrom, dateTo, planId ? Number(planId) : undefined);
   }
 
+  @Get('profile/stats')
+  @ApiOperation({ summary: 'Estadísticas del perfil administrativo' })
+  getProfileStats() {
+    return this.adminService.getProfileStats();
+  }
+
   @Get('users')
   @ApiOperation({ summary: 'Listado operativo de usuarios' })
   getUsers() {

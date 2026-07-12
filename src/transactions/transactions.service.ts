@@ -9,7 +9,7 @@ import { PrismaService } from '../database/prisma/prisma.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { QueryTransactionDto } from './dto/query-transaction.dto';
 import { ReconciliationsService } from '../reconciliations/reconciliations.service';
-import { Decimal } from '@prisma/client/runtime/library';
+import { FxOperationsService } from '../fx-operations/fx-operations.service';
 
 @Injectable()
 export class TransactionsService {
@@ -17,91 +17,18 @@ export class TransactionsService {
     private prisma: PrismaService,
     @Inject(forwardRef(() => ReconciliationsService))
     private reconciliationsService: ReconciliationsService,
+    private fxOperationsService: FxOperationsService,
   ) {}
 
   async create(userId: number, createDto: CreateTransactionDto) {
-    const currency = await this.prisma.currency.findUnique({
-      where: { id: createDto.currencyId },
-    });
-
-    if (!currency) {
-      throw new NotFoundException('Moneda no encontrada');
+    const result = await this.fxOperationsService.createTransfer(userId, createDto);
+    if (createDto.bankAccountId) {
+      await this.reconciliationsService.reconcileIncomeWithTransaction(
+        { transactionId: result.transaction.id, bankAccountId: createDto.bankAccountId, amount: createDto.amount },
+        userId,
+      );
     }
-
-    if (!currency.isActive) {
-      throw new BadRequestException('La moneda no está activa');
-    }
-
-    const amount = new Decimal(createDto.amount);
-    const rate = new Decimal(createDto.rate);
-    const totalCup = amount.mul(rate);
-
-    const cupCurrency = await this.prisma.currency.findUnique({
-      where: { code: 'CUP' },
-    });
-
-    if (!cupCurrency) {
-      throw new NotFoundException('Moneda CUP no encontrada');
-    }
-
-    const marginProfit = new Decimal(0);
-
-    const result = await this.prisma.$transaction(async (tx) => {
-      const transaction = await tx.transaction.create({
-        data: {
-          userId,
-          type: createDto.type,
-          currencyId: createDto.currencyId,
-          amount,
-          rate,
-          totalCup,
-          marginProfit,
-          notes: createDto.notes,
-        },
-        include: { currency: true },
-      });
-
-      if (createDto.type === 'COMPRA') {
-        await tx.cashBalance.upsert({
-          where: { userId_currencyId: { userId, currencyId: createDto.currencyId } },
-          update: { balance: { increment: amount } },
-          create: { userId, currencyId: createDto.currencyId, balance: amount },
-        });
-
-        await tx.cashBalance.upsert({
-          where: { userId_currencyId: { userId, currencyId: cupCurrency.id } },
-          update: { balance: { decrement: totalCup } },
-          create: { userId, currencyId: cupCurrency.id, balance: new Decimal(0).minus(totalCup) },
-        });
-      } else {
-        await tx.cashBalance.upsert({
-          where: { userId_currencyId: { userId, currencyId: createDto.currencyId } },
-          update: { balance: { decrement: amount } },
-          create: { userId, currencyId: createDto.currencyId, balance: new Decimal(0).minus(amount) },
-        });
-
-        await tx.cashBalance.upsert({
-          where: { userId_currencyId: { userId, currencyId: cupCurrency.id } },
-          update: { balance: { increment: totalCup } },
-          create: { userId, currencyId: cupCurrency.id, balance: totalCup },
-        });
-      }
-
-      if (createDto.bankAccountId) {
-        await this.reconciliationsService.reconcileIncomeWithTransaction(
-          {
-            transactionId: transaction.id,
-            bankAccountId: createDto.bankAccountId,
-            amount: amount.toNumber(),
-          },
-          userId,
-        );
-      }
-
-      return transaction;
-    });
-
-    return result;
+    return result.transaction;
   }
 
   async findAll(userId: number, query: QueryTransactionDto) {
