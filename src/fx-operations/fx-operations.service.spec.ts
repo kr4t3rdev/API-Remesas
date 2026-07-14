@@ -7,6 +7,36 @@ import {
 import { CurrencyPositionUnavailableError, InsufficientSaldoError } from './domain/domain-errors';
 
 describe('FX operations foundation', () => {
+  it('returns the existing transfer for a repeated user-scoped idempotency key', async () => {
+    const existing = { id: 11, userId: 7, idempotencyKey: 'fx-123', fxMovements: [{ id: 12 }] };
+    const prisma = {
+      transaction: { findUnique: jest.fn().mockResolvedValue(existing) },
+      currency: { findUnique: jest.fn().mockResolvedValue({ id: 2 }) },
+      $transaction: jest.fn(),
+    } as any;
+
+    await expect(new FxOperationsService(prisma).createTransfer(7, {
+      type: 'COMPRA' as any, currencyId: 2, amount: 50, rate: 260,
+    }, 'fx-123')).resolves.toEqual({ transaction: existing, movement: existing.fxMovements[0] });
+    expect(prisma.$transaction).not.toHaveBeenCalled();
+  });
+  it('rejects reuse of a key for a different transfer intent', async () => {
+    const existing = { id: 11, userId: 7, idempotencyKey: 'fx-123', type: 'COMPRA', currencyId: 2, amount: 50, rate: 260, notes: null, fxMovements: [{ id: 12 }] };
+    const prisma = { transaction: { findUnique: jest.fn().mockResolvedValue(existing) }, currency: { findUnique: jest.fn() }, $transaction: jest.fn() } as any;
+
+    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'VENTA' as any, currencyId: 2, amount: 50, rate: 260 }, 'fx-123'))
+      .rejects.toThrow('Idempotency key was already used for a different transfer');
+  });
+  it('does not replay a different intent after a concurrent unique-key race', async () => {
+    const raced = { id: 11, userId: 7, idempotencyKey: 'fx-race', type: 'COMPRA', currencyId: 2, amount: new Decimal(50), rate: new Decimal(260), notes: null, fxMovements: [{ id: 12 }] };
+    const prisma = {
+      transaction: { findUnique: jest.fn().mockResolvedValueOnce(null).mockResolvedValueOnce(raced) },
+      currency: { findUnique: jest.fn().mockResolvedValueOnce({ id: 2 }).mockResolvedValueOnce({ id: 1, code: 'CUP' }) },
+      $transaction: jest.fn().mockRejectedValue(new (require('@prisma/client').Prisma.PrismaClientKnownRequestError)('duplicate', { code: 'P2002', clientVersion: '5.8.1' })),
+    } as any;
+    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'VENTA' as any, currencyId: 2, amount: 50, rate: 260 }, 'fx-race'))
+      .rejects.toThrow('Idempotency key was already used for a different transfer');
+  });
   it('calculates the weighted-average purchase cost', () => {
     expect(calculateWeightedAveragePurchase(new Decimal(100), new Decimal(250), new Decimal(50), new Decimal(260)).toFixed(2)).toBe('253.33');
   });

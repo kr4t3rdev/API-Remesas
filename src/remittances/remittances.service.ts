@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CurrencyMovementType, RemittanceStatus } from '@prisma/client';
+import { CurrencyMovementType, Prisma, RemittanceStatus } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { FxOperationsService } from '../fx-operations/fx-operations.service';
@@ -41,7 +41,8 @@ export class RemittancesService {
   }
 
   private async complete(userId: number, event: RemittanceEventDto) {
-    return this.prisma.$transaction(async (tx: any) => {
+    try {
+      return await this.prisma.$transaction(async (tx: any) => {
       const current = await tx.remittance.findUnique({ where: { provider_sourceId: { provider: event.provider, sourceId: event.sourceId } } });
       if (current?.status === RemittanceStatus.COMPLETED) return { ...current, duplicate: true };
       const outgoing = await tx.currencyPosition.findUnique({ where: { userId_currencyId: { userId, currencyId: event.foreignCurrencyId } } });
@@ -53,9 +54,13 @@ export class RemittancesService {
       const remittance = current ?? await tx.remittance.create({ data: { userId, provider: event.provider, sourceId: event.sourceId, status: RemittanceStatus.COMPLETED, idempotencyKey: event.idempotencyKey } });
       const foreignAmount = new Decimal(event.foreignAmount); const localAmount = new Decimal(event.localAmount); const rate = new Decimal(event.rate);
       const costSnapshot = new Decimal(outgoing.costoPromedio ?? 0); const realizedProfit = rate.sub(costSnapshot).mul(foreignAmount);
+      const debited = await tx.currencyPosition.updateMany({
+        where: { id: outgoing.id, reviewStatus: 'REVIEWED', saldo: { gte: foreignAmount } },
+        data: { saldo: { decrement: foreignAmount } },
+      });
+      if (debited.count !== 1) throw new ConflictException({ code: 'FX_INSUFFICIENT_SALDO', message: 'Insufficient saldo for remittance' });
       const saleMovement = await tx.currencyMovement.create({ data: { userId, currencyId: event.foreignCurrencyId, positionId: outgoing.id, type: CurrencyMovementType.REMITTANCE, amount: foreignAmount.neg(), rate, costSnapshot, realizedProfit, remittanceId: remittance.id } });
       const purchaseMovement = await tx.currencyMovement.create({ data: { userId, currencyId: event.localCurrencyId, positionId: incoming.id, type: CurrencyMovementType.REMITTANCE, amount: localAmount, rate, costSnapshot: rate, realizedProfit: null, remittanceId: remittance.id } });
-      await tx.currencyPosition.update({ where: { id: outgoing.id }, data: { saldo: { decrement: foreignAmount } } });
       const nextSaldo = new Decimal(incoming.saldo).add(localAmount); const currentCost = new Decimal(incoming.costoPromedio ?? 0);
       const nextCost = nextSaldo.eq(0) ? rate : new Decimal(incoming.saldo).mul(currentCost).add(localAmount.mul(rate)).div(nextSaldo);
       await tx.currencyPosition.update({ where: { id: incoming.id }, data: { saldo: nextSaldo, costoPromedio: nextCost, reviewStatus: 'REVIEWED' } });
@@ -63,7 +68,14 @@ export class RemittancesService {
       await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: event.foreignCurrencyId } }, update: { balance: { decrement: foreignAmount } }, create: { userId, currencyId: event.foreignCurrencyId, balance: foreignAmount.neg() } });
       await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: event.localCurrencyId } }, update: { balance: { increment: localAmount } }, create: { userId, currencyId: event.localCurrencyId, balance: localAmount } });
       return { ...remittance, status: RemittanceStatus.COMPLETED, movements: [saleMovement, purchaseMovement], realizedProfit };
-    });
+      }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const existing = await this.prisma.remittance.findUnique({ where: { provider_sourceId: { provider: event.provider, sourceId: event.sourceId } } });
+        if (existing?.status === RemittanceStatus.COMPLETED) return { ...existing, duplicate: true };
+      }
+      throw error;
+    }
   }
 
   async list(userId: number) { return this.prisma.remittance.findMany({ where: { userId }, include: { movements: true }, orderBy: { createdAt: 'desc' } }); }

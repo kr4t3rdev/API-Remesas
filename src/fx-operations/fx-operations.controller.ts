@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, UseFilters } from '@nestjs/common';
+import { Body, Controller, Headers, Post, UseGuards, UseFilters } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -15,7 +15,7 @@ export class FxOperationsController {
   constructor(private readonly fxOperationsService: FxOperationsService) {}
 
   @Post('transfers')
-  createTransfer(@CurrentUser('id') userId: number, @Body() dto: CreateFxTransferDto) {
-    return this.fxOperationsService.createTransfer(userId, dto);
+  createTransfer(@CurrentUser('id') userId: number, @Body() dto: CreateFxTransferDto, @Headers('Idempotency-Key') idempotencyKey?: string) {
+    return this.fxOperationsService.createTransfer(userId, dto, idempotencyKey);
   }
 }

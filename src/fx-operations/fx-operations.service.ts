@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CurrencyMovementType, Prisma, TransactionType } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { PrismaService } from '../database/prisma/prisma.service';
@@ -12,9 +12,26 @@ import { CurrencyPositionUnavailableError, InsufficientSaldoError, InvalidRateEr
 export class FxOperationsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private assertSameTransferIntent(existing: any, userId: number, dto: CreateFxTransferDto) {
+    const sameIntent = existing.userId === userId && existing.type === dto.type
+      && existing.currencyId === dto.currencyId && Number(existing.amount) === dto.amount
+      && Number(existing.rate) === dto.rate && existing.notes === (dto.notes ?? null);
+    if (!sameIntent) throw new ConflictException('Idempotency key was already used for a different transfer');
+  }
+
   static assertSaleAvailable = assertSaleAvailable;
 
-  async createTransfer(userId: number, dto: CreateFxTransferDto) {
+  async createTransfer(userId: number, dto: CreateFxTransferDto, idempotencyKey?: string) {
+    if (idempotencyKey) {
+      const existing = await this.prisma.transaction.findUnique({
+        where: { userId_idempotencyKey: { userId, idempotencyKey } },
+        include: { fxMovements: true },
+      });
+      if (existing) {
+        if (existing.type !== undefined) this.assertSameTransferIntent(existing, userId, dto);
+        return { transaction: existing, movement: existing.fxMovements[0] };
+      }
+    }
     const amount = new Decimal(dto.amount);
     const rate = new Decimal(dto.rate);
     const currency = await this.prisma.currency.findUnique({ where: { id: dto.currencyId } });
@@ -22,7 +39,8 @@ export class FxOperationsService {
 
     if (!currency || !cupCurrency) throw new NotFoundException('Currency not found');
 
-    return this.prisma.$transaction(async (tx) => {
+    try {
+      return await this.prisma.$transaction(async (tx) => {
       const currentRate = await tx.exchangeRate.findUnique({
         where: { userId_currencyId: { userId, currencyId: dto.currencyId } },
       });
@@ -73,6 +91,7 @@ export class FxOperationsService {
           totalCup: amount.mul(rate),
           marginProfit: realizedProfit ?? new Decimal(0),
           notes: dto.notes,
+          idempotencyKey,
         },
       });
 
@@ -136,6 +155,19 @@ export class FxOperationsService {
       }
 
       return { transaction, movement, position: { ...position, saldo: nextSaldo, costoPromedio: average }, realizedProfit };
-    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+      }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+    } catch (error) {
+      if (idempotencyKey && error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const existing = await this.prisma.transaction.findUnique({
+          where: { userId_idempotencyKey: { userId, idempotencyKey } },
+          include: { fxMovements: true },
+        });
+        if (existing) {
+          this.assertSameTransferIntent(existing, userId, dto);
+          return { transaction: existing, movement: existing.fxMovements[0] };
+        }
+      }
+      throw error;
+    }
   }
 }

@@ -219,6 +219,7 @@ model Transaction {
   marginProfit  Decimal              @db.Decimal(15, 2)
   status        ReconciliationStatus @default(PENDIENTE)
   notes         String?
+  idempotencyKey String?
   
   incomeReconciliation IncomeReconciliation?
   fxMovements        CurrencyMovement[]
@@ -229,6 +230,7 @@ model Transaction {
   @@index([userId, type, createdAt])
   @@index([userId, currencyId, createdAt])
   @@index([userId, status])
+  @@unique([userId, idempotencyKey])
   @@map("transactions")
 }
 
