@@ -25,10 +25,12 @@ import { ExpenseItemsModule } from './expense-items/expense-items.module';
 import { FxOperationsModule } from './fx-operations/fx-operations.module';
 import { CashModule } from './cash/cash.module';
 import { RemittancesModule } from './remittances/remittances.module';
+import { HealthModule } from './health/health.module';
+import { validateEnvironment } from './config/environment';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, validate: validateEnvironment }),
     DatabaseModule,
     AuthModule,
     CurrenciesModule,
@@ -54,6 +56,7 @@ import { RemittancesModule } from './remittances/remittances.module';
     FxOperationsModule,
     CashModule,
     RemittancesModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
