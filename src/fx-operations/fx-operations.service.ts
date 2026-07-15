@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { CurrencyMovementType, Prisma, TransactionType } from '@prisma/client';
+import { CurrencyMovementType, Prisma, TransactionType, TransferAccountType } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { CreateFxTransferDto } from './dto/create-fx-transfer.dto';
@@ -15,7 +15,11 @@ export class FxOperationsService {
   private assertSameTransferIntent(existing: any, userId: number, dto: CreateFxTransferDto) {
     const sameIntent = existing.userId === userId && existing.type === dto.type
       && existing.currencyId === dto.currencyId && Number(existing.amount) === dto.amount
-      && Number(existing.rate) === dto.rate && existing.notes === (dto.notes ?? null);
+      && Number(existing.rate) === dto.rate && existing.notes === (dto.notes ?? null)
+      && (existing.sourceType ?? TransferAccountType.CASH) === (dto.sourceType ?? TransferAccountType.CASH)
+      && (existing.sourceBankAccountId ?? null) === (dto.sourceBankAccountId ?? null)
+      && (existing.destinationType ?? TransferAccountType.CASH) === (dto.destinationType ?? TransferAccountType.CASH)
+      && (existing.destinationBankAccountId ?? null) === (dto.destinationBankAccountId ?? null);
     if (!sameIntent) throw new ConflictException('Idempotency key was already used for a different transfer');
   }
 
@@ -92,6 +96,10 @@ export class FxOperationsService {
           marginProfit: realizedProfit ?? new Decimal(0),
           notes: dto.notes,
           idempotencyKey,
+          sourceType: dto.sourceType ?? TransferAccountType.CASH,
+          sourceBankAccountId: dto.sourceBankAccountId,
+          destinationType: dto.destinationType ?? TransferAccountType.CASH,
+          destinationBankAccountId: dto.destinationBankAccountId,
         },
       });
 
@@ -130,7 +138,44 @@ export class FxOperationsService {
         });
       }
 
-      if (dto.type === TransactionType.COMPRA) {
+      const sourceType = dto.sourceType ?? TransferAccountType.CASH;
+      const destinationType = dto.destinationType ?? TransferAccountType.CASH;
+      const sourceBankAccountId = dto.sourceBankAccountId;
+      const destinationBankAccountId = dto.destinationBankAccountId;
+      const sourceCurrencyId = dto.type === TransactionType.COMPRA ? cupCurrency.id : dto.currencyId;
+      const destinationCurrencyId = dto.type === TransactionType.COMPRA ? dto.currencyId : cupCurrency.id;
+      const sourceAmount = dto.type === TransactionType.COMPRA ? amount.mul(rate) : amount;
+      const destinationAmount = dto.type === TransactionType.COMPRA ? amount : amount.mul(rate);
+
+      const adjustBankAccount = async (accountId: number | undefined, currencyId: number, delta: Decimal, requireFunds: boolean) => {
+        if (!accountId) throw new NotFoundException('Bank account is required for BANK_ACCOUNT transfers');
+        const account = await tx.bankAccount.findFirst({ where: { id: accountId, userId, isActive: true } });
+        if (!account || account.currencyId !== currencyId) throw new NotFoundException('Bank account not found or currency mismatch');
+        const result = await tx.bankAccount.updateMany({
+          where: { id: accountId, userId, ...(requireFunds ? { balance: { gte: sourceAmount } } : {}) },
+          data: { balance: { increment: delta } },
+        });
+        if (result.count !== 1) throw new InsufficientSaldoError();
+      };
+
+      if (sourceType === TransferAccountType.BANK_ACCOUNT) {
+        await adjustBankAccount(sourceBankAccountId, sourceCurrencyId, sourceAmount.neg(), true);
+      } else if (destinationType === TransferAccountType.BANK_ACCOUNT) {
+        // Cash source is kept in the legacy cash ledger below; bank destination is applied here.
+      }
+      if (destinationType === TransferAccountType.BANK_ACCOUNT) {
+        await adjustBankAccount(destinationBankAccountId, destinationCurrencyId, destinationAmount, false);
+      }
+
+      if (sourceType === TransferAccountType.BANK_ACCOUNT || destinationType === TransferAccountType.BANK_ACCOUNT) {
+        // For bank-backed legs, only apply the remaining cash leg. Bank legs were updated above.
+        if (sourceType === TransferAccountType.CASH) {
+          await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: sourceCurrencyId } }, update: { balance: { decrement: sourceAmount } }, create: { userId, currencyId: sourceCurrencyId, balance: sourceAmount.neg() } });
+        }
+        if (destinationType === TransferAccountType.CASH) {
+          await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: destinationCurrencyId } }, update: { balance: { increment: destinationAmount } }, create: { userId, currencyId: destinationCurrencyId, balance: destinationAmount } });
+        }
+      } else if (dto.type === TransactionType.COMPRA) {
         await tx.cashBalance.upsert({
           where: { userId_currencyId: { userId, currencyId: dto.currencyId } },
           update: { balance: { increment: amount } },

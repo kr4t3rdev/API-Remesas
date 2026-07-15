@@ -129,4 +129,39 @@ describe('FX operations foundation', () => {
     })).rejects.toThrow('legacy write failed');
     expect(transaction).toHaveBeenCalledTimes(1);
   });
+
+  it('routes purchase legs through selected bank accounts', async () => {
+    const bankUpdates: any[] = [];
+    const prisma = {
+      currency: { findUnique: jest.fn()
+        .mockResolvedValueOnce({ id: 2, isActive: true })
+        .mockResolvedValueOnce({ id: 1, code: 'CUP', isActive: true }) },
+      $transaction: jest.fn(async (callback: any) => callback({
+        exchangeRate: { findUnique: jest.fn().mockResolvedValue({ referenceRate: new Decimal(260), buyMargin: new Decimal(0), sellMargin: new Decimal(0) }) },
+        currencyPosition: {
+          findUnique: jest.fn().mockResolvedValue({ id: 9, saldo: new Decimal(0), costoPromedio: new Decimal(0), reviewStatus: 'UNREVIEWED', reviewedAt: null }),
+          update: jest.fn().mockResolvedValue({}),
+        },
+        transaction: { create: jest.fn().mockResolvedValue({ id: 11 }) },
+        currencyMovement: { create: jest.fn().mockResolvedValue({ id: 12 }) },
+        bankAccount: {
+          findFirst: jest.fn()
+            .mockResolvedValueOnce({ id: 3, userId: 7, currencyId: 1, isActive: true, balance: new Decimal(10000) })
+            .mockResolvedValueOnce({ id: 4, userId: 7, currencyId: 2, isActive: true, balance: new Decimal(0) }),
+          updateMany: jest.fn(async (args: any) => { bankUpdates.push(args); return { count: 1 }; }),
+        },
+        cashBalance: { upsert: jest.fn() },
+      })),
+    } as any;
+
+    await new FxOperationsService(prisma).createTransfer(7, {
+      type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 260,
+      sourceType: 'BANK_ACCOUNT' as any, sourceBankAccountId: 3,
+      destinationType: 'BANK_ACCOUNT' as any, destinationBankAccountId: 4,
+    });
+
+    expect(bankUpdates).toHaveLength(2);
+    expect(bankUpdates[0].data.balance.increment.toString()).toBe('-2600');
+    expect(bankUpdates[1].data.balance.increment.toString()).toBe('10');
+  });
 });

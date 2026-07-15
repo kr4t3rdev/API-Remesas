@@ -96,6 +96,11 @@ enum CashClosingStatus {
   CLOSED
 }
 
+enum TransferAccountType {
+  CASH
+  BANK_ACCOUNT
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email    String   @unique
@@ -220,6 +225,12 @@ model Transaction {
   status        ReconciliationStatus @default(PENDIENTE)
   notes         String?
   idempotencyKey String?
+  sourceType TransferAccountType @default(CASH)
+  sourceBankAccountId Int?
+  sourceBankAccount BankAccount? @relation("TransferSource", fields: [sourceBankAccountId], references: [id])
+  destinationType TransferAccountType @default(CASH)
+  destinationBankAccountId Int?
+  destinationBankAccount BankAccount? @relation("TransferDestination", fields: [destinationBankAccountId], references: [id])
   
   incomeReconciliation IncomeReconciliation?
   fxMovements        CurrencyMovement[]
@@ -398,6 +409,8 @@ model BankAccount {
   expenseReconciliations  ExpenseReconciliation[]
   incomeReconciliations   IncomeReconciliation[]
   objectives              Objective[]
+  transferSources         Transaction[] @relation("TransferSource")
+  transferDestinations    Transaction[] @relation("TransferDestination")
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
