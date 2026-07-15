@@ -164,4 +164,19 @@ describe('FX operations foundation', () => {
     expect(bankUpdates[0].data.balance.increment.toString()).toBe('-2600');
     expect(bankUpdates[1].data.balance.increment.toString()).toBe('10');
   });
+
+  it('rejects a cash source when the atomic balance guard finds insufficient funds', async () => {
+    const prisma = {
+      currency: { findUnique: jest.fn()
+        .mockResolvedValueOnce({ id: 2, isActive: true })
+        .mockResolvedValueOnce({ id: 1, code: 'CUP', isActive: true }) },
+      $transaction: jest.fn(async (callback: any) => callback({
+        exchangeRate: { findUnique: jest.fn().mockResolvedValue({ referenceRate: new Decimal(260), buyMargin: new Decimal(0), sellMargin: new Decimal(0) }) },
+        currencyPosition: { findUnique: jest.fn().mockResolvedValue({ id: 9, saldo: new Decimal(0), costoPromedio: new Decimal(0), reviewStatus: 'UNREVIEWED', reviewedAt: null }), update: jest.fn() },
+        transaction: { create: jest.fn().mockResolvedValue({ id: 11 }) }, currencyMovement: { create: jest.fn().mockResolvedValue({ id: 12 }) },
+        cashBalance: { updateMany: jest.fn().mockResolvedValue({ count: 0 }), upsert: jest.fn() },
+      })),
+    } as any;
+    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 260 })).rejects.toThrow(InsufficientSaldoError);
+  });
 });

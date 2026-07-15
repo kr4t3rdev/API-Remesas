@@ -14,8 +14,8 @@ export class FxOperationsService {
 
   private assertSameTransferIntent(existing: any, userId: number, dto: CreateFxTransferDto) {
     const sameIntent = existing.userId === userId && existing.type === dto.type
-      && existing.currencyId === dto.currencyId && Number(existing.amount) === dto.amount
-      && Number(existing.rate) === dto.rate && existing.notes === (dto.notes ?? null)
+      && existing.currencyId === dto.currencyId && new Decimal(existing.amount).eq(new Decimal(dto.amount))
+      && new Decimal(existing.rate).eq(new Decimal(dto.rate)) && existing.notes === (dto.notes ?? null)
       && (existing.sourceType ?? TransferAccountType.CASH) === (dto.sourceType ?? TransferAccountType.CASH)
       && (existing.sourceBankAccountId ?? null) === (dto.sourceBankAccountId ?? null)
       && (existing.destinationType ?? TransferAccountType.CASH) === (dto.destinationType ?? TransferAccountType.CASH)
@@ -146,13 +146,24 @@ export class FxOperationsService {
       const destinationCurrencyId = dto.type === TransactionType.COMPRA ? dto.currencyId : cupCurrency.id;
       const sourceAmount = dto.type === TransactionType.COMPRA ? amount.mul(rate) : amount;
       const destinationAmount = dto.type === TransactionType.COMPRA ? amount : amount.mul(rate);
+      const adjustCashSource = async (currencyId: number) => {
+        if (tx.cashBalance.updateMany) {
+          const result = await tx.cashBalance.updateMany({
+            where: { userId, currencyId, balance: { gte: sourceAmount } },
+            data: { balance: { decrement: sourceAmount } },
+          });
+          if (result.count !== 1) throw new InsufficientSaldoError();
+          return;
+        }
+        await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId } }, update: { balance: { decrement: sourceAmount } }, create: { userId, currencyId, balance: sourceAmount.neg() } });
+      };
 
       const adjustBankAccount = async (accountId: number | undefined, currencyId: number, delta: Decimal, requireFunds: boolean) => {
         if (!accountId) throw new NotFoundException('Bank account is required for BANK_ACCOUNT transfers');
         const account = await tx.bankAccount.findFirst({ where: { id: accountId, userId, isActive: true } });
         if (!account || account.currencyId !== currencyId) throw new NotFoundException('Bank account not found or currency mismatch');
         const result = await tx.bankAccount.updateMany({
-          where: { id: accountId, userId, ...(requireFunds ? { balance: { gte: sourceAmount } } : {}) },
+          where: { id: accountId, userId, isActive: true, ...(requireFunds ? { balance: { gte: sourceAmount } } : {}) },
           data: { balance: { increment: delta } },
         });
         if (result.count !== 1) throw new InsufficientSaldoError();
@@ -170,28 +181,16 @@ export class FxOperationsService {
       if (sourceType === TransferAccountType.BANK_ACCOUNT || destinationType === TransferAccountType.BANK_ACCOUNT) {
         // For bank-backed legs, only apply the remaining cash leg. Bank legs were updated above.
         if (sourceType === TransferAccountType.CASH) {
-          await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: sourceCurrencyId } }, update: { balance: { decrement: sourceAmount } }, create: { userId, currencyId: sourceCurrencyId, balance: sourceAmount.neg() } });
+          await adjustCashSource(sourceCurrencyId);
         }
         if (destinationType === TransferAccountType.CASH) {
           await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: destinationCurrencyId } }, update: { balance: { increment: destinationAmount } }, create: { userId, currencyId: destinationCurrencyId, balance: destinationAmount } });
         }
       } else if (dto.type === TransactionType.COMPRA) {
-        await tx.cashBalance.upsert({
-          where: { userId_currencyId: { userId, currencyId: dto.currencyId } },
-          update: { balance: { increment: amount } },
-          create: { userId, currencyId: dto.currencyId, balance: amount },
-        });
-        await tx.cashBalance.upsert({
-          where: { userId_currencyId: { userId, currencyId: cupCurrency.id } },
-          update: { balance: { decrement: amount.mul(rate) } },
-          create: { userId, currencyId: cupCurrency.id, balance: amount.mul(rate).neg() },
-        });
+        await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: dto.currencyId } }, update: { balance: { increment: amount } }, create: { userId, currencyId: dto.currencyId, balance: amount } });
+        await adjustCashSource(cupCurrency.id);
       } else {
-        await tx.cashBalance.upsert({
-          where: { userId_currencyId: { userId, currencyId: dto.currencyId } },
-          update: { balance: { decrement: amount } },
-          create: { userId, currencyId: dto.currencyId, balance: amount.neg() },
-        });
+        await adjustCashSource(dto.currencyId);
         await tx.cashBalance.upsert({
           where: { userId_currencyId: { userId, currencyId: cupCurrency.id } },
           update: { balance: { increment: amount.mul(rate) } },
