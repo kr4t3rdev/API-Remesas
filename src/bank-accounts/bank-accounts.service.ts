@@ -104,7 +104,9 @@ export class BankAccountsService {
         type: transfer.type,
         direction: isSource ? 'OUT' as const : 'IN' as const,
         amount,
-        currency: isSource && transfer.type === 'COMPRA' ? { code: 'CUP', id: null } : transfer.currency,
+        currency: (isSource && transfer.type === 'COMPRA') || (!isSource && transfer.type === 'VENTA')
+          ? { code: 'CUP', id: null }
+          : transfer.currency,
         rate: Number(transfer.rate),
         sourceType: transfer.sourceType,
         destinationType: transfer.destinationType,

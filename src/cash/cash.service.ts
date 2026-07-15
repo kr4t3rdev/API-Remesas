@@ -21,7 +21,10 @@ export class CashService {
       this.prisma.user.findUnique({ where: { id: userId }, include: { primaryCurrency: true } }),
       this.prisma.cashBalance.findMany({ where: { userId }, include: { currency: true }, orderBy: { currency: { code: 'asc' } } }),
       this.prisma.currency.findMany({ where: { isActive: true }, orderBy: { code: 'asc' } }),
-      this.prisma.transaction.findMany({ where: { userId }, include: { currency: true }, orderBy: { createdAt: 'desc' }, take: 20 }),
+      this.prisma.transaction.findMany({
+        where: { userId, OR: [{ sourceType: 'CASH' }, { destinationType: 'CASH' }] },
+        include: { currency: true }, orderBy: { createdAt: 'desc' }, take: 20,
+      }),
       this.prisma.cashAdjustment.findMany({ where: { userId }, include: { currency: true }, orderBy: { createdAt: 'desc' }, take: 20 }),
       this.prisma.cashAudit.findMany({
         where: { userId },
@@ -36,7 +39,7 @@ export class CashService {
         id: `transaction:${transaction.id}`,
         kind: 'TRANSACTION' as const,
         type: transaction.type,
-        direction: transaction.type === 'VENTA' ? ('IN' as const) : ('OUT' as const),
+        direction: transaction.sourceType === 'CASH' ? ('OUT' as const) : ('IN' as const),
         title: transaction.type === 'VENTA' ? 'Venta de moneda' : 'Compra de moneda',
         description: `${toNumber(transaction.amount)} ${transaction.currency.code}`,
         amount: toNumber(transaction.amount),

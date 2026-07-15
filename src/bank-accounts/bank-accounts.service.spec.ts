@@ -22,4 +22,14 @@ describe('BankAccountsService transfer history', () => {
     }}));
     expect(result.transfers).toEqual([expect.objectContaining({ id: 'transfer:10', direction: 'IN', amount: 10, currency: expect.objectContaining({ code: 'USD' }) })]);
   });
+
+  it('uses CUP for a VENTA destination leg', async () => {
+    const prisma = {
+      bankAccount: { findFirst: jest.fn().mockResolvedValue({ id: 4, userId: 7, currency: { id: 1, code: 'CUP' } }) },
+      expenseReconciliation: { findMany: jest.fn().mockResolvedValue([]) }, incomeReconciliation: { findMany: jest.fn().mockResolvedValue([]) },
+      transaction: { findMany: jest.fn().mockResolvedValue([{ id: 11, type: 'VENTA', amount: { toString: () => '10' }, totalCup: { toString: () => '2400' }, rate: { toString: () => '240' }, currency: { id: 2, code: 'USD' }, sourceBankAccountId: null, destinationBankAccountId: 4, sourceType: 'CASH', destinationType: 'BANK_ACCOUNT', createdAt: new Date() }]) },
+    };
+    const result = await new BankAccountsService(prisma as unknown as PrismaService).getTransactions(7, 4);
+    expect(result.transfers[0]).toEqual(expect.objectContaining({ direction: 'IN', amount: 2400, currency: { code: 'CUP', id: null } }));
+  });
 });
