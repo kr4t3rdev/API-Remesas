@@ -87,9 +87,37 @@ export class BankAccountsService {
       orderBy: { createdAt: 'desc' },
     });
 
+    const transfers = await this.prisma.transaction.findMany({
+      where: { userId, OR: [{ sourceBankAccountId: id }, { destinationBankAccountId: id }] },
+      include: { currency: true, sourceBankAccount: true, destinationBankAccount: true },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const serializedTransfers = transfers.map((transfer) => {
+      const isSource = transfer.sourceBankAccountId === id;
+      const amount = transfer.type === 'COMPRA'
+        ? (isSource ? Number(transfer.totalCup) : Number(transfer.amount))
+        : (isSource ? Number(transfer.amount) : Number(transfer.totalCup));
+      return {
+        id: `transfer:${transfer.id}`,
+        transactionId: transfer.id,
+        type: transfer.type,
+        direction: isSource ? 'OUT' as const : 'IN' as const,
+        amount,
+        currency: isSource && transfer.type === 'COMPRA' ? { code: 'CUP', id: null } : transfer.currency,
+        rate: Number(transfer.rate),
+        sourceType: transfer.sourceType,
+        destinationType: transfer.destinationType,
+        sourceBankAccountId: transfer.sourceBankAccountId,
+        destinationBankAccountId: transfer.destinationBankAccountId,
+        createdAt: transfer.createdAt,
+      };
+    });
+
     return {
       expenses: expenseReconciliations,
       incomes: incomeReconciliations,
+      transfers: serializedTransfers,
     };
   }
 }

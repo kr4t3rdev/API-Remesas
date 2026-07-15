@@ -67,6 +67,7 @@ describe('CashService', () => {
           },
         ]),
       },
+      bankAccount: { findMany: jest.fn().mockResolvedValue([]) },
     };
 
     const service = new CashService(prisma as unknown as PrismaService);
@@ -97,6 +98,27 @@ describe('CashService', () => {
         auditorName: undefined,
       }),
     );
+  });
+
+  it('includes FX transfers in the cash history with only the cash leg', async () => {
+    const prisma = {
+      user: { findUnique: jest.fn().mockResolvedValue({ primaryCurrency: null }) },
+      currency: { findMany: jest.fn().mockResolvedValue([]) },
+      cashBalance: { findMany: jest.fn().mockResolvedValue([]) },
+      transaction: { findMany: jest.fn().mockResolvedValue([{
+        id: 21, userId: 7, type: 'COMPRA', amount: { toString: () => '10' }, totalCup: { toString: () => '2400' }, rate: { toString: () => '240' },
+        currency: { id: 2, code: 'USD' }, sourceType: 'CASH', destinationType: 'BANK_ACCOUNT', destinationBankAccountId: 4,
+        createdAt: new Date('2026-07-12T12:00:00.000Z'),
+      }]) },
+      cashAdjustment: { findMany: jest.fn().mockResolvedValue([]) },
+      cashAudit: { findMany: jest.fn().mockResolvedValue([]) },
+    };
+
+    const result = await new CashService(prisma as unknown as PrismaService).getOverview(7);
+    expect(result.recentMovements).toEqual([expect.objectContaining({
+      id: 'transaction:21', kind: 'TRANSACTION', direction: 'OUT', amount: 10, cashAmount: 2400,
+      sourceType: 'CASH', destinationType: 'BANK_ACCOUNT', destinationBankAccountId: 4,
+    })]);
   });
 
   it('updates a non-negative policy for an active currency', async () => {

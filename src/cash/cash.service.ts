@@ -40,7 +40,16 @@ export class CashService {
         title: transaction.type === 'VENTA' ? 'Venta de moneda' : 'Compra de moneda',
         description: `${toNumber(transaction.amount)} ${transaction.currency.code}`,
         amount: toNumber(transaction.amount),
+        cashAmount: transaction.sourceType === 'CASH' && transaction.type === 'COMPRA'
+          ? toNumber(transaction.totalCup)
+          : transaction.destinationType === 'CASH' && transaction.type === 'VENTA'
+            ? toNumber(transaction.totalCup)
+            : toNumber(transaction.amount),
         totalBase: toNumber(transaction.totalCup),
+        sourceType: transaction.sourceType,
+        destinationType: transaction.destinationType,
+        sourceBankAccountId: transaction.sourceBankAccountId,
+        destinationBankAccountId: transaction.destinationBankAccountId,
         currency: transaction.currency,
         createdAt: transaction.createdAt,
       })),
