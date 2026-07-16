@@ -1,15 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../database/prisma/prisma.service';
-import { CreateObjectiveDto } from './dto/create-objective.dto';
-import { UpdateObjectiveDto } from './dto/update-objective.dto';
-import { UpdateStatusDto } from './dto/update-status.dto';
-import { Decimal } from '@prisma/client/runtime/library';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../database/prisma/prisma.service";
+import { CreateObjectiveDto } from "./dto/create-objective.dto";
+import { UpdateObjectiveDto } from "./dto/update-objective.dto";
+import { UpdateStatusDto } from "./dto/update-status.dto";
+import { Decimal } from "@prisma/client/runtime/library";
 
 @Injectable()
 export class ObjectivesService {
   constructor(private prisma: PrismaService) {}
 
   async create(createDto: CreateObjectiveDto, userId: number) {
+    await this.assertBankAccountOwnership(createDto.bankAccountId, userId);
+
     return this.prisma.objective.create({
       data: {
         name: createDto.name,
@@ -19,7 +21,7 @@ export class ObjectivesService {
         bankAccountId: createDto.bankAccountId,
         userId,
       },
-      include: { currency: true, bankAccount: true },
+      include: this.tenantSafeInclude(userId),
     });
   }
 
@@ -29,19 +31,19 @@ export class ObjectivesService {
 
     return this.prisma.objective.findMany({
       where,
-      include: { currency: true, bankAccount: true },
-      orderBy: { createdAt: 'desc' },
+      include: this.tenantSafeInclude(userId),
+      orderBy: { createdAt: "desc" },
     });
   }
 
   async findOne(id: number, userId: number) {
     const objective = await this.prisma.objective.findFirst({
       where: { id, userId },
-      include: { currency: true, bankAccount: true },
+      include: this.tenantSafeInclude(userId),
     });
 
     if (!objective) {
-      throw new NotFoundException('Objetivo no encontrado');
+      throw new NotFoundException("Objetivo no encontrado");
     }
 
     return objective;
@@ -49,6 +51,7 @@ export class ObjectivesService {
 
   async update(id: number, updateDto: UpdateObjectiveDto, userId: number) {
     await this.findOne(id, userId);
+    await this.assertBankAccountOwnership(updateDto.bankAccountId, userId);
 
     const data: any = { ...updateDto };
     if (updateDto.targetAmount) {
@@ -56,25 +59,29 @@ export class ObjectivesService {
     }
 
     return this.prisma.objective.update({
-      where: { id },
+      where: { id, userId },
       data,
-      include: { currency: true, bankAccount: true },
+      include: this.tenantSafeInclude(userId),
     });
   }
 
-  async updateStatus(id: number, updateStatusDto: UpdateStatusDto, userId: number) {
+  async updateStatus(
+    id: number,
+    updateStatusDto: UpdateStatusDto,
+    userId: number,
+  ) {
     await this.findOne(id, userId);
 
     const data: any = { status: updateStatusDto.status };
 
-    if (updateStatusDto.status === 'COMPLETADO') {
+    if (updateStatusDto.status === "COMPLETADO") {
       data.completedAt = new Date();
     }
 
     return this.prisma.objective.update({
-      where: { id },
+      where: { id, userId },
       data,
-      include: { currency: true, bankAccount: true },
+      include: this.tenantSafeInclude(userId),
     });
   }
 
@@ -82,17 +89,21 @@ export class ObjectivesService {
     const objective = await this.findOne(id, userId);
 
     const newAmount = Number(objective.currentAmount) + amount;
-    const status = newAmount >= Number(objective.targetAmount) ? 'COMPLETADO' : objective.status;
-    const completedAt = status === 'COMPLETADO' ? new Date() : objective.completedAt;
+    const status =
+      newAmount >= Number(objective.targetAmount)
+        ? "COMPLETADO"
+        : objective.status;
+    const completedAt =
+      status === "COMPLETADO" ? new Date() : objective.completedAt;
 
     return this.prisma.objective.update({
-      where: { id },
+      where: { id, userId },
       data: {
         currentAmount: new Decimal(newAmount),
         status: status as any,
         completedAt,
       },
-      include: { currency: true, bankAccount: true },
+      include: this.tenantSafeInclude(userId),
     });
   }
 
@@ -101,7 +112,8 @@ export class ObjectivesService {
 
     const targetAmount = Number(objective.targetAmount);
     const currentAmount = Number(objective.currentAmount);
-    const percentage = targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0;
+    const percentage =
+      targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0;
 
     return {
       ...objective,
@@ -116,7 +128,30 @@ export class ObjectivesService {
     await this.findOne(id, userId);
 
     return this.prisma.objective.delete({
-      where: { id },
+      where: { id, userId },
     });
+  }
+
+  private async assertBankAccountOwnership(
+    bankAccountId: number | null | undefined,
+    userId: number,
+  ) {
+    if (bankAccountId == null) return;
+
+    const bankAccount = await this.prisma.bankAccount.findFirst({
+      where: { id: bankAccountId, userId },
+      select: { id: true },
+    });
+
+    if (!bankAccount) {
+      throw new NotFoundException("Cuenta bancaria no encontrada");
+    }
+  }
+
+  private tenantSafeInclude(userId: number) {
+    return {
+      currency: true,
+      bankAccount: { where: { userId } },
+    };
   }
 }
