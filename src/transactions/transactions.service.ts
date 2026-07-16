@@ -23,6 +23,7 @@ export class TransactionsService {
     const where: any = { userId };
 
     if (query.type) where.type = query.type;
+    if (query.operationKind) where.operationKind = query.operationKind;
     if (query.currencyId) where.currencyId = query.currencyId;
     if (query.startDate || query.endDate) {
       where.createdAt = {};

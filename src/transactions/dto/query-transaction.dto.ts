@@ -1,12 +1,17 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsEnum, IsInt, IsDateString } from 'class-validator';
-import { TransactionType } from '@prisma/client';
+import { FxOperationKind, TransactionType } from '@prisma/client';
 
 export class QueryTransactionDto {
   @ApiPropertyOptional({ enum: TransactionType })
   @IsOptional()
   @IsEnum(TransactionType)
   type?: TransactionType;
+
+  @ApiPropertyOptional({ enum: FxOperationKind })
+  @IsOptional()
+  @IsEnum(FxOperationKind)
+  operationKind?: FxOperationKind;
 
   @ApiPropertyOptional()
   @IsOptional()

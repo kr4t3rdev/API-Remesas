@@ -1,15 +1,22 @@
-import { NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { FxOperationsService } from '../fx-operations/fx-operations.service';
 import { TransactionsService } from './transactions.service';
 
 const USER_A = 101;
-const rows = [{ id: 201, userId: USER_A, currencyId: 3 }, { id: 202, userId: 102, currencyId: 3 }];
+const rows = [
+  { id: 201, userId: USER_A, currencyId: 3, type: 'COMPRA', operationKind: 'TRANSFER' },
+  { id: 203, userId: USER_A, currencyId: 3, type: 'COMPRA', operationKind: 'REMITTANCE' },
+  { id: 202, userId: 102, currencyId: 3, type: 'COMPRA', operationKind: 'REMITTANCE' },
+];
 
 describe('TransactionsService tenant isolation', () => {
   const setup = () => {
     const transaction = {
-      findMany: jest.fn(({ where }: any) => Promise.resolve(rows.filter((row) => row.userId === where.userId && (!where.currencyId || row.currencyId === where.currencyId)))),
+      findMany: jest.fn(({ where }: any) => Promise.resolve(rows.filter((row) =>
+        row.userId === where.userId
+        && (!where.currencyId || row.currencyId === where.currencyId)
+        && (!where.type || row.type === where.type)
+        && (!where.operationKind || row.operationKind === where.operationKind)))),
       findFirst: jest.fn(({ where }: any) => Promise.resolve(rows.find((row) => row.id === where.id && row.userId === where.userId) ?? null)),
     };
     const fx = { createTransfer: jest.fn().mockResolvedValue({ transaction: rows[0] }) };
@@ -25,8 +32,26 @@ describe('TransactionsService tenant isolation', () => {
 
   it('lists only owner A using an exact tenant filter', async () => {
     const { service, transaction } = setup();
-    await expect(service.findAll(USER_A, { currencyId: 3 })).resolves.toEqual([rows[0]]);
+    await expect(service.findAll(USER_A, { currencyId: 3 })).resolves.toEqual([rows[0], rows[1]]);
     expect(transaction.findMany).toHaveBeenCalledWith({ where: { userId: USER_A, currencyId: 3 }, include: { currency: true }, orderBy: { createdAt: 'desc' } });
+  });
+
+  it('combines operation kind and transaction type within the authenticated tenant', async () => {
+    const { service, transaction } = setup();
+
+    await expect(service.findAll(USER_A, {
+      type: TransactionType.COMPRA,
+      operationKind: FxOperationKind.REMITTANCE,
+    })).resolves.toEqual([rows[1]]);
+    expect(transaction.findMany).toHaveBeenCalledWith({
+      where: {
+        userId: USER_A,
+        type: 'COMPRA',
+        operationKind: 'REMITTANCE',
+      },
+      include: { currency: true },
+      orderBy: { createdAt: 'desc' },
+    });
   });
 
   it('returns owner A and hides user B with a 404', async () => {
@@ -37,3 +62,4 @@ describe('TransactionsService tenant isolation', () => {
     expect(transaction.findFirst).toHaveBeenNthCalledWith(2, { where: { id: 202, userId: USER_A }, include: { currency: true } });
   });
 });
+import { FxOperationKind, TransactionType } from '@prisma/client';
