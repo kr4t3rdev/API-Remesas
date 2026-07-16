@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
-import { TransactionType, TransferAccountType } from '@prisma/client';
+import { IsBoolean, IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { FxOperationKind, TransactionType, TransferAccountType } from '@prisma/client';
 
 export class CreateFxTransferDto {
   @ApiProperty({ enum: TransactionType })
@@ -20,6 +20,16 @@ export class CreateFxTransferDto {
   @IsNumber()
   @Min(0.000001)
   rate: number;
+
+  @ApiPropertyOptional({ enum: FxOperationKind, default: FxOperationKind.TRANSFER })
+  @IsOptional()
+  @IsEnum(FxOperationKind)
+  operationKind?: FxOperationKind;
+
+  @ApiPropertyOptional({ default: false, description: 'Persist this effective rate as the active rate for this transaction side' })
+  @IsOptional()
+  @IsBoolean()
+  persistRate?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()

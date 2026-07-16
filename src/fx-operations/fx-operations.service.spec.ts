@@ -4,9 +4,19 @@ import {
   calculateWeightedAveragePurchase,
   calculateSaleSnapshot,
 } from './domain/position-calculator';
-import { CurrencyPositionUnavailableError, InsufficientSaldoError } from './domain/domain-errors';
+import { CurrencyPositionUnavailableError, InsufficientSaldoError, InvalidRateError } from './domain/domain-errors';
+import { calculatePersistedMargin } from './fx-operations.service';
 
 describe('FX operations foundation', () => {
+  it('derives the selected side margin while preserving the reference rate', () => {
+    expect(calculatePersistedMargin('COMPRA' as any, new Decimal(250), new Decimal(200)).toString()).toBe('0.2');
+    expect(calculatePersistedMargin('VENTA' as any, new Decimal(250), new Decimal(300)).toString()).toBe('0.2');
+  });
+
+  it('rejects an active rate whose derived margin cannot be stored', () => {
+    expect(() => calculatePersistedMargin('COMPRA' as any, new Decimal(100), new Decimal(1100))).toThrow(InvalidRateError);
+  });
+
   it('returns the existing transfer for a repeated user-scoped idempotency key', async () => {
     const existing = { id: 11, userId: 7, idempotencyKey: 'fx-123', fxMovements: [{ id: 12 }] };
     const prisma = {
@@ -26,6 +36,49 @@ describe('FX operations foundation', () => {
 
     await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'VENTA' as any, currencyId: 2, amount: 50, rate: 260 }, 'fx-123'))
       .rejects.toThrow('Idempotency key was already used for a different transfer');
+  });
+  it('includes operation kind and rate persistence in idempotency intent', async () => {
+    const existing = { id: 11, userId: 7, type: 'COMPRA', currencyId: 2, amount: 50, rate: 260, notes: null, operationKind: 'TRANSFER', persistRate: false, sourceType: 'CASH', destinationType: 'CASH', fxMovements: [] };
+    const prisma = { transaction: { findUnique: jest.fn().mockResolvedValue(existing) } } as any;
+
+    await expect(new FxOperationsService(prisma).createTransfer(7, {
+      type: 'COMPRA' as any, currencyId: 2, amount: 50, rate: 260,
+      operationKind: 'REMITTANCE' as any, persistRate: false,
+    }, 'fx-kind')).rejects.toThrow('Idempotency key was already used for a different transfer');
+  });
+  it('classifies a manual remittance and persists only the selected active-rate side atomically', async () => {
+    const createTransaction = jest.fn().mockImplementation(({ data }) => ({ id: 11, ...data }));
+    const updateRate = jest.fn().mockResolvedValue({});
+    const createRateHistory = jest.fn().mockResolvedValue({});
+    const prisma = {
+      currency: { findUnique: jest.fn()
+        .mockResolvedValueOnce({ id: 2, isActive: true })
+        .mockResolvedValueOnce({ id: 1, code: 'CUP', isActive: true }) },
+      $transaction: jest.fn(async (callback: any) => callback({
+        exchangeRate: {
+          findUnique: jest.fn().mockResolvedValue({ referenceRate: new Decimal(250), buyMargin: new Decimal(0.1), sellMargin: new Decimal(0.2) }),
+          update: updateRate,
+        },
+        rateHistory: { create: createRateHistory },
+        currencyPosition: {
+          findUnique: jest.fn().mockResolvedValue({ id: 9, saldo: new Decimal(0), costoPromedio: new Decimal(0), reviewStatus: 'REVIEWED', reviewedAt: new Date() }),
+          update: jest.fn().mockResolvedValue({}),
+        },
+        transaction: { create: createTransaction },
+        currencyMovement: { create: jest.fn().mockResolvedValue({ id: 12 }) },
+        cashBalance: { updateMany: jest.fn().mockResolvedValue({ count: 1 }), upsert: jest.fn().mockResolvedValue({}) },
+      })),
+    } as any;
+
+    await new FxOperationsService(prisma).createTransfer(7, {
+      type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 200,
+      operationKind: 'REMITTANCE' as any, persistRate: true,
+    });
+
+    expect(createTransaction).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ operationKind: 'REMITTANCE', persistRate: true }) }));
+    expect(updateRate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ buyMargin: new Decimal(0.2) }) }));
+    expect(updateRate.mock.calls[0][0].data).not.toHaveProperty('sellMargin');
+    expect(createRateHistory).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ referenceType: 'FX_TRANSACTION', referenceId: 11 }) }));
   });
   it('does not replay a different intent after a concurrent unique-key race', async () => {
     const raced = { id: 11, userId: 7, idempotencyKey: 'fx-race', type: 'COMPRA', currencyId: 2, amount: new Decimal(50), rate: new Decimal(260), notes: null, fxMovements: [{ id: 12 }] };

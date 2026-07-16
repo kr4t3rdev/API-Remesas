@@ -17,6 +17,11 @@ enum TransactionType {
   VENTA
 }
 
+enum FxOperationKind {
+  TRANSFER
+  REMITTANCE
+}
+
 enum ReconciliationStatus {
   PENDIENTE
   RECONCILIADO
@@ -225,6 +230,8 @@ model Transaction {
   status        ReconciliationStatus @default(PENDIENTE)
   notes         String?
   idempotencyKey String?
+  operationKind FxOperationKind @default(TRANSFER)
+  persistRate Boolean @default(false)
   sourceType TransferAccountType @default(CASH)
   sourceBankAccountId Int?
   sourceBankAccount BankAccount? @relation("TransferSource", fields: [sourceBankAccountId], references: [id])
@@ -241,6 +248,7 @@ model Transaction {
   @@index([userId, type, createdAt])
   @@index([userId, currencyId, createdAt])
   @@index([userId, status])
+  @@index([userId, operationKind, createdAt])
   @@unique([userId, idempotencyKey])
   @@map("transactions")
 }

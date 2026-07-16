@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { CurrencyMovementType, Prisma, TransactionType, TransferAccountType } from '@prisma/client';
+import { CurrencyMovementType, FxOperationKind, Prisma, TransactionType, TransferAccountType } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { CreateFxTransferDto } from './dto/create-fx-transfer.dto';
@@ -7,6 +7,17 @@ import { assertSaleAvailable, calculateSaleSnapshot, calculateWeightedAveragePur
 import { mapTransferMovement } from './domain/movement-mapper';
 import { validateServerRate } from './rate-validator';
 import { CurrencyPositionUnavailableError, InsufficientSaldoError, InvalidRateError } from './domain/domain-errors';
+
+export function calculatePersistedMargin(type: TransactionType, referenceRate: Decimal, effectiveRate: Decimal): Decimal {
+  if (!referenceRate.isPositive() || !effectiveRate.isPositive()) throw new InvalidRateError();
+  const margin = type === TransactionType.COMPRA
+    ? new Decimal(1).sub(effectiveRate.div(referenceRate))
+    : effectiveRate.div(referenceRate).sub(1);
+  if (margin.abs().gte(10) || !margin.eq(margin.toDecimalPlaces(4))) {
+    throw new InvalidRateError('Rate cannot be represented by the active rate margin');
+  }
+  return margin;
+}
 
 @Injectable()
 export class FxOperationsService {
@@ -19,7 +30,9 @@ export class FxOperationsService {
       && (existing.sourceType ?? TransferAccountType.CASH) === (dto.sourceType ?? TransferAccountType.CASH)
       && (existing.sourceBankAccountId ?? null) === (dto.sourceBankAccountId ?? null)
       && (existing.destinationType ?? TransferAccountType.CASH) === (dto.destinationType ?? TransferAccountType.CASH)
-      && (existing.destinationBankAccountId ?? null) === (dto.destinationBankAccountId ?? null);
+      && (existing.destinationBankAccountId ?? null) === (dto.destinationBankAccountId ?? null)
+      && (existing.operationKind ?? FxOperationKind.TRANSFER) === (dto.operationKind ?? FxOperationKind.TRANSFER)
+      && (existing.persistRate ?? false) === (dto.persistRate ?? false);
     if (!sameIntent) throw new ConflictException('Idempotency key was already used for a different transfer');
   }
 
@@ -49,10 +62,11 @@ export class FxOperationsService {
         where: { userId_currencyId: { userId, currencyId: dto.currencyId } },
       });
       if (!currentRate) throw new InvalidRateError('Current exchange rate is unavailable');
-      const expectedRate = dto.type === TransactionType.COMPRA
-        ? new Decimal(currentRate.referenceRate).mul(new Decimal(1).sub(currentRate.buyMargin))
-        : new Decimal(currentRate.referenceRate).mul(new Decimal(1).add(currentRate.sellMargin));
-      validateServerRate(dto.rate, expectedRate.toNumber());
+      if (dto.persistRate) {
+        calculatePersistedMargin(dto.type, new Decimal(currentRate.referenceRate), rate);
+      } else {
+        validateServerRate(dto.rate);
+      }
 
       const existing = await tx.currencyPosition.findUnique({
         where: { userId_currencyId: { userId, currencyId: dto.currencyId } },
@@ -96,6 +110,8 @@ export class FxOperationsService {
           marginProfit: realizedProfit ?? new Decimal(0),
           notes: dto.notes,
           idempotencyKey,
+          operationKind: dto.operationKind ?? FxOperationKind.TRANSFER,
+          persistRate: dto.persistRate ?? false,
           sourceType: dto.sourceType ?? TransferAccountType.CASH,
           sourceBankAccountId: dto.sourceBankAccountId,
           destinationType: dto.destinationType ?? TransferAccountType.CASH,
@@ -116,6 +132,27 @@ export class FxOperationsService {
           realizedProfit,
         }),
       });
+
+      if (dto.persistRate) {
+        const margin = calculatePersistedMargin(dto.type, new Decimal(currentRate.referenceRate), rate);
+        await tx.exchangeRate.update({
+          where: { userId_currencyId: { userId, currencyId: dto.currencyId } },
+          data: dto.type === TransactionType.COMPRA
+            ? { buyMargin: margin, effectiveDate: new Date() }
+            : { sellMargin: margin, effectiveDate: new Date() },
+        });
+        await tx.rateHistory.create({
+          data: {
+            userId,
+            currencyFromId: dto.currencyId,
+            currencyToId: cupCurrency.id,
+            rate,
+            source: 'MANUAL',
+            referenceType: 'FX_TRANSACTION',
+            referenceId: transaction.id,
+          },
+        });
+      }
 
       if (dto.type === TransactionType.VENTA) {
         const updated = await tx.currencyPosition.updateMany({
