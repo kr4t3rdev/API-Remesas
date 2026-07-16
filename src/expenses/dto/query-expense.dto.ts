@@ -1,6 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsEnum, IsInt, IsDateString } from 'class-validator';
-import { ReconciliationStatus } from '@prisma/client';
 import { ExpenseCategory } from './create-expense.dto';
 
 export class QueryExpenseDto {
@@ -9,10 +8,6 @@ export class QueryExpenseDto {
   @IsEnum(ExpenseCategory)
   category?: string;
 
-  @ApiPropertyOptional({ enum: ReconciliationStatus })
-  @IsOptional()
-  @IsEnum(ReconciliationStatus)
-  status?: ReconciliationStatus;
 
   @ApiPropertyOptional()
   @IsOptional()

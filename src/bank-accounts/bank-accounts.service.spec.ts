@@ -11,8 +11,7 @@ describe('BankAccountsService transfer history', () => {
     }]);
     const prisma = {
       bankAccount: { findFirst: jest.fn().mockResolvedValue({ id: 4, userId: 7, currency: { id: 2, code: 'USD' } }) },
-      expenseReconciliation: { findMany: jest.fn().mockResolvedValue([]) },
-      incomeReconciliation: { findMany: jest.fn().mockResolvedValue([]) },
+      expense: { findMany: jest.fn().mockResolvedValue([]) },
       transaction: { findMany: transactionFindMany },
     };
 
@@ -26,7 +25,7 @@ describe('BankAccountsService transfer history', () => {
   it('uses CUP for a VENTA destination leg', async () => {
     const prisma = {
       bankAccount: { findFirst: jest.fn().mockResolvedValue({ id: 4, userId: 7, currency: { id: 1, code: 'CUP' } }) },
-      expenseReconciliation: { findMany: jest.fn().mockResolvedValue([]) }, incomeReconciliation: { findMany: jest.fn().mockResolvedValue([]) },
+      expense: { findMany: jest.fn().mockResolvedValue([]) },
       transaction: { findMany: jest.fn().mockResolvedValue([{ id: 11, type: 'VENTA', amount: { toString: () => '10' }, totalCup: { toString: () => '2400' }, rate: { toString: () => '240' }, currency: { id: 2, code: 'USD' }, sourceBankAccountId: null, destinationBankAccountId: 4, sourceType: 'CASH', destinationType: 'BANK_ACCOUNT', createdAt: new Date() }]) },
     };
     const result = await new BankAccountsService(prisma as unknown as PrismaService).getTransactions(7, 4);

@@ -21,7 +21,7 @@ export class CreateTransactionDto {
   @Min(0)
   rate: number;
 
-  @ApiPropertyOptional({ example: 1, description: 'Cuenta bancaria para reconciliación directa' })
+  @ApiPropertyOptional({ example: 1, description: 'Cuenta bancaria de destino' })
   @IsOptional()
   @IsInt()
   bankAccountId?: number;

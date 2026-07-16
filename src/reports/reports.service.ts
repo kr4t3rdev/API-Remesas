@@ -225,17 +225,17 @@ export class ReportsService {
 
     const accountsWithSummary = await Promise.all(
       accounts.map(async (account) => {
-        const expenseCount = await this.prisma.expenseReconciliation.count({
-          where: { bankAccountId: account.id },
+        const expenseCount = await this.prisma.expense.count({
+          where: { sourceBankAccountId: account.id, userId },
         });
-        const incomeCount = await this.prisma.incomeReconciliation.count({
-          where: { bankAccountId: account.id },
+        const transferCount = await this.prisma.transaction.count({
+          where: { userId, OR: [{ sourceBankAccountId: account.id }, { destinationBankAccountId: account.id }] },
         });
 
         return {
           ...account,
           balance: Number(account.balance),
-          transactionCount: expenseCount + incomeCount,
+          transactionCount: expenseCount + transferCount,
         };
       }),
     );

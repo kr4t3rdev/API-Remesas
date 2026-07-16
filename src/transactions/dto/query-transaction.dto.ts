@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsEnum, IsInt, IsDateString } from 'class-validator';
-import { TransactionType, ReconciliationStatus } from '@prisma/client';
+import { TransactionType } from '@prisma/client';
 
 export class QueryTransactionDto {
   @ApiPropertyOptional({ enum: TransactionType })
@@ -13,10 +13,6 @@ export class QueryTransactionDto {
   @IsInt()
   currencyId?: number;
 
-  @ApiPropertyOptional({ enum: ReconciliationStatus })
-  @IsOptional()
-  @IsEnum(ReconciliationStatus)
-  status?: ReconciliationStatus;
 
   @ApiPropertyOptional()
   @IsOptional()

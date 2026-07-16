@@ -50,13 +50,6 @@ export class TransactionsController {
     return this.transactionsService.findAll(userId, query);
   }
 
-  @Get('pending')
-  @ApiOperation({ summary: 'Transacciones pendientes de reconciliar' })
-  @ApiResponse({ status: 200, description: 'Lista de transacciones pendientes' })
-  findPending(@CurrentUser('id') userId: number) {
-    return this.transactionsService.findPending(userId);
-  }
-
   @Get(':id')
   @ApiOperation({ summary: 'Obtener transacción por ID' })
   @ApiResponse({ status: 200, description: 'Transacción encontrada' })

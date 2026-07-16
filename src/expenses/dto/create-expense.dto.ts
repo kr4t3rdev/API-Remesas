@@ -8,7 +8,9 @@ import {
   IsNotEmpty,
   IsEnum,
   Min,
+  ValidateIf,
 } from 'class-validator';
+import { TransferAccountType } from '@prisma/client';
 
 export enum ExpenseCategory {
   RENTA = 'renta',
@@ -32,6 +34,15 @@ export class CreateExpenseDto {
   @ApiProperty({ example: 1 })
   @IsInt()
   currencyId: number;
+
+  @ApiProperty({ enum: TransferAccountType })
+  @IsEnum(TransferAccountType)
+  sourceType: TransferAccountType;
+
+  @ApiPropertyOptional({ description: 'Required when sourceType is BANK_ACCOUNT' })
+  @ValidateIf((dto) => dto.sourceType === TransferAccountType.BANK_ACCOUNT)
+  @IsInt()
+  sourceBankAccountId?: number;
 
   @ApiProperty({ enum: ExpenseCategory, example: 'renta' })
   @IsEnum(ExpenseCategory)

@@ -44,13 +44,6 @@ export class ExpensesController {
     return this.expensesService.findAll(query, userId);
   }
 
-  @Get('pending')
-  @ApiOperation({ summary: 'Gastos pendientes de reconciliar' })
-  @ApiResponse({ status: 200, description: 'Lista de gastos pendientes' })
-  findPending(@CurrentUser('id') userId: number) {
-    return this.expensesService.findPending(userId);
-  }
-
   @Get(':id')
   @ApiOperation({ summary: 'Obtener gasto por ID' })
   @ApiResponse({ status: 200, description: 'Gasto encontrado' })

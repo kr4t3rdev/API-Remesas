@@ -42,6 +42,7 @@ describe('CashService', () => {
           },
         ]),
       },
+      expense: { findMany: jest.fn().mockResolvedValue([]) },
       cashAdjustment: {
         findMany: jest.fn().mockResolvedValue([
           {
@@ -112,6 +113,7 @@ describe('CashService', () => {
         currency: { id: 2, code: 'USD' }, sourceType: 'CASH', destinationType: 'BANK_ACCOUNT', destinationBankAccountId: 4,
         createdAt: new Date('2026-07-12T12:00:00.000Z'),
       }]) },
+      expense: { findMany: jest.fn().mockResolvedValue([]) },
       cashAdjustment: { findMany: jest.fn().mockResolvedValue([]) },
       cashAudit: { findMany: jest.fn().mockResolvedValue([]) },
     };
@@ -129,11 +131,22 @@ describe('CashService', () => {
     ]);
     const prisma = {
       user: { findUnique: jest.fn().mockResolvedValue({ primaryCurrency: null }) }, currency: { findMany: jest.fn().mockResolvedValue([]) }, cashBalance: { findMany: jest.fn().mockResolvedValue([]) },
-      transaction: { findMany: transactionFindMany }, cashAdjustment: { findMany: jest.fn().mockResolvedValue([]) }, cashAudit: { findMany: jest.fn().mockResolvedValue([]) },
+      transaction: { findMany: transactionFindMany }, expense: { findMany: jest.fn().mockResolvedValue([]) }, cashAdjustment: { findMany: jest.fn().mockResolvedValue([]) }, cashAudit: { findMany: jest.fn().mockResolvedValue([]) },
     };
     const result = await new CashService(prisma as unknown as PrismaService).getOverview(7);
     expect(transactionFindMany).toHaveBeenCalledWith(expect.objectContaining({ where: { userId: 7, OR: [{ sourceType: 'CASH' }, { destinationType: 'CASH' }] } }));
     expect(result.recentMovements[0]).toEqual(expect.objectContaining({ direction: 'IN', cashAmount: 2400 }));
+  });
+
+  it('includes cash-sourced expenses in cash history', async () => {
+    const prisma = {
+      user: { findUnique: jest.fn().mockResolvedValue({ primaryCurrency: null }) }, currency: { findMany: jest.fn().mockResolvedValue([]) }, cashBalance: { findMany: jest.fn().mockResolvedValue([]) },
+      transaction: { findMany: jest.fn().mockResolvedValue([]) }, expense: { findMany: jest.fn().mockResolvedValue([{ id: 9, description: 'Rent', category: 'renta', amount: 100, currency: { id: 1, code: 'CUP' }, createdAt: new Date() }]) },
+      cashAdjustment: { findMany: jest.fn().mockResolvedValue([]) }, cashAudit: { findMany: jest.fn().mockResolvedValue([]) },
+    };
+    const result = await new CashService(prisma as unknown as PrismaService).getOverview(7);
+    expect(result.recentMovements[0]).toEqual(expect.objectContaining({ id: 'expense:9', kind: 'EXPENSE', direction: 'OUT', amount: 100 }));
+    expect(prisma.expense.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { userId: 7, sourceType: 'CASH' } }));
   });
 
   it('updates a non-negative policy for an active currency', async () => {

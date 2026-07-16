@@ -10,7 +10,6 @@ import { CashAuditsModule } from './cash-audits/cash-audits.module';
 import { CashAdjustmentsModule } from './cash-adjustments/cash-adjustments.module';
 import { BankAccountsModule } from './bank-accounts/bank-accounts.module';
 import { ExpensesModule } from './expenses/expenses.module';
-import { ReconciliationsModule } from './reconciliations/reconciliations.module';
 import { ObjectivesModule } from './objectives/objectives.module';
 import { ReportsModule } from './reports/reports.module';
 import { RateHistoryModule } from './rate-history/rate-history.module';
@@ -41,7 +40,6 @@ import { validateEnvironment } from './config/environment';
     CashAdjustmentsModule,
     BankAccountsModule,
     ExpensesModule,
-    ReconciliationsModule,
     ObjectivesModule,
     ReportsModule,
     RateHistoryModule,

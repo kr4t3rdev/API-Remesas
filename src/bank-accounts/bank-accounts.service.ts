@@ -75,15 +75,9 @@ export class BankAccountsService {
   async getTransactions(userId: number, id: number) {
     await this.findOne(userId, id);
 
-    const expenseReconciliations = await this.prisma.expenseReconciliation.findMany({
-      where: { bankAccountId: id },
-      include: { expense: { include: { currency: true } } },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    const incomeReconciliations = await this.prisma.incomeReconciliation.findMany({
-      where: { bankAccountId: id },
-      include: { transaction: { include: { currency: true } } },
+    const expenses = await this.prisma.expense.findMany({
+      where: { sourceBankAccountId: id, userId },
+      include: { currency: true },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -118,8 +112,8 @@ export class BankAccountsService {
     });
 
     return {
-      expenses: expenseReconciliations,
-      incomes: incomeReconciliations,
+      expenses,
+      incomes: [],
       transfers: serializedTransfers,
     };
   }

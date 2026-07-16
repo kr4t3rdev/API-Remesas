@@ -17,13 +17,16 @@ export class CashService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getOverview(userId: number) {
-    const [user, balances, currencies, transactions, adjustments, audits] = await Promise.all([
+    const [user, balances, currencies, transactions, expenses, adjustments, audits] = await Promise.all([
       this.prisma.user.findUnique({ where: { id: userId }, include: { primaryCurrency: true } }),
       this.prisma.cashBalance.findMany({ where: { userId }, include: { currency: true }, orderBy: { currency: { code: 'asc' } } }),
       this.prisma.currency.findMany({ where: { isActive: true }, orderBy: { code: 'asc' } }),
       this.prisma.transaction.findMany({
         where: { userId, OR: [{ sourceType: 'CASH' }, { destinationType: 'CASH' }] },
         include: { currency: true }, orderBy: { createdAt: 'desc' }, take: 20,
+      }),
+      this.prisma.expense.findMany({
+        where: { userId, sourceType: 'CASH' }, include: { currency: true }, orderBy: { createdAt: 'desc' }, take: 20,
       }),
       this.prisma.cashAdjustment.findMany({ where: { userId }, include: { currency: true }, orderBy: { createdAt: 'desc' }, take: 20 }),
       this.prisma.cashAudit.findMany({
@@ -68,6 +71,19 @@ export class CashService {
         totalBase: null,
         currency: adjustment.currency,
         createdAt: adjustment.createdAt,
+      })),
+      ...expenses.map((expense) => ({
+        id: `expense:${expense.id}`,
+        kind: 'EXPENSE' as const,
+        type: 'EGRESO' as const,
+        direction: 'OUT' as const,
+        title: expense.description,
+        description: expense.category,
+        amount: toNumber(expense.amount),
+        cashAmount: toNumber(expense.amount),
+        totalBase: null,
+        currency: expense.currency,
+        createdAt: expense.createdAt,
       })),
     ].sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime()).slice(0, 20);
 
