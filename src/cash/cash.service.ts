@@ -39,6 +39,7 @@ export class CashService {
         id: `transaction:${transaction.id}`,
         kind: 'TRANSACTION' as const,
         type: transaction.type,
+        operationKind: transaction.operationKind,
         direction: transaction.sourceType === 'CASH' ? ('OUT' as const) : ('IN' as const),
         title: transaction.type === 'VENTA' ? 'Venta de moneda' : 'Compra de moneda',
         description: `${toNumber(transaction.amount)} ${transaction.currency.code}`,

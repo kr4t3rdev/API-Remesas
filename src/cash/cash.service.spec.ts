@@ -33,6 +33,7 @@ describe('CashService', () => {
         findMany: jest.fn().mockResolvedValue([
           {
             id: 20,
+            operationKind: 'REMITTANCE',
             type: 'VENTA',
             amount: { toString: () => '10' },
             totalCup: { toString: () => '2400' },
@@ -82,6 +83,7 @@ describe('CashService', () => {
         kind: 'TRANSACTION',
         direction: 'IN',
         totalBase: 2400,
+        operationKind: 'REMITTANCE',
       }),
       expect.objectContaining({
         id: 'adjustment:30',

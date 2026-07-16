@@ -4,7 +4,7 @@ import { RemittancesService } from './remittances.service';
 
 describe('RemittancesService', () => {
   const state: any = { remittances: [], positions: [], movements: [] };
-  const prisma: any = { remittance: {}, $transaction: jest.fn(async (cb) => cb(prisma)), currencyPosition: {}, currencyMovement: {}, cashBalance: {} };
+  const prisma: any = { remittance: {}, transaction: {}, $transaction: jest.fn(async (cb) => cb(prisma)), currencyPosition: {}, currencyMovement: {}, cashBalance: {} };
   const config: any = { get: jest.fn() };
   beforeEach(() => {
     jest.clearAllMocks(); state.remittances = []; state.movements = [];
@@ -19,6 +19,7 @@ describe('RemittancesService', () => {
     prisma.currencyPosition.update = jest.fn().mockImplementation(({ where, data }: any) => { const p = state.positions.find((x: any) => x.id === where.id); if (data.saldo?.decrement) p.saldo = p.saldo.sub(data.saldo.decrement); else if (data.saldo?.increment) p.saldo = p.saldo.add(data.saldo.increment); else Object.assign(p, data); return p; });
     prisma.currencyMovement.create = jest.fn().mockImplementation(({ data }: any) => { const m = { id: state.movements.length + 1, ...data }; state.movements.push(m); return m; });
     prisma.cashBalance.upsert = jest.fn();
+    prisma.transaction.findMany = jest.fn().mockResolvedValue([]);
   });
   const service = () => new RemittancesService(prisma, { constructor: { assertSaleAvailable: (position: any, amount: Decimal) => { if (position.reviewStatus !== 'REVIEWED' || position.saldo.lt(amount)) throw new Error('unavailable'); } } } as any, config);
   const event: any = (status = 'COMPLETED') => ({ userId: 7, provider: 'stripe', sourceId: 'src-1', status, foreignCurrencyId: 2, foreignAmount: 10, localCurrencyId: 1, localAmount: 2700, rate: 270 });
@@ -31,4 +32,11 @@ describe('RemittancesService', () => {
   it('rejects and writes no movement when outgoing position is unavailable', async () => { state.positions[0].reviewStatus = 'UNREVIEWED'; await expect(service().ingest(7, event())).rejects.toThrow(ConflictException); expect(prisma.currencyMovement.create).not.toHaveBeenCalled(); });
   it('rejects an atomic completion when the guarded saldo update loses the race', async () => { prisma.currencyPosition.updateMany.mockReturnValueOnce({ count: 0 }); await expect(service().ingest(7, event())).rejects.toMatchObject({ response: expect.objectContaining({ code: 'FX_INSUFFICIENT_SALDO' }) }); expect(prisma.currencyMovement.create).not.toHaveBeenCalled(); });
   it('prevents two concurrent completions from decrementing saldo twice', async () => { const large = { ...event(), foreignAmount: 60 }; const results = await Promise.allSettled([service().ingest(7, large), service().ingest(7, { ...large, sourceId: 'src-2' })]); expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1); expect(state.positions[0].saldo.toString()).toBe('40'); });
+  it('unifies manual remittances in the listing without representing them as provider callbacks', async () => {
+    prisma.remittance.findMany = jest.fn().mockResolvedValue([{ id: 1, provider: 'stripe', sourceId: 'evt', status: 'COMPLETED', createdAt: new Date('2026-07-15') }]);
+    prisma.transaction.findMany.mockResolvedValue([{ id: 9, operationKind: 'REMITTANCE', type: 'COMPRA', amount: new Decimal(10), rate: new Decimal(260), totalCup: new Decimal(2600), createdAt: new Date('2026-07-16'), currency: { id: 2, code: 'USD' } }]);
+    const result = await service().list(7);
+    expect(result[0]).toEqual(expect.objectContaining({ id: 'transaction:9', origin: 'MANUAL', provider: null, status: 'COMPLETED' }));
+    expect(result[1]).toEqual(expect.objectContaining({ id: 1, origin: 'PROVIDER', provider: 'stripe' }));
+  });
 });

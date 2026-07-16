@@ -102,6 +102,7 @@ export class BankAccountsService {
         id: `transfer:${transfer.id}`,
         transactionId: transfer.id,
         type: transfer.type,
+        operationKind: transfer.operationKind,
         direction: isSource ? 'OUT' as const : 'IN' as const,
         amount,
         currency: (isSource && transfer.type === 'COMPRA') || (!isSource && transfer.type === 'VENTA')

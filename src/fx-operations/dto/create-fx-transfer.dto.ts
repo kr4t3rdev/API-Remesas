@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 import { FxOperationKind, TransactionType, TransferAccountType } from '@prisma/client';
 
 export class CreateFxTransferDto {
@@ -12,13 +12,15 @@ export class CreateFxTransferDto {
   currencyId: number;
 
   @ApiProperty()
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0.01)
+  @Max(9999999999999.99)
   amount: number;
 
   @ApiProperty()
-  @IsNumber()
-  @Min(0.000001)
+  @IsNumber({ maxDecimalPlaces: 4 })
+  @Min(0.0001)
+  @Max(999999.9999)
   rate: number;
 
   @ApiPropertyOptional({ enum: FxOperationKind, default: FxOperationKind.TRANSFER })

@@ -5,16 +5,39 @@ import {
   calculateSaleSnapshot,
 } from './domain/position-calculator';
 import { CurrencyPositionUnavailableError, InsufficientSaldoError, InvalidRateError } from './domain/domain-errors';
-import { calculatePersistedMargin } from './fx-operations.service';
+import { calculatePersistedRate } from './fx-operations.service';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
+import { CreateFxTransferDto } from './dto/create-fx-transfer.dto';
 
 describe('FX operations foundation', () => {
+  it('enforces database-compatible amount and rate precision at the API boundary', async () => {
+    const dto = plainToInstance(CreateFxTransferDto, { type: 'COMPRA', currencyId: 2, amount: 10.123, rate: 260.12345 });
+    const errors = await validate(dto);
+    expect(errors.map((error) => error.property)).toEqual(expect.arrayContaining(['amount', 'rate']));
+  });
+
+  it.each([
+    [{ id: 2, code: 'USD', isActive: false }, { id: 1, code: 'CUP', isActive: true }],
+    [{ id: 1, code: 'CUP', isActive: true }, { id: 1, code: 'CUP', isActive: true }],
+  ])('rejects an inactive or CUP currency as the FX divisa', async (divisa, cup) => {
+    const prisma = { currency: { findUnique: jest.fn().mockResolvedValueOnce(divisa).mockResolvedValueOnce(cup) } } as any;
+    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 260 }))
+      .rejects.toThrow('Active non-CUP FX currency not found');
+  });
   it('derives the selected side margin while preserving the reference rate', () => {
-    expect(calculatePersistedMargin('COMPRA' as any, new Decimal(250), new Decimal(200)).toString()).toBe('0.2');
-    expect(calculatePersistedMargin('VENTA' as any, new Decimal(250), new Decimal(300)).toString()).toBe('0.2');
+    expect(calculatePersistedRate('COMPRA' as any, new Decimal(250), new Decimal(200)).margin.toString()).toBe('0.2');
+    expect(calculatePersistedRate('VENTA' as any, new Decimal(250), new Decimal(300)).margin.toString()).toBe('0.2');
   });
 
   it('rejects an active rate whose derived margin cannot be stored', () => {
-    expect(() => calculatePersistedMargin('COMPRA' as any, new Decimal(100), new Decimal(1100))).toThrow(InvalidRateError);
+    expect(() => calculatePersistedRate('COMPRA' as any, new Decimal(100), new Decimal(1100))).toThrow(InvalidRateError);
+  });
+
+  it('rounds a reasonable active-rate margin and exposes the effective persisted rate', () => {
+    const result = calculatePersistedRate('COMPRA' as any, new Decimal(300), new Decimal(260));
+    expect(result.margin.toString()).toBe('0.1333');
+    expect(result.effectiveRate.toString()).toBe('260.01');
   });
 
   it('returns the existing transfer for a repeated user-scoped idempotency key', async () => {
@@ -84,7 +107,7 @@ describe('FX operations foundation', () => {
     const raced = { id: 11, userId: 7, idempotencyKey: 'fx-race', type: 'COMPRA', currencyId: 2, amount: new Decimal(50), rate: new Decimal(260), notes: null, fxMovements: [{ id: 12 }] };
     const prisma = {
       transaction: { findUnique: jest.fn().mockResolvedValueOnce(null).mockResolvedValueOnce(raced) },
-      currency: { findUnique: jest.fn().mockResolvedValueOnce({ id: 2 }).mockResolvedValueOnce({ id: 1, code: 'CUP' }) },
+      currency: { findUnique: jest.fn().mockResolvedValueOnce({ id: 2, code: 'USD', isActive: true }).mockResolvedValueOnce({ id: 1, code: 'CUP', isActive: true }) },
       $transaction: jest.fn().mockRejectedValue(new (require('@prisma/client').Prisma.PrismaClientKnownRequestError)('duplicate', { code: 'P2002', clientVersion: '5.8.1' })),
     } as any;
     await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'VENTA' as any, currencyId: 2, amount: 50, rate: 260 }, 'fx-race'))

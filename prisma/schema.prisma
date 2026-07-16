@@ -225,6 +225,7 @@ model Transaction {
   currency      Currency             @relation(fields: [currencyId], references: [id])
   amount        Decimal              @db.Decimal(15, 2)
   rate          Decimal              @db.Decimal(10, 4)
+  requestedRate Decimal?             @db.Decimal(10, 4)
   totalCup      Decimal              @db.Decimal(15, 2)
   marginProfit  Decimal              @db.Decimal(15, 2)
   status        ReconciliationStatus @default(PENDIENTE)

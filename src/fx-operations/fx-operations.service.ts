@@ -8,15 +8,26 @@ import { mapTransferMovement } from './domain/movement-mapper';
 import { validateServerRate } from './rate-validator';
 import { CurrencyPositionUnavailableError, InsufficientSaldoError, InvalidRateError } from './domain/domain-errors';
 
-export function calculatePersistedMargin(type: TransactionType, referenceRate: Decimal, effectiveRate: Decimal): Decimal {
-  if (!referenceRate.isPositive() || !effectiveRate.isPositive()) throw new InvalidRateError();
-  const margin = type === TransactionType.COMPRA
-    ? new Decimal(1).sub(effectiveRate.div(referenceRate))
-    : effectiveRate.div(referenceRate).sub(1);
-  if (margin.abs().gte(10) || !margin.eq(margin.toDecimalPlaces(4))) {
+const MAX_TRANSACTION_TOTAL = new Decimal('9999999999999.99');
+const PERSISTED_RATE_RELATIVE_TOLERANCE = new Decimal('0.0001');
+
+export function calculatePersistedRate(type: TransactionType, referenceRate: Decimal, requestedRate: Decimal) {
+  if (!referenceRate.isPositive() || !requestedRate.isPositive()) throw new InvalidRateError();
+  const rawMargin = type === TransactionType.COMPRA
+    ? new Decimal(1).sub(requestedRate.div(referenceRate))
+    : requestedRate.div(referenceRate).sub(1);
+  const margin = rawMargin.toDecimalPlaces(4);
+  if (margin.abs().gte(10)) {
     throw new InvalidRateError('Rate cannot be represented by the active rate margin');
   }
-  return margin;
+  const effectiveRate = (type === TransactionType.COMPRA
+    ? referenceRate.mul(new Decimal(1).sub(margin))
+    : referenceRate.mul(new Decimal(1).add(margin))).toDecimalPlaces(4);
+  const relativeDeviation = effectiveRate.sub(requestedRate).abs().div(requestedRate);
+  if (relativeDeviation.gt(PERSISTED_RATE_RELATIVE_TOLERANCE)) {
+    throw new InvalidRateError('Rounded active rate differs materially from the requested rate');
+  }
+  return { margin, effectiveRate };
 }
 
 @Injectable()
@@ -26,7 +37,7 @@ export class FxOperationsService {
   private assertSameTransferIntent(existing: any, userId: number, dto: CreateFxTransferDto) {
     const sameIntent = existing.userId === userId && existing.type === dto.type
       && existing.currencyId === dto.currencyId && new Decimal(existing.amount).eq(new Decimal(dto.amount))
-      && new Decimal(existing.rate).eq(new Decimal(dto.rate)) && existing.notes === (dto.notes ?? null)
+      && new Decimal(existing.requestedRate ?? existing.rate).eq(new Decimal(dto.rate)) && existing.notes === (dto.notes ?? null)
       && (existing.sourceType ?? TransferAccountType.CASH) === (dto.sourceType ?? TransferAccountType.CASH)
       && (existing.sourceBankAccountId ?? null) === (dto.sourceBankAccountId ?? null)
       && (existing.destinationType ?? TransferAccountType.CASH) === (dto.destinationType ?? TransferAccountType.CASH)
@@ -50,11 +61,13 @@ export class FxOperationsService {
       }
     }
     const amount = new Decimal(dto.amount);
-    const rate = new Decimal(dto.rate);
+    const requestedRate = new Decimal(dto.rate);
     const currency = await this.prisma.currency.findUnique({ where: { id: dto.currencyId } });
     const cupCurrency = await this.prisma.currency.findUnique({ where: { code: 'CUP' } });
 
-    if (!currency || !cupCurrency) throw new NotFoundException('Currency not found');
+    if (!currency || !currency.isActive || currency.code === 'CUP' || !cupCurrency || !cupCurrency.isActive) {
+      throw new NotFoundException('Active non-CUP FX currency not found');
+    }
 
     try {
       return await this.prisma.$transaction(async (tx) => {
@@ -62,11 +75,14 @@ export class FxOperationsService {
         where: { userId_currencyId: { userId, currencyId: dto.currencyId } },
       });
       if (!currentRate) throw new InvalidRateError('Current exchange rate is unavailable');
-      if (dto.persistRate) {
-        calculatePersistedMargin(dto.type, new Decimal(currentRate.referenceRate), rate);
-      } else {
+      const persistedRate = dto.persistRate
+        ? calculatePersistedRate(dto.type, new Decimal(currentRate.referenceRate), requestedRate)
+        : null;
+      const rate = persistedRate?.effectiveRate ?? requestedRate;
+      if (!dto.persistRate) {
         validateServerRate(dto.rate);
       }
+      if (amount.mul(rate).gt(MAX_TRANSACTION_TOTAL)) throw new InvalidRateError('Transaction total exceeds the supported range');
 
       const existing = await tx.currencyPosition.findUnique({
         where: { userId_currencyId: { userId, currencyId: dto.currencyId } },
@@ -106,6 +122,7 @@ export class FxOperationsService {
           currencyId: dto.currencyId,
           amount,
           rate,
+          requestedRate,
           totalCup: amount.mul(rate),
           marginProfit: realizedProfit ?? new Decimal(0),
           notes: dto.notes,
@@ -134,7 +151,7 @@ export class FxOperationsService {
       });
 
       if (dto.persistRate) {
-        const margin = calculatePersistedMargin(dto.type, new Decimal(currentRate.referenceRate), rate);
+        const margin = persistedRate!.margin;
         await tx.exchangeRate.update({
           where: { userId_currencyId: { userId, currencyId: dto.currencyId } },
           data: dto.type === TransactionType.COMPRA

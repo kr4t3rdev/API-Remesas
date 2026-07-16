@@ -78,7 +78,40 @@ export class RemittancesService {
     }
   }
 
-  async list(userId: number) { return this.prisma.remittance.findMany({ where: { userId }, include: { movements: true }, orderBy: { createdAt: 'desc' } }); }
+  async list(userId: number) {
+    const [providerRemittances, manualRemittances] = await Promise.all([
+      this.prisma.remittance.findMany({ where: { userId }, include: { movements: true }, orderBy: { createdAt: 'desc' } }),
+      this.prisma.transaction.findMany({
+        where: { userId, operationKind: 'REMITTANCE' },
+        include: { currency: true, fxMovements: true, sourceBankAccount: true, destinationBankAccount: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+    ]);
+    return [
+      ...providerRemittances.map((remittance) => ({ ...remittance, origin: 'PROVIDER' as const })),
+      ...manualRemittances.map((transaction) => ({
+        id: `transaction:${transaction.id}`,
+        transactionId: transaction.id,
+        origin: 'MANUAL' as const,
+        provider: null,
+        sourceId: null,
+        status: 'COMPLETED' as const,
+        operationKind: transaction.operationKind,
+        type: transaction.type,
+        currency: transaction.currency,
+        amount: Number(transaction.amount),
+        rate: Number(transaction.rate),
+        totalCup: Number(transaction.totalCup),
+        sourceType: transaction.sourceType,
+        destinationType: transaction.destinationType,
+        sourceBankAccount: transaction.sourceBankAccount,
+        destinationBankAccount: transaction.destinationBankAccount,
+        movements: transaction.fxMovements,
+        createdAt: transaction.createdAt,
+        updatedAt: transaction.updatedAt,
+      })),
+    ].sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
+  }
 
   async retry(userId: number, id: number, event: RemittanceEventDto) {
     const current = await this.prisma.remittance.findFirst({ where: { id, userId } });
@@ -87,7 +120,18 @@ export class RemittancesService {
   }
 
   async reconcile(userId: number) {
-    const [remittances, movements] = await Promise.all([this.prisma.remittance.findMany({ where: { userId, status: RemittanceStatus.COMPLETED } }), this.prisma.currencyMovement.findMany({ where: { userId, type: CurrencyMovementType.REMITTANCE } })]);
-    return { ok: remittances.every((r: any) => movements.some((m: any) => m.remittanceId === r.id)), completedRemittances: remittances.length, linkedMovements: movements.length };
+    const [remittances, movements, manualRemittances] = await Promise.all([
+      this.prisma.remittance.findMany({ where: { userId, status: RemittanceStatus.COMPLETED } }),
+      this.prisma.currencyMovement.findMany({ where: { userId, type: CurrencyMovementType.REMITTANCE } }),
+      this.prisma.transaction.count({ where: { userId, operationKind: 'REMITTANCE' } }),
+    ]);
+    return {
+      ok: remittances.every((r: any) => movements.some((m: any) => m.remittanceId === r.id)),
+      completedRemittances: remittances.length + manualRemittances,
+      providerRemittances: remittances.length,
+      manualRemittances,
+      linkedProviderMovements: movements.length,
+      linkedMovements: movements.length,
+    };
   }
 }
