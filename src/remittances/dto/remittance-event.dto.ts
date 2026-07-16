@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { RemittanceStatus } from '@prisma/client';
 export class RemittanceEventDto {
-  @ApiProperty() @IsInt() userId!: number;
+  @ApiPropertyOptional({ deprecated: true, description: 'Ignored. Tenant identity is resolved from provider credentials.' }) @IsOptional() @IsInt() userId?: number;
   @ApiProperty() @IsString() provider!: string;
   @ApiProperty() @IsString() sourceId!: string;
   @ApiProperty({ enum: RemittanceStatus }) @IsEnum(RemittanceStatus) status!: RemittanceStatus;

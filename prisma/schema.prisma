@@ -313,7 +313,7 @@ model Remittance {
 
   movements         CurrencyMovement[]
 
-  @@unique([provider, sourceId])
+  @@unique([userId, provider, sourceId])
   @@index([userId, status, createdAt])
   @@index([idempotencyKey])
   @@map("remittances")

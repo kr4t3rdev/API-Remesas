@@ -11,7 +11,7 @@ export class RemittancesController {
   constructor(private readonly service: RemittancesService) {}
 
   @Post('events')
-  ingest(@Headers('x-provider-token') token: string, @Body() event: RemittanceEventDto) { this.service.assertProviderToken(token); return this.service.ingest(event.userId, event); }
+  ingest(@Headers('x-provider-token') token: string, @Body() event: RemittanceEventDto) { const userId = this.service.resolveProviderTenant(token); return this.service.ingest(userId, event); }
 
   @UseGuards(JwtAuthGuard) @ApiBearerAuth() @Get()
   list(@CurrentUser('id') userId: number) { return this.service.list(userId); }

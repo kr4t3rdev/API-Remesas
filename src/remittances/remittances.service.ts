@@ -10,9 +10,25 @@ import { RemittanceEventDto } from './dto/remittance-event.dto';
 export class RemittancesService {
   constructor(private readonly prisma: PrismaService, private readonly fxOperations: FxOperationsService, private readonly config: ConfigService) {}
 
+  resolveProviderTenant(token?: string): number {
+    if (!token) throw new UnauthorizedException('Invalid provider authentication');
+    const configuredMappings = this.config.get<string>('REMITTANCE_PROVIDER_TENANT_TOKENS');
+    if (configuredMappings) {
+      try {
+        const tenant = (JSON.parse(configuredMappings) as Record<string, unknown>)[token];
+        if (Number.isInteger(tenant) && Number(tenant) > 0) return Number(tenant);
+      } catch {
+        throw new UnauthorizedException('Invalid provider authentication');
+      }
+    }
+    const legacyToken = this.config.get<string>('REMITTANCE_PROVIDER_TOKEN');
+    const legacyUserId = Number(this.config.get<string>('REMITTANCE_PROVIDER_USER_ID'));
+    if (legacyToken === token && Number.isInteger(legacyUserId) && legacyUserId > 0) return legacyUserId;
+    throw new UnauthorizedException('Invalid provider authentication');
+  }
+
   assertProviderToken(token?: string) {
-    const expected = this.config.get<string>('REMITTANCE_PROVIDER_TOKEN');
-    if (!expected || token !== expected) throw new UnauthorizedException('Invalid provider authentication');
+    return this.resolveProviderTenant(token);
   }
 
   private validateEvent(event: RemittanceEventDto) {
@@ -28,22 +44,41 @@ export class RemittancesService {
   async ingest(userId: number, event: RemittanceEventDto) {
     this.ensureEnabled();
     this.validateEvent(event);
-    const existing = await this.prisma.remittance.findUnique({ where: { provider_sourceId: { provider: event.provider, sourceId: event.sourceId } }, include: { movements: true } });
+    const existing = await this.prisma.remittance.findUnique({ where: { userId_provider_sourceId: { userId, provider: event.provider, sourceId: event.sourceId } }, include: { movements: true } });
     if (existing) {
       if (existing.status === RemittanceStatus.COMPLETED) return { ...existing, duplicate: true };
       if (event.status === RemittanceStatus.COMPLETED) return this.complete(userId, event);
       return existing;
     }
     if (event.status !== RemittanceStatus.COMPLETED) {
-      return this.prisma.remittance.create({ data: { userId, provider: event.provider, sourceId: event.sourceId, status: event.status, idempotencyKey: event.idempotencyKey } });
+      try {
+        return await this.prisma.remittance.create({ data: { userId, provider: event.provider, sourceId: event.sourceId, status: event.status, idempotencyKey: event.idempotencyKey } });
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+          const duplicate = await this.prisma.remittance.findUnique({ where: { userId_provider_sourceId: { userId, provider: event.provider, sourceId: event.sourceId } } });
+          if (duplicate) return { ...duplicate, duplicate: true };
+        }
+        throw error;
+      }
     }
     return this.complete(userId, event);
   }
 
   private async complete(userId: number, event: RemittanceEventDto) {
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        return await this.completeOnce(userId, event);
+      } catch (error) {
+        if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== 'P2034' || attempt === 2) throw error;
+      }
+    }
+    throw new ConflictException('Unable to complete remittance');
+  }
+
+  private async completeOnce(userId: number, event: RemittanceEventDto) {
     try {
       return await this.prisma.$transaction(async (tx: any) => {
-      const current = await tx.remittance.findUnique({ where: { provider_sourceId: { provider: event.provider, sourceId: event.sourceId } } });
+      const current = await tx.remittance.findUnique({ where: { userId_provider_sourceId: { userId, provider: event.provider, sourceId: event.sourceId } } });
       if (current?.status === RemittanceStatus.COMPLETED) return { ...current, duplicate: true };
       const outgoing = await tx.currencyPosition.findUnique({ where: { userId_currencyId: { userId, currencyId: event.foreignCurrencyId } } });
       if (!outgoing || outgoing.reviewStatus !== 'REVIEWED') throw new ConflictException({ code: 'FX_POSITION_UNAVAILABLE', message: 'Currency position is unavailable for remittance' });
@@ -71,7 +106,7 @@ export class RemittancesService {
       }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        const existing = await this.prisma.remittance.findUnique({ where: { provider_sourceId: { provider: event.provider, sourceId: event.sourceId } } });
+        const existing = await this.prisma.remittance.findUnique({ where: { userId_provider_sourceId: { userId, provider: event.provider, sourceId: event.sourceId } } });
         if (existing?.status === RemittanceStatus.COMPLETED) return { ...existing, duplicate: true };
       }
       throw error;
