@@ -7,6 +7,21 @@ import { Decimal } from '@prisma/client/runtime/library';
 export class WorkerPaymentsService {
   constructor(private prisma: PrismaService) {}
 
+  private async getWorkerCurrencyId(userId: number): Promise<number> {
+    const owner = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { primaryCurrencyId: true },
+    });
+
+    if (!owner?.primaryCurrencyId) {
+      throw new BadRequestException(
+        'El propietario del trabajador no tiene una moneda principal configurada',
+      );
+    }
+
+    return owner.primaryCurrencyId;
+  }
+
   /**
    * Genera las iniciales del trabajador a partir del nombre
    * 2 primeras letras del nombre + 1era letra del apellido
@@ -97,6 +112,7 @@ export class WorkerPaymentsService {
    */
   async createTransaction(workerId: number, createDto: CreateTransactionDto, userId: number) {
     const worker = await this.findOne(workerId, userId);
+    const currencyId = await this.getWorkerCurrencyId(worker.userId);
 
     const currentBalance = Number(worker.balance);
     const amount = createDto.amount;
@@ -110,6 +126,7 @@ export class WorkerPaymentsService {
       this.prisma.workerTransaction.create({
         data: {
           workerId,
+          currencyId,
           type: 'TRANSACTION',
           amount: new Decimal(amount),
           profit: new Decimal(profit),
@@ -141,6 +158,7 @@ export class WorkerPaymentsService {
     }
 
     const worker = await this.findOne(workerId, userId);
+    const currencyId = await this.getWorkerCurrencyId(worker.userId);
 
     const currentBalance = Number(worker.balance);
     const currentTotalDelivered = Number(worker.totalDelivered);
@@ -154,6 +172,7 @@ export class WorkerPaymentsService {
       this.prisma.workerTransaction.create({
         data: {
           workerId,
+          currencyId,
           type: 'BALANCE_ADD',
           amount: new Decimal(amount),
           balanceBefore: new Decimal(currentBalance),
