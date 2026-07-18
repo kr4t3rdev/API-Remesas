@@ -179,6 +179,9 @@ model Currency {
   primaryUsers       User[]         @relation("PrimaryCurrency")
   positions          CurrencyPosition[]
   movements          CurrencyMovement[]
+  workerBalances     WorkerBalance[]
+  workerTransactions WorkerTransaction[]
+  fxWorkerProfitTransactions Transaction[] @relation("FxWorkerCurrency")
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -228,6 +231,11 @@ model Transaction {
   destinationType TransferAccountType @default(CASH)
   destinationBankAccountId Int?
   destinationBankAccount BankAccount? @relation("TransferDestination", fields: [destinationBankAccountId], references: [id])
+  workerId       Int?
+  worker         Worker?  @relation("FxWorkerProfit", fields: [workerId], references: [id], onDelete: SetNull)
+  workerProfit   Decimal? @db.Decimal(15, 2)
+  workerCurrencyId Int?
+  workerCurrency Currency? @relation("FxWorkerCurrency", fields: [workerCurrencyId], references: [id], onDelete: SetNull)
   
   fxMovements        CurrencyMovement[]
   
@@ -237,6 +245,8 @@ model Transaction {
   @@index([userId, type, createdAt])
   @@index([userId, currencyId, createdAt])
   @@index([userId, operationKind, createdAt])
+  @@index([workerId])
+  @@index([workerCurrencyId])
   @@unique([userId, idempotencyKey])
   @@map("transactions")
 }
@@ -617,6 +627,8 @@ model Worker {
   totalDelivered     Decimal   @db.Decimal(15, 2) @default(0)
   
   transactions       WorkerTransaction[]
+  balances           WorkerBalance[]
+  fxProfitTransactions Transaction[] @relation("FxWorkerProfit")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -625,10 +637,31 @@ model Worker {
   @@map("workers")
 }
 
+model WorkerBalance {
+  id                Int      @id @default(autoincrement())
+  workerId          Int
+  worker            Worker   @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  currencyId        Int
+  currency          Currency @relation(fields: [currencyId], references: [id])
+  balance           Decimal  @db.Decimal(15, 2) @default(0)
+  accumulatedProfit Decimal  @db.Decimal(15, 2) @default(0)
+  totalDelivered    Decimal  @db.Decimal(15, 2) @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([workerId, currencyId])
+  @@index([workerId])
+  @@index([currencyId])
+  @@map("worker_balances")
+}
+
 model WorkerTransaction {
   id             Int                 @id @default(autoincrement())
   workerId       Int
   worker         Worker              @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  currencyId     Int
+  currency       Currency            @relation(fields: [currencyId], references: [id])
   type           WorkerTransactionType
   amount         Decimal             @db.Decimal(15, 2)
   profit         Decimal?            @db.Decimal(15, 2) // Solo para TRANSACTION
@@ -639,6 +672,7 @@ model WorkerTransaction {
   createdAt DateTime @default(now())
 
   @@index([workerId, createdAt])
+  @@index([currencyId, createdAt])
   @@map("worker_transactions")
 }
 
