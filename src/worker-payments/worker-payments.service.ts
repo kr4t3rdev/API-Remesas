@@ -1,194 +1,157 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
-import { CreateWorkerDto, UpdateWorkerDto, CreateTransactionDto, AddBalanceDto } from './dto';
+import { CreateWorkerDto, UpdateWorkerDto, CreateTransactionDto, AddBalanceDto, DepositDto } from './dto';
 import { Decimal } from '@prisma/client/runtime/library';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class WorkerPaymentsService {
   constructor(private prisma: PrismaService) {}
 
-  private async getWorkerCurrencyId(userId: number): Promise<number> {
-    const owner = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { primaryCurrencyId: true },
-    });
-
-    if (!owner?.primaryCurrencyId) {
-      throw new BadRequestException(
-        'El propietario del trabajador no tiene una moneda principal configurada',
-      );
+  /** Execute monetary mutations at serializable isolation and retry transient write conflicts. */
+  private async serializableTransaction<T>(callback: (tx: any) => Promise<T>): Promise<T> {
+    const maxAttempts = 3;
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      try {
+        return await this.prisma.$transaction(callback, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+      } catch (error) {
+        const isConflict = error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2034';
+        if (!isConflict || attempt === maxAttempts) throw error;
+      }
     }
-
-    return owner.primaryCurrencyId;
+    throw new Error('Serializable transaction failed');
   }
 
-  /**
-   * Genera las iniciales del trabajador a partir del nombre
-   * 2 primeras letras del nombre + 1era letra del apellido
-   */
   private generateInitials(name: string): string {
     const parts = name.trim().split(/\s+/);
     const firstName = parts[0] || '';
     const lastName = parts.length > 1 ? parts[parts.length - 1] : '';
-
-    const firstPart = firstName.substring(0, 2).toUpperCase();
-    const lastPart = lastName.substring(0, 1).toUpperCase();
-
-    return `${firstPart}${lastPart}`;
+    return `${firstName.substring(0, 2).toUpperCase()}${lastName.substring(0, 1).toUpperCase()}`;
   }
 
   async create(createDto: CreateWorkerDto, userId: number) {
-    const initials = this.generateInitials(createDto.name);
-
     return this.prisma.worker.create({
-      data: {
-        name: createDto.name,
-        phone: createDto.phone,
-        photoUrl: createDto.photoUrl,
-        initials,
-        userId,
-        balance: new Decimal(0),
-        accumulatedProfit: new Decimal(0),
-        totalDelivered: new Decimal(0),
-      },
+      data: { ...createDto, initials: this.generateInitials(createDto.name), userId, balance: 0, accumulatedProfit: 0, totalDelivered: 0 },
+      include: { balances: true },
     });
   }
 
   async findAll(userId: number) {
-    return this.prisma.worker.findMany({
-      where: { userId },
-      include: {
-        transactions: {
-          orderBy: { createdAt: 'desc' },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    return this.prisma.worker.findMany({ where: { userId }, include: { balances: { include: { currency: true } }, transactions: { include: { currency: true }, orderBy: { createdAt: 'desc' } } }, orderBy: { createdAt: 'desc' } });
   }
 
   async findOne(id: number, userId: number) {
-    const worker = await this.prisma.worker.findFirst({
-      where: { id, userId },
-      include: {
-        transactions: {
-          orderBy: { createdAt: 'desc' },
-        },
-      },
-    });
-
-    if (!worker) {
-      throw new NotFoundException('Trabajador no encontrado');
-    }
-
+    const worker = await this.prisma.worker.findFirst({ where: { id, userId }, include: { balances: { include: { currency: true } }, transactions: { include: { currency: true }, orderBy: { createdAt: 'desc' } } } });
+    if (!worker) throw new NotFoundException('Trabajador no encontrado');
     return worker;
+  }
+
+  private async getWorkerBalance(workerId: number, currencyId: number | undefined, userId: number, tx: any = this.prisma) {
+    if (!currencyId) throw new BadRequestException('La moneda es obligatoria');
+    const worker = await tx.worker.findFirst({ where: { id: workerId, userId }, select: { id: true } });
+    if (!worker) throw new NotFoundException('Trabajador no encontrado');
+    const currency = await tx.currency.findFirst({ where: { id: currencyId, isActive: true }, select: { id: true } });
+    if (!currency) throw new BadRequestException('La moneda no existe o está inactiva');
+    return tx.workerBalance.upsert({ where: { workerId_currencyId: { workerId, currencyId } }, create: { workerId, currencyId, balance: 0, accumulatedProfit: 0, totalDelivered: 0 }, update: {} });
   }
 
   async update(id: number, updateDto: UpdateWorkerDto, userId: number) {
     await this.findOne(id, userId);
-
     const data: any = { ...updateDto };
-    if (updateDto.name) {
-      data.initials = this.generateInitials(updateDto.name);
-    }
-
-    return this.prisma.worker.update({
-      where: { id },
-      data,
-    });
+    if (updateDto.name) data.initials = this.generateInitials(updateDto.name);
+    return this.prisma.worker.update({ where: { id }, data });
   }
 
   async remove(id: number, userId: number) {
     await this.findOne(id, userId);
+    return this.prisma.worker.delete({ where: { id } });
+  }
 
-    return this.prisma.worker.delete({
-      where: { id },
+  private validateSelection(type: string | undefined, id: number | undefined, currencyId: number | undefined, label: string) {
+    if (!currencyId) throw new BadRequestException(`${label}: moneda requerida`);
+    // An identifier without a selection is ambiguous and must never be silently ignored.
+    // This also protects callers that bypass class-validator (e.g. internal jobs/tests).
+    if (!type) {
+      if (id !== undefined) throw new BadRequestException(`${label}: el id requiere un tipo`);
+      return;
+    }
+    if (type !== 'CASH' && type !== 'BANK_ACCOUNT') throw new BadRequestException(`${label}: tipo inválido`);
+    if (type === 'BANK_ACCOUNT' && id === undefined) throw new BadRequestException(`${label}: cuenta bancaria requerida`);
+    if (type === 'CASH' && id !== undefined) throw new BadRequestException(`${label}: id no permitido para caja`);
+  }
+
+  private async validateSource(dto: AddBalanceDto, userId: number, amount: number, tx: any = this.prisma) {
+    this.validateSelection(dto.sourceType, dto.sourceId, dto.currencyId, 'Origen');
+    if (!dto.sourceType) return null;
+    if (dto.sourceType === 'CASH') {
+      const cash = await tx.cashBalance.findUnique({ where: { userId_currencyId: { userId, currencyId: dto.currencyId! } } });
+      if (!cash) throw new BadRequestException('Caja no encontrada');
+      if (Number(cash.balance) < amount) throw new BadRequestException('Saldo insuficiente en caja');
+      return { kind: 'CASH' as const, record: cash };
+    }
+    const account = await tx.bankAccount.findFirst({ where: { id: dto.sourceId!, userId } });
+    if (!account) throw new BadRequestException('Cuenta bancaria no encontrada');
+    if (!account.isActive) throw new BadRequestException('La cuenta bancaria no está activa');
+    if (account.currencyId !== dto.currencyId) throw new BadRequestException('La moneda de la cuenta no coincide');
+    if (Number(account.balance) < amount) throw new BadRequestException('Saldo insuficiente en la cuenta bancaria');
+    return { kind: 'BANK_ACCOUNT' as const, record: account };
+  }
+
+  private async validateDestination(type: string | undefined, id: number | undefined, currencyId: number | undefined, userId: number, tx: any = this.prisma) {
+    this.validateSelection(type, id, currencyId, 'Destino');
+    if (!type) return null;
+    if (type === 'CASH') {
+      const cash = await tx.cashBalance.findUnique({ where: { userId_currencyId: { userId, currencyId: currencyId! } } });
+      if (!cash) throw new BadRequestException('Caja no encontrada');
+      return { kind: 'CASH' as const, record: cash };
+    }
+    const account = await tx.bankAccount.findFirst({ where: { id: id!, userId } });
+    if (!account) throw new BadRequestException('Cuenta bancaria no encontrada');
+    if (!account.isActive) throw new BadRequestException('La cuenta bancaria no está activa');
+    if (account.currencyId !== currencyId) throw new BadRequestException('La moneda de la cuenta no coincide');
+    return { kind: 'BANK_ACCOUNT' as const, record: account };
+  }
+
+  async addBalance(workerId: number, dto: AddBalanceDto, userId: number) {
+    if (dto.amount <= 0) throw new BadRequestException('El monto debe ser mayor a cero');
+    this.validateSelection(dto.sourceType, dto.sourceId, dto.currencyId, 'Origen');
+    return this.serializableTransaction(async (tx: any) => {
+      const balance = await this.getWorkerBalance(workerId, dto.currencyId, userId, tx);
+      const source = await this.validateSource(dto, userId, dto.amount, tx);
+      const before = Number(balance.balance); const after = before + dto.amount;
+      const transaction = await tx.workerTransaction.create({ data: { workerId, currencyId: dto.currencyId!, type: 'BALANCE_ADD', amount: new Decimal(dto.amount), balanceBefore: new Decimal(before), balanceAfter: new Decimal(after), description: dto.sourceType ? `Saldo agregado desde ${dto.sourceType === 'CASH' ? 'Caja' : 'Cuenta bancaria'}` : 'Saldo agregado' } });
+      const updatedBalance = await tx.workerBalance.update({ where: { id: balance.id }, data: { balance: new Decimal(after), totalDelivered: { increment: new Decimal(dto.amount) } } });
+      if (source?.kind === 'CASH') await tx.cashBalance.update({ where: { userId_currencyId: { userId, currencyId: dto.currencyId! } }, data: { balance: { decrement: new Decimal(dto.amount) } } });
+      if (source?.kind === 'BANK_ACCOUNT') await tx.bankAccount.update({ where: { id: dto.sourceId! }, data: { balance: { decrement: new Decimal(dto.amount) } } });
+      return { transaction, workerBalance: updatedBalance };
     });
   }
 
-  /**
-   * Registra una transacción para un trabajador
-   * - Resta el monto del saldo del trabajador
-   * - Suma la ganancia a accumulatedProfit
-   */
-  async createTransaction(workerId: number, createDto: CreateTransactionDto, userId: number) {
-    const worker = await this.findOne(workerId, userId);
-    const currencyId = await this.getWorkerCurrencyId(worker.userId);
-
-    const currentBalance = Number(worker.balance);
-    const amount = createDto.amount;
-    const profit = createDto.profit;
-
-    const newBalance = currentBalance - amount;
-    const newAccumulatedProfit = Number(worker.accumulatedProfit) + profit;
-
-    // Usar transacción de Prisma para garantizar consistencia
-    const [transaction, updatedWorker] = await this.prisma.$transaction([
-      this.prisma.workerTransaction.create({
-        data: {
-          workerId,
-          currencyId,
-          type: 'TRANSACTION',
-          amount: new Decimal(amount),
-          profit: new Decimal(profit),
-          balanceBefore: new Decimal(currentBalance),
-          balanceAfter: new Decimal(newBalance),
-          description: createDto.description,
-        },
-      }),
-      this.prisma.worker.update({
-        where: { id: workerId },
-        data: {
-          balance: new Decimal(newBalance),
-          accumulatedProfit: new Decimal(newAccumulatedProfit),
-        },
-      }),
-    ]);
-
-    return { transaction, worker: updatedWorker };
+  async deposit(workerId: number, dto: DepositDto, userId: number) {
+    if (dto.amount <= 0) throw new BadRequestException('El monto debe ser mayor a cero');
+    return this.serializableTransaction(async (tx: any) => {
+      const balance = await this.getWorkerBalance(workerId, dto.currencyId, userId, tx);
+      const destination = await this.validateDestination(dto.destinationType, dto.destinationId, dto.currencyId, userId, tx);
+      const before = Number(balance.balance); if (before < dto.amount) throw new BadRequestException('Saldo insuficiente del trabajador');
+      const transaction = await tx.workerTransaction.create({ data: { workerId, currencyId: dto.currencyId, type: 'TRANSACTION', amount: new Decimal(dto.amount), balanceBefore: new Decimal(before), balanceAfter: new Decimal(before - dto.amount), description: dto.destinationType ? `Depósito a ${dto.destinationType === 'CASH' ? 'Caja' : 'Cuenta bancaria'}` : 'Depósito' } });
+      const updatedBalance = await tx.workerBalance.update({ where: { id: balance.id }, data: { balance: { decrement: new Decimal(dto.amount) } } });
+      if (destination?.kind === 'CASH') await tx.cashBalance.update({ where: { userId_currencyId: { userId, currencyId: dto.currencyId! } }, data: { balance: { increment: new Decimal(dto.amount) } } });
+      if (destination?.kind === 'BANK_ACCOUNT') await tx.bankAccount.update({ where: { id: dto.destinationId! }, data: { balance: { increment: new Decimal(dto.amount) } } });
+      return { transaction, workerBalance: updatedBalance };
+    });
   }
 
-  /**
-   * Agrega saldo a un trabajador
-   * - Suma el monto al saldo del trabajador
-   * - Suma el monto a totalDelivered
-   */
-  async addBalance(workerId: number, addDto: AddBalanceDto, userId: number) {
-    if (addDto.amount <= 0) {
-      throw new BadRequestException('El monto debe ser mayor a cero');
-    }
-
-    const worker = await this.findOne(workerId, userId);
-    const currencyId = await this.getWorkerCurrencyId(worker.userId);
-
-    const currentBalance = Number(worker.balance);
-    const currentTotalDelivered = Number(worker.totalDelivered);
-    const amount = addDto.amount;
-
-    const newBalance = currentBalance + amount;
-    const newTotalDelivered = currentTotalDelivered + amount;
-
-    // Usar transacción de Prisma para garantizar consistencia
-    const [transaction, updatedWorker] = await this.prisma.$transaction([
-      this.prisma.workerTransaction.create({
-        data: {
-          workerId,
-          currencyId,
-          type: 'BALANCE_ADD',
-          amount: new Decimal(amount),
-          balanceBefore: new Decimal(currentBalance),
-          balanceAfter: new Decimal(newBalance),
-          description: 'Saldo agregado',
-        },
-      }),
-      this.prisma.worker.update({
-        where: { id: workerId },
-        data: {
-          balance: new Decimal(newBalance),
-          totalDelivered: new Decimal(newTotalDelivered),
-        },
-      }),
-    ]);
-
-    return { transaction, worker: updatedWorker };
+  async createTransaction(workerId: number, dto: CreateTransactionDto, userId: number) {
+    if (dto.amount <= 0) throw new BadRequestException('El monto debe ser mayor a cero');
+    return this.serializableTransaction(async (tx: any) => {
+      const balance = await this.getWorkerBalance(workerId, dto.currencyId, userId, tx);
+      const destination = await this.validateDestination(dto.destinationType, dto.destinationId, dto.currencyId, userId, tx);
+      const before = Number(balance.balance); if (before < dto.amount) throw new BadRequestException('Saldo insuficiente del trabajador');
+      const transaction = await tx.workerTransaction.create({ data: { workerId, currencyId: dto.currencyId, type: 'TRANSACTION', amount: new Decimal(dto.amount), profit: new Decimal(dto.profit), balanceBefore: new Decimal(before), balanceAfter: new Decimal(before - dto.amount), description: dto.description } });
+      const updatedBalance = await tx.workerBalance.update({ where: { id: balance.id }, data: { balance: { decrement: new Decimal(dto.amount) }, accumulatedProfit: { increment: new Decimal(dto.profit) } } });
+      if (destination?.kind === 'CASH') await tx.cashBalance.update({ where: { userId_currencyId: { userId, currencyId: dto.currencyId! } }, data: { balance: { increment: new Decimal(dto.amount) } } });
+      if (destination?.kind === 'BANK_ACCOUNT') await tx.bankAccount.update({ where: { id: dto.destinationId! }, data: { balance: { increment: new Decimal(dto.amount) } } });
+      return { transaction, workerBalance: updatedBalance };
+    });
   }
 }

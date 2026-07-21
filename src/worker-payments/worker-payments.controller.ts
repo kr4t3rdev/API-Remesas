@@ -21,6 +21,7 @@ import {
   UpdateWorkerDto,
   CreateTransactionDto,
   AddBalanceDto,
+  DepositDto,
 } from './dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -94,5 +95,16 @@ export class WorkerPaymentsController {
     @CurrentUser('id') userId: number,
   ) {
     return this.workerPaymentsService.addBalance(id, addDto, userId);
+  }
+
+  @Post(':id/deposit')
+  @ApiOperation({ summary: 'Depositar saldo del trabajador a caja/cuenta' })
+  @ApiResponse({ status: 201, description: 'Depósito realizado' })
+  deposit(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() depositDto: DepositDto,
+    @CurrentUser('id') userId: number,
+  ) {
+    return this.workerPaymentsService.deposit(id, depositDto, userId);
   }
 }

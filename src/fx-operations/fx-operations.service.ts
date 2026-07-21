@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CurrencyMovementType, FxOperationKind, Prisma, TransactionType, TransferAccountType } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { PrismaService } from '../database/prisma/prisma.service';
@@ -43,13 +43,33 @@ export class FxOperationsService {
       && (existing.destinationType ?? TransferAccountType.CASH) === (dto.destinationType ?? TransferAccountType.CASH)
       && (existing.destinationBankAccountId ?? null) === (dto.destinationBankAccountId ?? null)
       && (existing.operationKind ?? FxOperationKind.TRANSFER) === (dto.operationKind ?? FxOperationKind.TRANSFER)
-      && (existing.persistRate ?? false) === (dto.persistRate ?? false);
+      && (existing.persistRate ?? false) === (dto.persistRate ?? false)
+      && (existing.workerId ?? null) === (dto.workerId ?? null)
+      && (existing.workerCurrencyId ?? null) === (dto.workerCurrencyId ?? null)
+      && ((existing.workerProfit ?? null) === null
+        ? dto.workerProfit === undefined
+        : dto.workerProfit !== undefined && new Decimal(existing.workerProfit).eq(new Decimal(dto.workerProfit)));
     if (!sameIntent) throw new ConflictException('Idempotency key was already used for a different transfer');
   }
 
   static assertSaleAvailable = assertSaleAvailable;
 
   async createTransfer(userId: number, dto: CreateFxTransferDto, idempotencyKey?: string) {
+    const workerFieldsProvided = dto.workerId !== undefined || dto.workerProfit !== undefined || dto.workerCurrencyId !== undefined;
+    if (workerFieldsProvided && (dto.workerId === undefined || dto.workerProfit === undefined || dto.workerCurrencyId === undefined)) {
+      throw new BadRequestException('workerId, workerProfit and workerCurrencyId must be provided together');
+    }
+    if (dto.workerId !== undefined && (
+      dto.sourceType === TransferAccountType.BANK_ACCOUNT
+      || dto.destinationType === TransferAccountType.BANK_ACCOUNT
+      || dto.sourceBankAccountId !== undefined
+      || dto.destinationBankAccountId !== undefined
+    )) {
+      throw new BadRequestException('Worker FX transfers must use CASH accounts only');
+    }
+    if (dto.workerProfit !== undefined && dto.workerProfit < 0) {
+      throw new BadRequestException('Worker profit cannot be negative');
+    }
     if (idempotencyKey) {
       const existing = await this.prisma.transaction.findUnique({
         where: { userId_idempotencyKey: { userId, idempotencyKey } },
@@ -133,6 +153,9 @@ export class FxOperationsService {
           sourceBankAccountId: dto.sourceBankAccountId,
           destinationType: dto.destinationType ?? TransferAccountType.CASH,
           destinationBankAccountId: dto.destinationBankAccountId,
+          workerId: dto.workerId,
+          workerProfit: dto.workerProfit === undefined ? undefined : new Decimal(dto.workerProfit),
+          workerCurrencyId: dto.workerCurrencyId,
         },
       });
 
@@ -249,6 +272,45 @@ export class FxOperationsService {
           where: { userId_currencyId: { userId, currencyId: cupCurrency.id } },
           update: { balance: { increment: amount.mul(rate) } },
           create: { userId, currencyId: cupCurrency.id, balance: amount.mul(rate) },
+        });
+      }
+
+      if (dto.workerId !== undefined) {
+        const worker = await tx.worker.findFirst({ where: { id: dto.workerId, userId }, select: { id: true } });
+        if (!worker) throw new NotFoundException('Trabajador no encontrado');
+        const workerCurrencyId = dto.workerCurrencyId!;
+        const workerBalance = await tx.workerBalance.findUnique({
+          where: { workerId_currencyId: { workerId: dto.workerId, currencyId: workerCurrencyId } },
+          include: { currency: true },
+        });
+        if (!workerBalance) throw new NotFoundException('Worker balance not found for currency');
+        if (!workerBalance.currency?.isActive) throw new NotFoundException('Worker currency is inactive');
+        const profit = new Decimal(dto.workerProfit!);
+        // The worker funds the FX operation. Debit the selected worker currency
+        // atomically; for COMPRA this is the purchased amount, never the CUP
+        // source amount (amount * rate).
+        const debitAmount = amount;
+        const balanceBefore = new Decimal(workerBalance.balance);
+        const balanceAfter = balanceBefore.sub(debitAmount);
+        const updatedWorkerBalance = await tx.workerBalance.updateMany({
+          where: { id: workerBalance.id, balance: { gte: debitAmount } },
+          data: {
+            balance: { decrement: debitAmount },
+            accumulatedProfit: { increment: profit },
+          },
+        });
+        if (updatedWorkerBalance.count !== 1) throw new InsufficientSaldoError();
+        await tx.workerTransaction.create({
+          data: {
+            workerId: dto.workerId,
+            currencyId: workerCurrencyId,
+            type: 'TRANSACTION',
+            amount: debitAmount,
+            profit,
+            balanceBefore,
+            balanceAfter,
+            description: 'Ganancia por operación FX',
+          },
         });
       }
 
