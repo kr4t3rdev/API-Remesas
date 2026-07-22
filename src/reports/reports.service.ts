@@ -30,6 +30,28 @@ export class ReportsService {
   }
 
   /**
+   * Resuelve las fechas (start, end) y valida que start <= end. Si end tiene
+   * horas:0:0:0:0 (caso inicio de dia), lo extiende al fin del dia (23:59:59.999)
+   * para que inclusivo en el dia exacto. Lanza BadRequestException con codigo
+   * REPORT_INVALID_PERIOD si end < start.
+   */
+  private resolvePeriod(
+    startDate: string,
+    endDate: string,
+  ): { start: Date; end: Date } {
+    const start = this.parseDate(startDate, 'startDate');
+    const end = this.parseDate(endDate, 'endDate');
+    if (end < start) {
+      throw new BadRequestException({
+        code: 'REPORT_INVALID_PERIOD',
+        message: 'endDate must be on or after startDate',
+      });
+    }
+    end.setHours(23, 59, 59, 999);
+    return { start, end };
+  }
+
+  /**
    * Obtiene la tasa vigente (referenceRate) de una moneda a CUP para una fecha
    * dada. Si la moneda ya es CUP devuelve 1. Si no hay tasa registrada devuelve
    * null (no se puede convertir).
@@ -169,9 +191,7 @@ export class ReportsService {
     startDate: string,
     endDate: string,
   ): Promise<PeriodReportDto> {
-    const start = this.parseDate(startDate, 'startDate');
-    const end = this.parseDate(endDate, 'endDate');
-    end.setHours(23, 59, 59, 999);
+    const { start, end } = this.resolvePeriod(startDate, endDate);
 
     const transactions = await this.prisma.transaction.findMany({
       where: {
@@ -226,9 +246,7 @@ export class ReportsService {
     startDate: string,
     endDate: string,
   ): Promise<ProfitReportDto> {
-    const start = this.parseDate(startDate, 'startDate');
-    const end = this.parseDate(endDate, 'endDate');
-    end.setHours(23, 59, 59, 999);
+    const { start, end } = this.resolvePeriod(startDate, endDate);
 
     const transactions = await this.prisma.transaction.findMany({
       where: {
@@ -317,9 +335,14 @@ export class ReportsService {
     const where: any = { userId };
     if (category) where.category = category;
     if (startDate || endDate) {
-      where.date = {};
-      if (startDate) where.date.gte = this.parseDate(startDate, 'startDate');
-      if (endDate) where.date.lte = this.parseDate(endDate, 'endDate');
+      if (startDate && endDate) {
+        const { start, end } = this.resolvePeriod(startDate, endDate);
+        where.date = { gte: start, lte: end };
+      } else {
+        where.date = {};
+        if (startDate) where.date.gte = this.parseDate(startDate, 'startDate');
+        if (endDate) where.date.lte = this.parseDate(endDate, 'endDate');
+      }
     }
 
     const expenses = await this.prisma.expense.findMany({
@@ -460,9 +483,7 @@ export class ReportsService {
     startDate: string,
     endDate: string,
   ): Promise<CashFlowReportDto> {
-    const start = this.parseDate(startDate, 'startDate');
-    const end = this.parseDate(endDate, 'endDate');
-    end.setHours(23, 59, 59, 999);
+    const { start, end } = this.resolvePeriod(startDate, endDate);
 
     const transactions = await this.prisma.transaction.findMany({
       where: { userId, createdAt: { gte: start, lte: end } },
@@ -479,24 +500,82 @@ export class ReportsService {
       include: { currency: true },
     });
 
+    // Transacciones ya estan en CUP via totalCup (de la conversion al crear
+    // el transaction), pero los gastos y ajustes estan en su currency
+    // original. Convertimos a CUP usando la tasa vigente a la fecha del
+    // movimiento para mantener la consistencia con E10.
+    const gastosInCup = await this.sumExpensesInCup(userId, expenses);
+
+    let adjustmentsIngresoInCup: number | null = 0;
+    let adjustmentsEgresoInCup: number | null = 0;
+    let adjustmentUnconverted = 0;
+
+    for (const adjustment of adjustments) {
+      const rate = await this.getRateToCup(
+        userId,
+        adjustment.currencyId,
+        adjustment.currency?.code,
+        adjustment.createdAt,
+      );
+      if (rate === null) {
+        adjustmentUnconverted += 1;
+        continue;
+      }
+      const amountInCup = Number(adjustment.amount) * rate;
+      if (adjustment.type === 'INGRESO') {
+        adjustmentsIngresoInCup =
+          (adjustmentsIngresoInCup ?? 0) + amountInCup;
+      } else if (adjustment.type === 'EGRESO') {
+        adjustmentsEgresoInCup =
+          (adjustmentsEgresoInCup ?? 0) + amountInCup;
+      }
+    }
+
+    // Si todos los gastos/ajustes del mes no pudieron convertirse, devolvemos
+    // null total para que el reporte indique esto (no mostramos un total aprox).
+    const expensesInCupFinal = gastosInCup.unconvertedCount > 0
+      ? (gastosInCup.totalInCup ?? null)
+      : gastosInCup.totalInCup;
+    const adjIngresoFinal =
+      adjustmentUnconverted > 0
+        ? adjustmentsIngresoInCup && adjustmentsIngresoInCup > 0
+          ? adjustmentsIngresoInCup
+          : null
+        : adjustmentsIngresoInCup;
+    const adjEgresoFinal =
+      adjustmentUnconverted > 0
+        ? adjustmentsEgresoInCup && adjustmentsEgresoInCup > 0
+          ? adjustmentsEgresoInCup
+          : null
+        : adjustmentsEgresoInCup;
+
+    const expensesRaw = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
+    const adjustmentsIngresoRaw = adjustments
+      .filter((a) => a.type === 'INGRESO')
+      .reduce((sum, a) => sum + Number(a.amount), 0);
+    const adjustmentsEgresoRaw = adjustments
+      .filter((a) => a.type === 'EGRESO')
+      .reduce((sum, a) => sum + Number(a.amount), 0);
+
     return {
       period: { startDate, endDate },
       inflows: {
         ventas: transactions
           .filter((t) => t.type === 'VENTA')
           .reduce((sum, t) => sum + Number(t.totalCup), 0),
-        adjustments: adjustments
-          .filter((a) => a.type === 'INGRESO')
-          .reduce((sum, a) => sum + Number(a.amount), 0),
+        adjustments: Number((adjIngresoFinal ?? 0).toFixed(2)),
+        adjustmentsRaw: Number(adjustmentsIngresoRaw.toFixed(2)),
+        unconvertedAdjustmentsCount: adjustmentUnconverted,
       },
       outflows: {
         compras: transactions
           .filter((t) => t.type === 'COMPRA')
           .reduce((sum, t) => sum + Number(t.totalCup), 0),
-        expenses: expenses.reduce((sum, e) => sum + Number(e.amount), 0),
-        adjustments: adjustments
-          .filter((a) => a.type === 'EGRESO')
-          .reduce((sum, a) => sum + Number(a.amount), 0),
+        expenses: Number((expensesInCupFinal ?? 0).toFixed(2)),
+        expensesRaw: Number(expensesRaw.toFixed(2)),
+        unconvertedExpensesCount: gastosInCup.unconvertedCount,
+        adjustments: Number((adjEgresoFinal ?? 0).toFixed(2)),
+        adjustmentsRaw: Number(adjustmentsEgresoRaw.toFixed(2)),
       },
     };
   }
@@ -509,8 +588,13 @@ export class ReportsService {
     const where: any = { userId };
     if (startDate || endDate) {
       where.createdAt = {};
-      if (startDate) where.createdAt.gte = this.parseDate(startDate, 'startDate');
-      if (endDate) where.createdAt.lte = this.parseDate(endDate, 'endDate');
+      if (startDate && endDate) {
+        const { start, end } = this.resolvePeriod(startDate, endDate);
+        where.createdAt = { gte: start, lte: end };
+      } else {
+        if (startDate) where.createdAt.gte = this.parseDate(startDate, 'startDate');
+        if (endDate) where.createdAt.lte = this.parseDate(endDate, 'endDate');
+      }
     }
 
     const audits = await this.prisma.cashAudit.findMany({
@@ -675,9 +759,14 @@ export class ReportsService {
     currencyCode?: string,
   ): Promise<FxPerformanceReportDto> {
     let start: Date; let end: Date;
-    try { start = this.parseDate(startDate, 'startDate'); end = this.parseDate(endDate, 'endDate'); } catch (error) { throw new BadRequestException({ code: 'REPORT_INVALID_PERIOD', message: (error as Error).message }); }
-    if (end < start) throw new BadRequestException({ code: 'REPORT_INVALID_PERIOD', message: 'endDate must be on or after startDate' });
-    end.setHours(23, 59, 59, 999);
+    try {
+      ({ start, end } = this.resolvePeriod(startDate, endDate));
+    } catch (error) {
+      throw new BadRequestException({
+        code: 'REPORT_INVALID_PERIOD',
+        message: (error as Error).message,
+      });
+    }
     const movements = await this.prisma.currencyMovement.findMany({
       where: { userId, type: 'SALE', createdAt: { gte: start, lte: end }, ...(currencyCode ? { currency: { code: currencyCode } } : {}) },
       include: { currency: true }, orderBy: { createdAt: 'asc' },

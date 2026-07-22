@@ -30,9 +30,12 @@ export class AdminController {
   @Get('reports/platform-series')
   @ApiOperation({ summary: 'Series temporales de plataforma (billing, newUsers, churn por mes)' })
   getPlatformSeries(@Query('monthsBack') monthsBack?: string) {
-    return this.adminService.getPlatformSeries(
-      monthsBack ? Math.max(1, Math.min(24, Number(monthsBack))) : 6,
-    );
+    const parsed = Number(monthsBack);
+    const safeMonthsBack =
+      Number.isFinite(parsed) && parsed > 0
+        ? Math.min(24, Math.floor(parsed))
+        : 6;
+    return this.adminService.getPlatformSeries(safeMonthsBack);
   }
 
   @Get('profile/stats')

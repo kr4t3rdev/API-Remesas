@@ -101,6 +101,12 @@ export class AdminService {
         ? Math.min(100, (cancelledEvents / licensesRegisteredByTo) * 100)
         : 0;
 
+    // reactivatedPeriod: licencias que pasaron a ACTIVE en el período
+    // (LicenseEvent con toState=ACTIVE, desde cualquier estado previo).
+    const reactivatedPeriod = await this.prisma.licenseEvent.count({
+      where: { toState: 'ACTIVE', createdAt: { gte: from, lte: to } },
+    });
+
     return {
       totalUsers,
       activeUsers30d: totalUsers - suspendedUsers,
@@ -113,7 +119,7 @@ export class AdminService {
       arpuEstimateCup,
       revenueAtRiskCup: mrrEstimateCup * 0.2,
       churnPeriod: licensesByState.CANCELLED ?? 0,
-      reactivatedPeriod: licensesByState.ACTIVE ?? 0,
+      reactivatedPeriod,
       trialToPaidConversionPct: Number(trialToPaidConversionPct.toFixed(2)),
       renewalRatePct: Number(renewalRatePct.toFixed(2)),
       cancellationRatePct: Number(cancellationRatePct.toFixed(2)),
