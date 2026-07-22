@@ -498,33 +498,88 @@ export class ReportsService {
   }
 
   private async getDailyBreakdown(userId: number, start: Date, end: Date) {
-    const days: any[] = [];
-    const current = new Date(start);
+    const startDay = new Date(start);
+    startDay.setHours(0, 0, 0, 0);
+    const endDay = new Date(end);
+    endDay.setHours(23, 59, 59, 999);
 
-    while (current <= end) {
-      const dayStart = new Date(current);
-      dayStart.setHours(0, 0, 0, 0);
-      const dayEnd = new Date(current);
-      dayEnd.setHours(23, 59, 59, 999);
+    // Un solo aggregate por tabla: agrupamos por fecha (truncada a día) y
+    // sumamos monto y marginProfit. Prisma no soporta date_trunc directo,
+    // así que traemos todas las filas del rango y agrupamos en JS. Sigue
+    // siendo O(N) en la DB pero con 2 queries en vez de N*2, y sin counts
+    // separados por día.
+    const [transactions, expenses] = await Promise.all([
+      this.prisma.transaction.findMany({
+        where: { userId, createdAt: { gte: startDay, lte: endDay } },
+        select: { createdAt: true, marginProfit: true, totalCup: true, type: true },
+      }),
+      this.prisma.expense.findMany({
+        where: { userId, date: { gte: startDay, lte: endDay } },
+        select: { date: true, amount: true, currency: { select: { code: true } } },
+      }),
+    ]);
 
-      const dayTransactions = await this.prisma.transaction.count({
-        where: { userId, createdAt: { gte: dayStart, lte: dayEnd } },
+    const buckets = new Map<
+      string,
+      {
+        transactions: number;
+        transactionsTotalCup: number;
+        expenses: number;
+        expensesTotalCup: number;
+        expensesUnconverted: number;
+        marginProfit: number;
+      }
+    >();
+
+    const dateKey = (d: Date) => d.toISOString().split('T')[0];
+
+    // Build all days in range first (so empty days show as 0)
+    const cursor = new Date(startDay);
+    while (cursor <= endDay) {
+      buckets.set(dateKey(cursor), {
+        transactions: 0,
+        transactionsTotalCup: 0,
+        expenses: 0,
+        expensesTotalCup: 0,
+        expensesUnconverted: 0,
+        marginProfit: 0,
       });
-
-      const dayExpenses = await this.prisma.expense.count({
-        where: { userId, date: { gte: dayStart, lte: dayEnd } },
-      });
-
-      days.push({
-        date: current.toISOString().split('T')[0],
-        transactions: dayTransactions,
-        expenses: dayExpenses,
-      });
-
-      current.setDate(current.getDate() + 1);
+      cursor.setDate(cursor.getDate() + 1);
     }
 
-    return days;
+    for (const tx of transactions) {
+      const key = dateKey(tx.createdAt);
+      const bucket = buckets.get(key);
+      if (!bucket) continue;
+      bucket.transactions += 1;
+      bucket.transactionsTotalCup += Number(tx.totalCup);
+      bucket.marginProfit += Number(tx.marginProfit);
+    }
+
+    for (const expense of expenses) {
+      const key = dateKey(expense.date);
+      const bucket = buckets.get(key);
+      if (!bucket) continue;
+      bucket.expenses += 1;
+      const isCup = expense.currency?.code === 'CUP';
+      if (isCup) {
+        bucket.expensesTotalCup += Number(expense.amount);
+      } else {
+        bucket.expensesUnconverted += 1;
+      }
+    }
+
+    return Array.from(buckets.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, b]) => ({
+        date,
+        transactions: b.transactions,
+        transactionsTotalCup: Number(b.transactionsTotalCup.toFixed(2)),
+        expenses: b.expenses,
+        expensesTotalCup: Number(b.expensesTotalCup.toFixed(2)),
+        expensesUnconverted: b.expensesUnconverted,
+        marginProfit: Number(b.marginProfit.toFixed(2)),
+      }));
   }
   async getFxPerformanceReport(userId: number, startDate: string, endDate: string, currencyCode?: string) {
     let start: Date; let end: Date;
