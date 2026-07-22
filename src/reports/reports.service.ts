@@ -113,10 +113,14 @@ export class ReportsService {
         totalTransactions: transactions.length,
         totalExpensesCount: expenses.length,
         totalExpensesAmount,
-        totalProfit: transactions.reduce(
+        marginProfit: transactions.reduce(
           (sum, t) => sum + Number(t.marginProfit),
           0,
         ),
+        netProfit: transactions.reduce(
+          (sum, t) => sum + Number(t.marginProfit),
+          0,
+        ) - totalExpensesAmount,
       },
       dailyBreakdown: dailyReports,
       transactionsByCurrency: this.groupByCurrency(transactions),
