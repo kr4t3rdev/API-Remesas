@@ -1,5 +1,17 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
+import type {
+  AccountsReportDto,
+  AuditSummaryReportDto,
+  CashFlowReportDto,
+  CurrencyReportDto,
+  DailyReportDto,
+  ExpensesReportDto,
+  FxPerformanceReportDto,
+  ObjectivesReportDto,
+  PeriodReportDto,
+  ProfitReportDto,
+} from './reports.types';
 
 const CUP_CURRENCY_CODE = 'CUP';
 
@@ -83,7 +95,7 @@ export class ReportsService {
     };
   }
 
-  async getDailyReport(userId: number, date?: string) {
+  async getDailyReport(userId: number, date?: string): Promise<DailyReportDto> {
     const targetDate = date ? this.parseDate(date, 'date') : new Date();
     const startOfDay = new Date(targetDate);
     startOfDay.setHours(0, 0, 0, 0);
@@ -152,7 +164,11 @@ export class ReportsService {
     };
   }
 
-  async getPeriodReport(userId: number, startDate: string, endDate: string) {
+  async getPeriodReport(
+    userId: number,
+    startDate: string,
+    endDate: string,
+  ): Promise<PeriodReportDto> {
     const start = this.parseDate(startDate, 'startDate');
     const end = this.parseDate(endDate, 'endDate');
     end.setHours(23, 59, 59, 999);
@@ -205,7 +221,11 @@ export class ReportsService {
     };
   }
 
-  async getProfitReport(userId: number, startDate: string, endDate: string) {
+  async getProfitReport(
+    userId: number,
+    startDate: string,
+    endDate: string,
+  ): Promise<ProfitReportDto> {
     const start = this.parseDate(startDate, 'startDate');
     const end = this.parseDate(endDate, 'endDate');
     end.setHours(23, 59, 59, 999);
@@ -250,7 +270,12 @@ export class ReportsService {
     };
   }
 
-  async getCurrencyReport(userId: number, currencyId: number, startDate?: string, endDate?: string) {
+  async getCurrencyReport(
+    userId: number,
+    currencyId: number,
+    startDate?: string,
+    endDate?: string,
+  ): Promise<CurrencyReportDto> {
     const where: any = { userId, currencyId };
     if (startDate || endDate) {
       where.createdAt = {};
@@ -283,7 +308,12 @@ export class ReportsService {
     };
   }
 
-  async getExpensesReport(userId: number, startDate?: string, endDate?: string, category?: string) {
+  async getExpensesReport(
+    userId: number,
+    startDate?: string,
+    endDate?: string,
+    category?: string,
+  ): Promise<ExpensesReportDto> {
     const where: any = { userId };
     if (category) where.category = category;
     if (startDate || endDate) {
@@ -313,7 +343,7 @@ export class ReportsService {
     };
   }
 
-  async getAccountsReport(userId: number) {
+  async getAccountsReport(userId: number): Promise<AccountsReportDto> {
     const accounts = await this.prisma.bankAccount.findMany({
       where: { userId, isActive: true },
       include: { currency: true },
@@ -395,13 +425,13 @@ export class ReportsService {
     };
   }
 
-  async getObjectivesReport(userId: number) {
+  async getObjectivesReport(userId: number): Promise<ObjectivesReportDto> {
     const objectives = await this.prisma.objective.findMany({
       where: { userId },
       include: { currency: true, bankAccount: true },
     });
 
-    const objectivesWithProgress = objectives.map((obj) => {
+    const objectivesWithProgress: ObjectivesReportDto['objectives'] = objectives.map((obj) => {
       const targetAmount = Number(obj.targetAmount);
       const currentAmount = Number(obj.currentAmount);
       const percentage =
@@ -425,7 +455,11 @@ export class ReportsService {
     };
   }
 
-  async getCashFlowReport(userId: number, startDate: string, endDate: string) {
+  async getCashFlowReport(
+    userId: number,
+    startDate: string,
+    endDate: string,
+  ): Promise<CashFlowReportDto> {
     const start = this.parseDate(startDate, 'startDate');
     const end = this.parseDate(endDate, 'endDate');
     end.setHours(23, 59, 59, 999);
@@ -467,7 +501,11 @@ export class ReportsService {
     };
   }
 
-  async getAuditSummary(userId: number, startDate?: string, endDate?: string) {
+  async getAuditSummary(
+    userId: number,
+    startDate?: string,
+    endDate?: string,
+  ): Promise<AuditSummaryReportDto> {
     const where: any = { userId };
     if (startDate || endDate) {
       where.createdAt = {};
@@ -630,7 +668,12 @@ export class ReportsService {
         marginProfit: Number(b.marginProfit.toFixed(2)),
       }));
   }
-  async getFxPerformanceReport(userId: number, startDate: string, endDate: string, currencyCode?: string) {
+  async getFxPerformanceReport(
+    userId: number,
+    startDate: string,
+    endDate: string,
+    currencyCode?: string,
+  ): Promise<FxPerformanceReportDto> {
     let start: Date; let end: Date;
     try { start = this.parseDate(startDate, 'startDate'); end = this.parseDate(endDate, 'endDate'); } catch (error) { throw new BadRequestException({ code: 'REPORT_INVALID_PERIOD', message: (error as Error).message }); }
     if (end < start) throw new BadRequestException({ code: 'REPORT_INVALID_PERIOD', message: 'endDate must be on or after startDate' });

@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Param,
-  ParseIntPipe,
   UseGuards,
   Query,
 } from '@nestjs/common';
@@ -11,11 +10,33 @@ import {
   ApiOperation,
   ApiBearerAuth,
   ApiResponse,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { ReportsService } from './reports.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import {
+  GetAuditSummaryDto,
+  GetCashFlowReportDto,
+  GetCurrencyReportByIdParamDto,
+  GetCurrencyReportDto,
+  GetDailyReportDto,
+  GetExpensesReportDto,
+  GetFxPerformanceReportDto,
+  GetPeriodReportDto,
+  GetProfitReportDto,
+} from './dto/reports.dto';
+import {
+  AccountsReportDto,
+  AuditSummaryReportDtoSwagger,
+  CashFlowReportDtoSwagger,
+  CurrencyReportDto,
+  DailyReportDto,
+  ExpensesReportDto,
+  FxPerformanceReportDto,
+  ObjectivesReportDto,
+  PeriodReportDto,
+  ProfitReportDto,
+} from './reports.swagger';
 
 @ApiTags('Reports')
 @ApiBearerAuth()
@@ -26,113 +47,127 @@ export class ReportsController {
 
   @Get('daily')
   @ApiOperation({ summary: 'Resumen del día' })
-  @ApiQuery({ name: 'date', required: false })
-  @ApiResponse({ status: 200, description: 'Resumen diario' })
+  @ApiResponse({ status: 200, type: DailyReportDto })
   getDailyReport(
     @CurrentUser('id') userId: number,
-    @Query('date') date?: string,
+    @Query() dto: GetDailyReportDto,
   ) {
-    return this.reportsService.getDailyReport(userId, date);
+    return this.reportsService.getDailyReport(userId, dto.date);
   }
 
   @Get('period')
   @ApiOperation({ summary: 'Reporte por período' })
-  @ApiQuery({ name: 'startDate', required: true })
-  @ApiQuery({ name: 'endDate', required: true })
-  @ApiResponse({ status: 200, description: 'Reporte del período' })
+  @ApiResponse({ status: 200, type: PeriodReportDto })
   getPeriodReport(
     @CurrentUser('id') userId: number,
-    @Query('startDate') startDate: string,
-    @Query('endDate') endDate: string,
+    @Query() dto: GetPeriodReportDto,
   ) {
-    return this.reportsService.getPeriodReport(userId, startDate, endDate);
+    return this.reportsService.getPeriodReport(
+      userId,
+      dto.startDate,
+      dto.endDate,
+    );
   }
 
   @Get('profit')
   @ApiOperation({ summary: 'Reporte de ganancias' })
-  @ApiQuery({ name: 'startDate', required: true })
-  @ApiQuery({ name: 'endDate', required: true })
-  @ApiResponse({ status: 200, description: 'Reporte de ganancias' })
+  @ApiResponse({ status: 200, type: ProfitReportDto })
   getProfitReport(
     @CurrentUser('id') userId: number,
-    @Query('startDate') startDate: string,
-    @Query('endDate') endDate: string,
+    @Query() dto: GetProfitReportDto,
   ) {
-    return this.reportsService.getProfitReport(userId, startDate, endDate);
+    return this.reportsService.getProfitReport(
+      userId,
+      dto.startDate,
+      dto.endDate,
+    );
   }
 
   @Get('currency/:id')
   @ApiOperation({ summary: 'Reporte por moneda' })
-  @ApiQuery({ name: 'startDate', required: false })
-  @ApiQuery({ name: 'endDate', required: false })
-  @ApiResponse({ status: 200, description: 'Reporte de la moneda' })
+  @ApiResponse({ status: 200, type: CurrencyReportDto })
   getCurrencyReport(
     @CurrentUser('id') userId: number,
-    @Param('id', ParseIntPipe) id: number,
-    @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
+    @Param() params: GetCurrencyReportByIdParamDto,
+    @Query() query: GetCurrencyReportDto,
   ) {
-    return this.reportsService.getCurrencyReport(userId, id, startDate, endDate);
+    return this.reportsService.getCurrencyReport(
+      userId,
+      params.id,
+      query.startDate,
+      query.endDate,
+    );
   }
 
   @Get('fx-performance')
   @ApiOperation({ summary: 'Rendimiento de operaciones FX' })
-  getFxPerformanceReport(@CurrentUser('id') userId: number, @Query('startDate') startDate: string, @Query('endDate') endDate: string, @Query('currency') currency?: string) {
-    return this.reportsService.getFxPerformanceReport(userId, startDate, endDate, currency);
+  @ApiResponse({ status: 200, type: FxPerformanceReportDto })
+  getFxPerformanceReport(
+    @CurrentUser('id') userId: number,
+    @Query() dto: GetFxPerformanceReportDto,
+  ) {
+    return this.reportsService.getFxPerformanceReport(
+      userId,
+      dto.startDate,
+      dto.endDate,
+      dto.currency,
+    );
   }
 
   @Get('expenses')
   @ApiOperation({ summary: 'Reporte de gastos' })
-  @ApiQuery({ name: 'startDate', required: false })
-  @ApiQuery({ name: 'endDate', required: false })
-  @ApiQuery({ name: 'category', required: false })
-  @ApiResponse({ status: 200, description: 'Reporte de gastos' })
+  @ApiResponse({ status: 200, type: ExpensesReportDto })
   getExpensesReport(
     @CurrentUser('id') userId: number,
-    @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
-    @Query('category') category?: string,
+    @Query() dto: GetExpensesReportDto,
   ) {
-    return this.reportsService.getExpensesReport(userId, startDate, endDate, category);
+    return this.reportsService.getExpensesReport(
+      userId,
+      dto.startDate,
+      dto.endDate,
+      dto.category,
+    );
   }
 
   @Get('accounts')
   @ApiOperation({ summary: 'Estado de cuentas bancarias' })
-  @ApiResponse({ status: 200, description: 'Estado de cuentas' })
+  @ApiResponse({ status: 200, type: AccountsReportDto })
   getAccountsReport(@CurrentUser('id') userId: number) {
     return this.reportsService.getAccountsReport(userId);
   }
 
   @Get('objectives')
   @ApiOperation({ summary: 'Avance de objetivos' })
-  @ApiResponse({ status: 200, description: 'Avance de objetivos' })
+  @ApiResponse({ status: 200, type: ObjectivesReportDto })
   getObjectivesReport(@CurrentUser('id') userId: number) {
     return this.reportsService.getObjectivesReport(userId);
   }
 
   @Get('cash-flow')
   @ApiOperation({ summary: 'Flujo de efectivo' })
-  @ApiQuery({ name: 'startDate', required: true })
-  @ApiQuery({ name: 'endDate', required: true })
-  @ApiResponse({ status: 200, description: 'Flujo de efectivo' })
+  @ApiResponse({ status: 200, type: CashFlowReportDtoSwagger })
   getCashFlowReport(
     @CurrentUser('id') userId: number,
-    @Query('startDate') startDate: string,
-    @Query('endDate') endDate: string,
+    @Query() dto: GetCashFlowReportDto,
   ) {
-    return this.reportsService.getCashFlowReport(userId, startDate, endDate);
+    return this.reportsService.getCashFlowReport(
+      userId,
+      dto.startDate,
+      dto.endDate,
+    );
   }
 
   @Get('audit-summary')
   @ApiOperation({ summary: 'Resumen de arqueos' })
-  @ApiQuery({ name: 'startDate', required: false })
-  @ApiQuery({ name: 'endDate', required: false })
-  @ApiResponse({ status: 200, description: 'Resumen de arqueos' })
+  @ApiResponse({ status: 200, type: AuditSummaryReportDtoSwagger })
   getAuditSummary(
     @CurrentUser('id') userId: number,
-    @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
+    @Query() dto: GetAuditSummaryDto,
   ) {
-    return this.reportsService.getAuditSummary(userId, startDate, endDate);
+    return this.reportsService.getAuditSummary(
+      userId,
+      dto.startDate,
+      dto.endDate,
+    );
   }
 }
