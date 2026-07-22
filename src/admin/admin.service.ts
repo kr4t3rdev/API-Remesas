@@ -59,6 +59,48 @@ export class AdminService {
     const mrrEstimateCup = payments.reduce((sum, p) => sum + Number(p.amountCup), 0);
     const arpuEstimateCup = totalUsers > 0 ? mrrEstimateCup / totalUsers : 0;
 
+    // trialToPaidConversionPct: licencias que pasaron TRIAL -> ACTIVE en el
+    // período (transition registrada en LicenseEvent) sobre total de TRIAL
+    // iniciados en el período.
+    const trialStartedInPeriod = licenses.filter(
+      (l) => l.state === 'TRIAL' && l.startedAt >= from && l.startedAt <= to,
+    ).length;
+    const trialToActiveEvents = await this.prisma.licenseEvent.count({
+      where: {
+        fromState: 'TRIAL',
+        toState: 'ACTIVE',
+        createdAt: { gte: from, lte: to },
+      },
+    });
+    const trialToPaidConversionPct =
+      trialStartedInPeriod > 0
+        ? Math.min(100, (trialToActiveEvents / trialStartedInPeriod) * 100)
+        : 0;
+
+    // renewalRatePct: % de licencias activas actualmente con al menos 1
+    // pago registrado despues de la fecha de inicio (es decir, no estan en
+    // trial puro). Sobre todas las licencias del scope.
+    const activeLicenses = licenses.filter((l) => l.state === 'ACTIVE').length;
+    const renewalsCount = licenses.filter(
+      (l) => l.state === 'ACTIVE' && l.lastPaymentAt && l.lastPaymentAt > l.startedAt,
+    ).length;
+    const renewalRatePct =
+      activeLicenses > 0 ? (renewalsCount / activeLicenses) * 100 : 0;
+
+    // cancellationRatePct: % de licencias que pasaron a CANCELLED en el
+    // período respecto al total de licencias registradas antes del fin del
+    // período.
+    const licensesRegisteredByTo = await this.prisma.userLicense.count({
+      where: { startedAt: { lte: to }, ...(planId ? { planId } : {}) },
+    });
+    const cancelledEvents = await this.prisma.licenseEvent.count({
+      where: { toState: 'CANCELLED', createdAt: { gte: from, lte: to } },
+    });
+    const cancellationRatePct =
+      licensesRegisteredByTo > 0
+        ? Math.min(100, (cancelledEvents / licensesRegisteredByTo) * 100)
+        : 0;
+
     return {
       totalUsers,
       activeUsers30d: totalUsers - suspendedUsers,
@@ -72,9 +114,9 @@ export class AdminService {
       revenueAtRiskCup: mrrEstimateCup * 0.2,
       churnPeriod: licensesByState.CANCELLED ?? 0,
       reactivatedPeriod: licensesByState.ACTIVE ?? 0,
-      trialToPaidConversionPct: 0,
-      renewalRatePct: 0,
-      cancellationRatePct: 0,
+      trialToPaidConversionPct: Number(trialToPaidConversionPct.toFixed(2)),
+      renewalRatePct: Number(renewalRatePct.toFixed(2)),
+      cancellationRatePct: Number(cancellationRatePct.toFixed(2)),
     };
   }
 
