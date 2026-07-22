@@ -96,11 +96,17 @@ export class ReportsService {
 
     const dailyReports = await this.getDailyBreakdown(userId, start, end);
 
+    const totalExpensesAmount = expenses.reduce(
+      (sum, e) => sum + Number(e.amount),
+      0,
+    );
+
     return {
       period: { startDate, endDate },
       summary: {
         totalTransactions: transactions.length,
-        totalExpenses: expenses.length,
+        totalExpensesCount: expenses.length,
+        totalExpensesAmount,
         totalProfit: transactions.reduce(
           (sum, t) => sum + Number(t.marginProfit),
           0,
