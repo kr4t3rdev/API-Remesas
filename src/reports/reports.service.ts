@@ -319,22 +319,71 @@ export class ReportsService {
       include: { currency: true },
     });
 
-    const accountsWithSummary = await Promise.all(
-      accounts.map(async (account) => {
-        const expenseCount = await this.prisma.expense.count({
-          where: { sourceBankAccountId: account.id, userId },
-        });
-        const transferCount = await this.prisma.transaction.count({
-          where: { userId, OR: [{ sourceBankAccountId: account.id }, { destinationBankAccountId: account.id }] },
-        });
+    const accountIds = accounts.map((a) => a.id);
 
-        return {
-          ...account,
-          balance: Number(account.balance),
-          transactionCount: expenseCount + transferCount,
-        };
+    if (!accountIds.length) {
+      return {
+        totalAccounts: 0,
+        totalBalance: 0,
+        accounts: [],
+      };
+    }
+
+    // En vez de N*2 queries por cuenta, hacemos 3 queries globales
+    // (1 findMany + 3 groupBy en paralelo) que escalan con la cantidad
+    // de cuentas, no con el producto cuentas * (expenses + transfers).
+    const [expenseGroupsByAccount, transferGroupsBySource, transferGroupsByDest] = await Promise.all([
+      this.prisma.expense.groupBy({
+        by: ['sourceBankAccountId'],
+        where: { userId, sourceBankAccountId: { in: accountIds } },
+        _count: { _all: true },
       }),
-    );
+      this.prisma.transaction.groupBy({
+        by: ['sourceBankAccountId'],
+        where: { userId, sourceBankAccountId: { in: accountIds } },
+        _count: { _all: true },
+      }),
+      this.prisma.transaction.groupBy({
+        by: ['destinationBankAccountId'],
+        where: { userId, destinationBankAccountId: { in: accountIds } },
+        _count: { _all: true },
+      }),
+    ]);
+
+    const expenseCountByAccount = new Map<number, number>();
+    for (const g of expenseGroupsByAccount) {
+      if (g.sourceBankAccountId != null) {
+        expenseCountByAccount.set(g.sourceBankAccountId, g._count._all);
+      }
+    }
+    const transferCountByAccount = new Map<number, number>();
+    for (const g of transferGroupsBySource) {
+      if (g.sourceBankAccountId != null) {
+        transferCountByAccount.set(
+          g.sourceBankAccountId,
+          (transferCountByAccount.get(g.sourceBankAccountId) ?? 0) + g._count._all,
+        );
+      }
+    }
+    for (const g of transferGroupsByDest) {
+      if (g.destinationBankAccountId != null) {
+        transferCountByAccount.set(
+          g.destinationBankAccountId,
+          (transferCountByAccount.get(g.destinationBankAccountId) ?? 0) + g._count._all,
+        );
+      }
+    }
+
+    const accountsWithSummary = accounts.map((account) => {
+      const expenseCount = expenseCountByAccount.get(account.id) ?? 0;
+      const transferCount = transferCountByAccount.get(account.id) ?? 0;
+
+      return {
+        ...account,
+        balance: Number(account.balance),
+        transactionCount: expenseCount + transferCount,
+      };
+    });
 
     return {
       totalAccounts: accounts.length,
