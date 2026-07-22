@@ -121,6 +121,89 @@ export class AdminService {
   }
 
   /**
+   * Series temporales de plataforma para el Admin Reports dashboard.
+   * Devuelve 6 buckets (meses) con:
+   * - billingCup: suma de SubscriptionPayment.amountCup de pagos en el mes
+   * - newUsers: nuevos usuarios (User.createdAt) en el mes
+   * - churn: LicenseEvent(toState=CANCELLED) en el mes
+   *
+   * El último bucket es el mes en curso.
+   */
+  async getPlatformSeries(monthsBack = 6) {
+    const referenceDate = new Date();
+    const buckets: Array<{
+      label: string;
+      year: number;
+      month: number;
+      start: Date;
+      end: Date;
+    }> = [];
+
+    for (let i = monthsBack - 1; i >= 0; i -= 1) {
+      const start = new Date(referenceDate.getFullYear(), referenceDate.getMonth() - i, 1);
+      const end = new Date(referenceDate.getFullYear(), referenceDate.getMonth() - i + 1, 0, 23, 59, 59, 999);
+      buckets.push({
+        label: start.toLocaleString('es', { month: 'short' }).toUpperCase(),
+        year: start.getFullYear(),
+        month: start.getMonth(),
+        start,
+        end,
+      });
+    }
+
+    const bucketStart = buckets[0].start;
+    const bucketEnd = buckets[buckets.length - 1].end;
+
+    const [payments, users, churnEvents] = await Promise.all([
+      this.prisma.subscriptionPayment.findMany({
+        where: { paidAt: { gte: bucketStart, lte: bucketEnd } },
+        select: { amountCup: true, paidAt: true },
+      }),
+      this.prisma.user.findMany({
+        where: { createdAt: { gte: bucketStart, lte: bucketEnd } },
+        select: { createdAt: true },
+      }),
+      this.prisma.licenseEvent.findMany({
+        where: { toState: 'CANCELLED', createdAt: { gte: bucketStart, lte: bucketEnd } },
+        select: { createdAt: true },
+      }),
+    ]);
+
+    const series = buckets.map((bucket) => {
+      const billing = payments
+        .filter((p) => p.paidAt >= bucket.start && p.paidAt <= bucket.end)
+        .reduce((sum, p) => sum + Number(p.amountCup), 0);
+
+      const newUsers = users.filter(
+        (u) => u.createdAt >= bucket.start && u.createdAt <= bucket.end,
+      ).length;
+
+      const churn = churnEvents.filter(
+        (e) => e.createdAt >= bucket.start && e.createdAt <= bucket.end,
+      ).length;
+
+      return {
+        label: bucket.label,
+        year: bucket.year,
+        month: bucket.month,
+        billingCup: Number(billing.toFixed(2)),
+        newUsers,
+        churn,
+      };
+    });
+
+    return {
+      monthsBack,
+      series,
+      totals: {
+        billingCup: series.reduce((sum, s) => sum + s.billingCup, 0),
+        newUsers: series.reduce((sum, s) => sum + s.newUsers, 0),
+        churn: series.reduce((sum, s) => sum + s.churn, 0),
+      },
+    };
+  }
+
+  /**
    * Get admin profile statistics - simplified stats for admin dashboard
    * Returns: totalUsers, activeUsers, blockedUsers, expiringLicenses, dailyRevenue, activeLicenses
    */

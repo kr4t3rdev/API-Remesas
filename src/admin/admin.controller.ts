@@ -27,6 +27,14 @@ export class AdminController {
     return this.adminService.getKpis(dateFrom, dateTo, planId ? Number(planId) : undefined);
   }
 
+  @Get('reports/platform-series')
+  @ApiOperation({ summary: 'Series temporales de plataforma (billing, newUsers, churn por mes)' })
+  getPlatformSeries(@Query('monthsBack') monthsBack?: string) {
+    return this.adminService.getPlatformSeries(
+      monthsBack ? Math.max(1, Math.min(24, Number(monthsBack))) : 6,
+    );
+  }
+
   @Get('profile/stats')
   @ApiOperation({ summary: 'Estadísticas del perfil administrativo' })
   getProfileStats() {
