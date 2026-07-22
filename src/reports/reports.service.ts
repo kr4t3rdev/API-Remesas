@@ -1,6 +1,8 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
 
+const CUP_CURRENCY_CODE = 'CUP';
+
 @Injectable()
 export class ReportsService {
   constructor(private prisma: PrismaService) {}
@@ -13,6 +15,72 @@ export class ReportsService {
       );
     }
     return date;
+  }
+
+  /**
+   * Obtiene la tasa vigente (referenceRate) de una moneda a CUP para una fecha
+   * dada. Si la moneda ya es CUP devuelve 1. Si no hay tasa registrada devuelve
+   * null (no se puede convertir).
+   */
+  private async getRateToCup(
+    userId: number,
+    currencyId: number,
+    currencyCode: string | undefined,
+    referenceDate: Date,
+  ): Promise<number | null> {
+    if (currencyCode === CUP_CURRENCY_CODE) return 1;
+
+    const rate = await this.prisma.exchangeRate.findFirst({
+      where: {
+        userId,
+        currencyId,
+        effectiveDate: { lte: referenceDate },
+      },
+      orderBy: { effectiveDate: 'desc' },
+    });
+
+    return rate ? Number(rate.referenceRate) : null;
+  }
+
+  /**
+   * Suma los montos de los gastos en CUP usando la tasa vigente a la fecha de
+   * cada gasto. Devuelve el total convertido a CUP y la lista de gastos que no
+   * se pudieron convertir (sin tasa registrada).
+   */
+  private async sumExpensesInCup(
+    userId: number,
+    expenses: Array<{
+      amount: any;
+      date: Date;
+      currencyId: number;
+      currency: { code: string };
+    }>,
+  ): Promise<{ totalInCup: number | null; unconvertedCount: number }> {
+    if (!expenses.length) return { totalInCup: 0, unconvertedCount: 0 };
+
+    let total = 0;
+    let hasAnyConversion = false;
+    let unconverted = 0;
+
+    for (const expense of expenses) {
+      const rate = await this.getRateToCup(
+        userId,
+        expense.currencyId,
+        expense.currency.code,
+        expense.date,
+      );
+      if (rate === null) {
+        unconverted += 1;
+        continue;
+      }
+      total += Number(expense.amount) * rate;
+      hasAnyConversion = true;
+    }
+
+    return {
+      totalInCup: hasAnyConversion ? Number(total.toFixed(2)) : null,
+      unconvertedCount: unconverted,
+    };
   }
 
   async getDailyReport(userId: number, date?: string) {
@@ -47,12 +115,15 @@ export class ReportsService {
       .reduce((sum, t) => sum + Number(t.totalCup), 0);
 
     const totalGastos = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
+    const gastosInCup = await this.sumExpensesInCup(userId, expenses);
     const totalProfit = transactions.reduce(
       (sum, t) => sum + Number(t.marginProfit),
       0,
     );
 
-    const net = totalVentas - totalCompras - totalGastos;
+    const totalCostsForNet =
+      gastosInCup.totalInCup !== null ? gastosInCup.totalInCup : totalGastos;
+    const net = totalVentas - totalCompras - totalCostsForNet;
     const marginPct = totalVentas > 0
       ? (totalProfit / totalVentas) * 100
       : 0;
@@ -69,12 +140,14 @@ export class ReportsService {
       expenses: {
         total: expenses.length,
         totalAmount: totalGastos,
+        totalAmountInCup: gastosInCup.totalInCup,
+        unconvertedCount: gastosInCup.unconvertedCount,
         byCategory: this.groupByCategory(expenses),
       },
       profit: {
         margin: Number(marginPct.toFixed(2)),
         marginProfit: totalProfit,
-        net,
+        net: Number(net.toFixed(2)),
       },
     };
   }
@@ -106,6 +179,14 @@ export class ReportsService {
       (sum, e) => sum + Number(e.amount),
       0,
     );
+    const gastosInCup = await this.sumExpensesInCup(userId, expenses);
+    const totalExpensesInCup =
+      gastosInCup.totalInCup !== null ? gastosInCup.totalInCup : totalExpensesAmount;
+
+    const marginProfit = transactions.reduce(
+      (sum, t) => sum + Number(t.marginProfit),
+      0,
+    );
 
     return {
       period: { startDate, endDate },
@@ -113,14 +194,10 @@ export class ReportsService {
         totalTransactions: transactions.length,
         totalExpensesCount: expenses.length,
         totalExpensesAmount,
-        marginProfit: transactions.reduce(
-          (sum, t) => sum + Number(t.marginProfit),
-          0,
-        ),
-        netProfit: transactions.reduce(
-          (sum, t) => sum + Number(t.marginProfit),
-          0,
-        ) - totalExpensesAmount,
+        totalExpensesInCup,
+        unconvertedExpensesCount: gastosInCup.unconvertedCount,
+        marginProfit,
+        netProfit: Number((marginProfit - totalExpensesInCup).toFixed(2)),
       },
       dailyBreakdown: dailyReports,
       transactionsByCurrency: this.groupByCurrency(transactions),
@@ -223,10 +300,13 @@ export class ReportsService {
 
     const totalByCategory = this.groupByCategory(expenses);
     const totalByCurrency = this.groupExpensesByCurrency(expenses);
+    const gastosInCup = await this.sumExpensesInCup(userId, expenses);
 
     return {
       total: expenses.length,
       totalAmount: expenses.reduce((sum, e) => sum + Number(e.amount), 0),
+      totalAmountInCup: gastosInCup.totalInCup,
+      unconvertedCount: gastosInCup.unconvertedCount,
       byCategory: totalByCategory,
       byCurrency: totalByCurrency,
       expenses,
