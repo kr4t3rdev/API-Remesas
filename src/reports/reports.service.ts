@@ -52,6 +52,11 @@ export class ReportsService {
       0,
     );
 
+    const net = totalVentas - totalCompras - totalGastos;
+    const marginPct = totalVentas > 0
+      ? (totalProfit / totalVentas) * 100
+      : 0;
+
     return {
       date: targetDate.toISOString().split('T')[0],
       transactions: {
@@ -67,8 +72,9 @@ export class ReportsService {
         byCategory: this.groupByCategory(expenses),
       },
       profit: {
-        margin: totalProfit,
-        net: totalVentas - totalCompras - totalGastos,
+        margin: Number(marginPct.toFixed(2)),
+        marginProfit: totalProfit,
+        net,
       },
     };
   }
