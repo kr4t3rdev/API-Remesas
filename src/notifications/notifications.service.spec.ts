@@ -13,9 +13,13 @@ describe('NotificationsService', () => {
     const mockPrisma = {
       notification: {
         create: jest.fn().mockResolvedValue({ id: 1 }),
+        findMany: jest.fn().mockResolvedValue([]),
+        count: jest.fn().mockResolvedValue(0),
+        updateMany: jest.fn().mockResolvedValue({ count: 1 }),
       },
       user: {
         findUnique: jest.fn().mockResolvedValue({ email: 'test@user.com' }),
+        findMany: jest.fn().mockResolvedValue([]),
       },
     };
 
@@ -60,6 +64,24 @@ describe('NotificationsService', () => {
         }),
       );
     });
+
+    it('debería crear la alerta IN_APP para administradores activos', async () => {
+      prisma.user.findMany.mockResolvedValue([{ id: 99 }]);
+
+      await service.notifyNewUserRegistered(1, 'new@user.com');
+
+      expect(prisma.user.findMany).toHaveBeenCalledWith({
+        where: { role: 'ADMIN', isActive: true },
+        select: { id: true },
+      });
+      expect(prisma.notification.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({
+          userId: 99,
+          channel: 'IN_APP',
+          type: 'NEW_USER_REGISTERED',
+        }),
+      }));
+    });
   });
 
   describe('notifyUserTemporarilyBlocked', () => {
@@ -101,6 +123,45 @@ describe('NotificationsService', () => {
       });
 
       expect(emailService.sendEmail).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('lectura y estado de notificaciones', () => {
+    it('debería devolver una página y el total de no leídas', async () => {
+      prisma.notification.findMany.mockResolvedValue([{ id: 4, readAt: null }]);
+      prisma.notification.count.mockResolvedValueOnce(3).mockResolvedValueOnce(1);
+
+      await expect(service.listForUser(7, { page: 2, limit: 10, unreadOnly: true })).resolves.toEqual({
+        data: [{ id: 4, readAt: null }],
+        meta: { page: 2, limit: 10, total: 3, unreadCount: 1, totalPages: 1 },
+      });
+      expect(prisma.notification.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        where: { userId: 7, readAt: null },
+        skip: 10,
+        take: 10,
+      }));
+    });
+
+    it('debería marcar una notificación propia como leída', async () => {
+      await expect(service.markAsRead(7, 4)).resolves.toEqual({ count: 1 });
+      expect(prisma.notification.updateMany).toHaveBeenCalledWith({
+        where: { id: 4, userId: 7, readAt: null },
+        data: { readAt: expect.any(Date) },
+      });
+    });
+
+    it('debería marcar todas las notificaciones propias no leídas', async () => {
+      await expect(service.markAllAsRead(7)).resolves.toEqual({ count: 1 });
+      expect(prisma.notification.updateMany).toHaveBeenCalledWith({
+        where: { userId: 7, readAt: null },
+        data: { readAt: expect.any(Date) },
+      });
+    });
+
+    it('debería devolver el conteo de no leídas', async () => {
+      prisma.notification.count.mockResolvedValue(5);
+      await expect(service.getUnreadCount(7)).resolves.toBe(5);
+      expect(prisma.notification.count).toHaveBeenCalledWith({ where: { userId: 7, readAt: null } });
     });
   });
 });

@@ -13,6 +13,86 @@ export class NotificationsService {
     private readonly emailService: EmailService,
   ) {}
 
+  async listForUser(
+    userId: number,
+    options: { page?: number; limit?: number; unreadOnly?: boolean } = {},
+  ) {
+    const page = options.page ?? 1;
+    const limit = options.limit ?? 20;
+    const where: Prisma.NotificationWhereInput = {
+      userId,
+      ...(options.unreadOnly ? { readAt: null } : {}),
+    };
+
+    const [data, total, unreadCount] = await Promise.all([
+      this.prisma.notification.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.notification.count({ where }),
+      this.getUnreadCount(userId),
+    ]);
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        unreadCount,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+      },
+    };
+  }
+
+  getUnreadCount(userId: number) {
+    return this.prisma.notification.count({ where: { userId, readAt: null } });
+  }
+
+  private async notifyAdminsInApp(params: {
+    type: NotificationType;
+    title: string;
+    message: string;
+    payload?: Prisma.InputJsonValue;
+  }) {
+    const admins = await this.prisma.user.findMany({
+      where: { role: 'ADMIN', isActive: true },
+      select: { id: true },
+    });
+
+    return Promise.all(
+      admins.map((admin) =>
+        this.prisma.notification.create({
+          data: {
+            userId: admin.id,
+            type: params.type,
+            channel: 'IN_APP',
+            title: params.title,
+            message: params.message,
+            payload: params.payload,
+            sentAt: new Date(),
+          },
+        }),
+      ),
+    );
+  }
+
+  markAsRead(userId: number, notificationId: number) {
+    return this.prisma.notification.updateMany({
+      where: { id: notificationId, userId, readAt: null },
+      data: { readAt: new Date() },
+    });
+  }
+
+  markAllAsRead(userId: number) {
+    return this.prisma.notification.updateMany({
+      where: { userId, readAt: null },
+      data: { readAt: new Date() },
+    });
+  }
+
   async notifyMixed(params: {
     userId?: number;
     type: NotificationType;
@@ -100,33 +180,45 @@ export class NotificationsService {
   }
 
   notifyNewUserRegistered(userId: number, email: string) {
-    return this.notifyMixed({
-      userId,
-      type: 'NEW_USER_REGISTERED',
+    const notification = {
+      type: 'NEW_USER_REGISTERED' as const,
       title: 'Nuevo usuario registrado',
       message: `Se registró el usuario ${email}`,
       payload: { email },
-    });
+    };
+
+    return Promise.all([
+      this.notifyMixed({ userId, ...notification, channels: ['EMAIL'] }),
+      this.notifyAdminsInApp(notification),
+    ]);
   }
 
   notifyUserTemporarilyBlocked(userId: number, blockedUntil: Date, failedAttempts: number) {
-    return this.notifyMixed({
-      userId,
-      type: 'USER_TEMP_BLOCKED',
+    const notification = {
+      type: 'USER_TEMP_BLOCKED' as const,
       title: 'Usuario bloqueado temporalmente',
       message: 'Demasiados intentos fallidos de inicio de sesión',
       payload: { blockedUntil: blockedUntil.toISOString(), failedAttempts },
-    });
+    };
+
+    return Promise.all([
+      this.notifyMixed({ userId, ...notification, channels: ['EMAIL'] }),
+      this.notifyAdminsInApp(notification),
+    ]);
   }
 
   notifyUserBanned(userId: number, reason: string, bannedUntil?: Date | null) {
-    return this.notifyMixed({
-      userId,
-      type: 'USER_BANNED',
+    const notification = {
+      type: 'USER_BANNED' as const,
       title: 'Usuario baneado',
       message: reason,
       payload: { reason, bannedUntil: bannedUntil?.toISOString() ?? null },
-    });
+    };
+
+    return Promise.all([
+      this.notifyMixed({ userId, ...notification, channels: ['EMAIL'] }),
+      this.notifyAdminsInApp(notification),
+    ]);
   }
 
   notifyEmailVerification(userId: number, email: string, name: string, verificationUrl: string) {
