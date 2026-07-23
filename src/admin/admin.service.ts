@@ -797,6 +797,7 @@ export class AdminService {
 
     // ACTIVE/TRIAL use their contractual expiry. GRACE remains usable only
     // while its explicit grace window is still open.
+    const activeLicenseStates = [LicenseState.ACTIVE, LicenseState.TRIAL, LicenseState.GRACE];
     const totalActive = await this.prisma.userLicense.count({
       where: {
         OR: [
