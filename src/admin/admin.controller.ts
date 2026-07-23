@@ -8,6 +8,7 @@ import { AdminService } from './admin.service';
 import { UpdateAdminUserDto } from './dto/update-admin-user.dto';
 import { AdminUserActionDto } from './dto/admin-user-action.dto';
 import { CreateAdminUserDto } from './dto/create-admin-user.dto';
+import { PlatformSeriesQueryDto } from './dto/platform-series-query.dto';
 
 @ApiTags('Admin')
 @ApiBearerAuth()
@@ -29,13 +30,8 @@ export class AdminController {
 
   @Get('reports/platform-series')
   @ApiOperation({ summary: 'Series temporales de plataforma (billing, newUsers, churn por mes)' })
-  getPlatformSeries(@Query('monthsBack') monthsBack?: string) {
-    const parsed = Number(monthsBack);
-    const safeMonthsBack =
-      Number.isFinite(parsed) && parsed > 0
-        ? Math.min(24, Math.floor(parsed))
-        : 6;
-    return this.adminService.getPlatformSeries(safeMonthsBack);
+  getPlatformSeries(@Query() query: PlatformSeriesQueryDto) {
+    return this.adminService.getPlatformSeries(query.monthsBack ?? 6);
   }
 
   @Get('profile/stats')

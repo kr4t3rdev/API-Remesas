@@ -500,83 +500,80 @@ export class ReportsService {
       include: { currency: true },
     });
 
-    // Transacciones ya estan en CUP via totalCup (de la conversion al crear
-    // el transaction), pero los gastos y ajustes estan en su currency
-    // original. Convertimos a CUP usando la tasa vigente a la fecha del
-    // movimiento para mantener la consistencia con E10.
-    const gastosInCup = await this.sumExpensesInCup(userId, expenses);
+    type Bucket = CashFlowReportDto['currencies'][number];
+    const emptyBucket = (code: string, symbol: string): Bucket => ({
+      currency: { code, symbol },
+      inflows: { transactions: 0, adjustments: 0, total: 0 },
+      outflows: { transactions: 0, expenses: 0, adjustments: 0, total: 0 },
+      balance: 0,
+    });
+    const buckets = new Map<string, Bucket>();
+    const add = (
+      code: string,
+      symbol: string,
+      section: 'inflows' | 'outflows',
+      field: 'transactions' | 'expenses' | 'adjustments',
+      amount: number,
+    ) => {
+      const bucket = buckets.get(code) ?? emptyBucket(code, symbol);
+      const currentAmount = (bucket[section] as Record<string, number>)[field] ?? 0;
+      const nextSection = {
+        ...bucket[section],
+        [field]: Number((currentAmount + amount).toFixed(2)),
+      };
+      const total = Object.entries(nextSection)
+        .filter(([key]) => key !== 'total')
+        .reduce((sum, [, value]) => sum + value, 0);
+      buckets.set(code, {
+        ...bucket,
+        [section]: { ...nextSection, total: Number(total.toFixed(2)) },
+      });
+    };
 
-    let adjustmentsIngresoInCup: number | null = 0;
-    let adjustmentsEgresoInCup: number | null = 0;
-    let adjustmentUnconverted = 0;
-
-    for (const adjustment of adjustments) {
-      const rate = await this.getRateToCup(
-        userId,
-        adjustment.currencyId,
-        adjustment.currency?.code,
-        adjustment.createdAt,
+    transactions.forEach((transaction) => {
+      add(
+        CUP_CURRENCY_CODE,
+        '$',
+        transaction.type === 'VENTA' ? 'inflows' : 'outflows',
+        'transactions',
+        Number(transaction.totalCup),
       );
-      if (rate === null) {
-        adjustmentUnconverted += 1;
-        continue;
-      }
-      const amountInCup = Number(adjustment.amount) * rate;
-      if (adjustment.type === 'INGRESO') {
-        adjustmentsIngresoInCup =
-          (adjustmentsIngresoInCup ?? 0) + amountInCup;
-      } else if (adjustment.type === 'EGRESO') {
-        adjustmentsEgresoInCup =
-          (adjustmentsEgresoInCup ?? 0) + amountInCup;
-      }
-    }
-
-    // Si todos los gastos/ajustes del mes no pudieron convertirse, devolvemos
-    // null total para que el reporte indique esto (no mostramos un total aprox).
-    const expensesInCupFinal = gastosInCup.unconvertedCount > 0
-      ? (gastosInCup.totalInCup ?? null)
-      : gastosInCup.totalInCup;
-    const adjIngresoFinal =
-      adjustmentUnconverted > 0
-        ? adjustmentsIngresoInCup && adjustmentsIngresoInCup > 0
-          ? adjustmentsIngresoInCup
-          : null
-        : adjustmentsIngresoInCup;
-    const adjEgresoFinal =
-      adjustmentUnconverted > 0
-        ? adjustmentsEgresoInCup && adjustmentsEgresoInCup > 0
-          ? adjustmentsEgresoInCup
-          : null
-        : adjustmentsEgresoInCup;
-
-    const expensesRaw = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
-    const adjustmentsIngresoRaw = adjustments
-      .filter((a) => a.type === 'INGRESO')
-      .reduce((sum, a) => sum + Number(a.amount), 0);
-    const adjustmentsEgresoRaw = adjustments
-      .filter((a) => a.type === 'EGRESO')
-      .reduce((sum, a) => sum + Number(a.amount), 0);
+    });
+    expenses.forEach((expense) => {
+      add(
+        expense.currency.code,
+        expense.currency.symbol,
+        'outflows',
+        'expenses',
+        Number(expense.amount),
+      );
+    });
+    adjustments.forEach((adjustment) => {
+      add(
+        adjustment.currency.code,
+        adjustment.currency.symbol,
+        adjustment.type === 'INGRESO' ? 'inflows' : 'outflows',
+        'adjustments',
+        Number(adjustment.amount),
+      );
+    });
 
     return {
       period: { startDate, endDate },
-      inflows: {
-        ventas: transactions
-          .filter((t) => t.type === 'VENTA')
-          .reduce((sum, t) => sum + Number(t.totalCup), 0),
-        adjustments: Number((adjIngresoFinal ?? 0).toFixed(2)),
-        adjustmentsRaw: Number(adjustmentsIngresoRaw.toFixed(2)),
-        unconvertedAdjustmentsCount: adjustmentUnconverted,
-      },
-      outflows: {
-        compras: transactions
-          .filter((t) => t.type === 'COMPRA')
-          .reduce((sum, t) => sum + Number(t.totalCup), 0),
-        expenses: Number((expensesInCupFinal ?? 0).toFixed(2)),
-        expensesRaw: Number(expensesRaw.toFixed(2)),
-        unconvertedExpensesCount: gastosInCup.unconvertedCount,
-        adjustments: Number((adjEgresoFinal ?? 0).toFixed(2)),
-        adjustmentsRaw: Number(adjustmentsEgresoRaw.toFixed(2)),
-      },
+      currencies: [...buckets.values()]
+        .map((bucket) => ({
+          ...bucket,
+          balance: Number(
+            (bucket.inflows.total - bucket.outflows.total).toFixed(2),
+          ),
+        }))
+        .sort((a, b) =>
+          a.currency.code === CUP_CURRENCY_CODE
+            ? -1
+            : b.currency.code === CUP_CURRENCY_CODE
+              ? 1
+              : a.currency.code.localeCompare(b.currency.code),
+        ),
     };
   }
 

@@ -795,27 +795,22 @@ export class AdminService {
     const previousPeriodStart = sixtyDaysAgo;
     const previousPeriodEnd = thirtyDaysAgo;
 
-    // Active license: state is ACTIVE, TRIAL, or GRACE AND (expiresAt > now() OR expiresAt IS NULL)
-    const activeLicenseStates = [LicenseState.ACTIVE, LicenseState.TRIAL, LicenseState.GRACE];
-
-    // Count active licenses with future expiry
-    const activeLicensesWithExpiry = await this.prisma.userLicense.count({
+    // ACTIVE/TRIAL use their contractual expiry. GRACE remains usable only
+    // while its explicit grace window is still open.
+    const totalActive = await this.prisma.userLicense.count({
       where: {
-        state: { in: activeLicenseStates },
-        expiresAt: { gt: now },
+        OR: [
+          {
+            state: { in: [LicenseState.ACTIVE, LicenseState.TRIAL] },
+            expiresAt: { gt: now },
+          },
+          {
+            state: LicenseState.GRACE,
+            graceUntil: { gt: now },
+          },
+        ],
       },
     });
-
-    // Count active licenses with null expiresAt (never expire)
-    const activeLicensesNoExpiry = await this.prisma.userLicense.count({
-      where: {
-        state: { in: activeLicenseStates },
-        expiresAt: undefined,
-      },
-    });
-
-    // Total active = those with future expiry + those with no expiry
-    const totalActive = activeLicensesWithExpiry + activeLicensesNoExpiry;
 
     // Count expired licenses currently
     const expiredLicensesCurrent = await this.prisma.userLicense.count({

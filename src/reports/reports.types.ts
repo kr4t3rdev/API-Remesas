@@ -154,26 +154,17 @@ export interface ObjectivesReportDto {
 
 export interface CashFlowReportDto {
   period: { startDate: string; endDate: string };
-  inflows: {
-    /** ventas en CUP (Transaction.totalCup ya esta en CUP) */
-    ventas: number;
-    /** ajustes INGRESO convertidos a CUP. Si algun ajuste no se pudo convertir queda en null/unconvertedCount. */
-    adjustments: number;
-    /** ajustes INGRESO crudos, en su currency original mezclados. */
-    adjustmentsRaw: number;
-    unconvertedAdjustmentsCount: number;
-  };
-  outflows: {
-    /** compras en CUP. */
-    compras: number;
-    /** gastos convertidos a CUP. Si algun gasto no se pudo convertir queda en null y unconvertedExpensesCount > 0. */
-    expenses: number;
-    /** gastos crudos mezclando currencies. */
-    expensesRaw: number;
-    unconvertedExpensesCount: number;
-    adjustments: number;
-    adjustmentsRaw: number;
-  };
+  currencies: Array<{
+    currency: { code: string; symbol: string };
+    inflows: { transactions: number; adjustments: number; total: number };
+    outflows: {
+      transactions: number;
+      expenses: number;
+      adjustments: number;
+      total: number;
+    };
+    balance: number;
+  }>;
 }
 
 export interface AuditSummaryReportDto {

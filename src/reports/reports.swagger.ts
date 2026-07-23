@@ -246,9 +246,12 @@ export class CashFlowReportDtoSwagger {
   @ApiProperty({ type: PeriodReportPeriodDto })
   period!: PeriodReportPeriodDto;
   @ApiProperty()
-  inflows!: { ventas: number; adjustments: number };
-  @ApiProperty()
-  outflows!: { compras: number; expenses: number; adjustments: number };
+  currencies!: Array<{
+    currency: { code: string; symbol: string };
+    inflows: { transactions: number; adjustments: number; total: number };
+    outflows: { transactions: number; expenses: number; adjustments: number; total: number };
+    balance: number;
+  }>;
 }
 
 export class AuditSummaryReportDtoSwagger {

@@ -45,11 +45,37 @@ describe('AdminService user controls', () => {
 
   // Tests for getServiceMetrics
   describe('getServiceMetrics', () => {
+    it('counts current active licenses with one mutually exclusive Prisma query', async () => {
+      prismaMock.userLicense.count
+        .mockResolvedValueOnce(12)
+        .mockResolvedValueOnce(3)
+        .mockResolvedValueOnce(10)
+        .mockResolvedValueOnce(2);
+
+      const result = await service.getServiceMetrics();
+
+      expect(result.activeCount).toBe(12);
+      expect(prismaMock.userLicense.count).toHaveBeenNthCalledWith(1, {
+        where: {
+          OR: [
+            {
+              state: { in: [LicenseState.ACTIVE, LicenseState.TRIAL] },
+              expiresAt: { gt: expect.any(Date) },
+            },
+            {
+              state: LicenseState.GRACE,
+              graceUntil: { gt: expect.any(Date) },
+            },
+          ],
+        },
+      });
+      expect(prismaMock.userLicense.count).toHaveBeenCalledTimes(4);
+    });
+
     it('returns active and expired counts with deltas', async () => {
       // Mock active licenses with future expiry
       prismaMock.userLicense.count
-        .mockResolvedValueOnce(100) // activeLicensesWithExpiry
-        .mockResolvedValueOnce(10)   // activeLicensesNoExpiry
+        .mockResolvedValueOnce(110) // activeLicensesCurrent
         .mockResolvedValueOnce(25)   // expiredLicensesCurrent
         .mockResolvedValueOnce(80)   // activeLicensesPrevious
         .mockResolvedValueOnce(20);  // expiredLicensesPrevious
@@ -66,8 +92,7 @@ describe('AdminService user controls', () => {
 
     it('returns zero deltas when previous period has zero counts', async () => {
       prismaMock.userLicense.count
-        .mockResolvedValueOnce(50)  // activeLicensesWithExpiry
-        .mockResolvedValueOnce(5)   // activeLicensesNoExpiry
+        .mockResolvedValueOnce(55)  // activeLicensesCurrent
         .mockResolvedValueOnce(10)  // expiredLicensesCurrent
         .mockResolvedValueOnce(0)   // activeLicensesPrevious
         .mockResolvedValueOnce(0);  // expiredLicensesPrevious
@@ -82,8 +107,7 @@ describe('AdminService user controls', () => {
 
     it('returns negative delta when counts decrease', async () => {
       prismaMock.userLicense.count
-        .mockResolvedValueOnce(80)   // activeLicensesWithExpiry
-        .mockResolvedValueOnce(5)    // activeLicensesNoExpiry
+        .mockResolvedValueOnce(85)   // activeLicensesCurrent
         .mockResolvedValueOnce(30)  // expiredLicensesCurrent
         .mockResolvedValueOnce(100)  // activeLicensesPrevious
         .mockResolvedValueOnce(20);  // expiredLicensesPrevious
@@ -100,8 +124,7 @@ describe('AdminService user controls', () => {
 
     it('handles empty database (all zeros)', async () => {
       prismaMock.userLicense.count
-        .mockResolvedValueOnce(0)  // activeLicensesWithExpiry
-        .mockResolvedValueOnce(0)  // activeLicensesNoExpiry
+        .mockResolvedValueOnce(0)  // activeLicensesCurrent
         .mockResolvedValueOnce(0)  // expiredLicensesCurrent
         .mockResolvedValueOnce(0)  // activeLicensesPrevious
         .mockResolvedValueOnce(0); // expiredLicensesPrevious
@@ -119,8 +142,7 @@ describe('AdminService user controls', () => {
   describe('calculateDelta via getServiceMetrics', () => {
     it('calculates positive delta correctly', async () => {
       prismaMock.userLicense.count
-        .mockResolvedValueOnce(150) // activeLicensesWithExpiry
-        .mockResolvedValueOnce(0)   // activeLicensesNoExpiry
+        .mockResolvedValueOnce(150) // activeLicensesCurrent
         .mockResolvedValueOnce(10)  // expiredLicensesCurrent
         .mockResolvedValueOnce(100) // activeLicensesPrevious
         .mockResolvedValueOnce(10); // expiredLicensesPrevious
@@ -133,8 +155,7 @@ describe('AdminService user controls', () => {
 
     it('calculates zero delta correctly', async () => {
       prismaMock.userLicense.count
-        .mockResolvedValueOnce(50)  // activeLicensesWithExpiry
-        .mockResolvedValueOnce(0)   // activeLicensesNoExpiry
+        .mockResolvedValueOnce(50)  // activeLicensesCurrent
         .mockResolvedValueOnce(20)  // expiredLicensesCurrent
         .mockResolvedValueOnce(50)  // activeLicensesPrevious
         .mockResolvedValueOnce(20); // expiredLicensesPrevious
@@ -147,8 +168,7 @@ describe('AdminService user controls', () => {
 
     it('rounds delta to nearest integer', async () => {
       prismaMock.userLicense.count
-        .mockResolvedValueOnce(133) // activeLicensesWithExpiry
-        .mockResolvedValueOnce(0)  // activeLicensesNoExpiry
+        .mockResolvedValueOnce(133) // activeLicensesCurrent
         .mockResolvedValueOnce(10) // expiredLicensesCurrent
         .mockResolvedValueOnce(100) // activeLicensesPrevious
         .mockResolvedValueOnce(10); // expiredLicensesPrevious
