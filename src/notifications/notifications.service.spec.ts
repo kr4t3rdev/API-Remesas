@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsService } from './notifications.service';
+import { PushNotificationsService } from './push-notifications.service';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { EmailService } from '../email/email.service';
 import { NotificationType } from '@prisma/client';
@@ -8,6 +9,7 @@ describe('NotificationsService', () => {
   let service: NotificationsService;
   let prisma: any;
   let emailService: any;
+  let pushNotificationsService: any;
 
   beforeEach(async () => {
     const mockPrisma = {
@@ -27,17 +29,24 @@ describe('NotificationsService', () => {
       sendEmail: jest.fn().mockResolvedValue({ success: true, messageId: 'msg-123' }),
     };
 
+    const mockPushNotificationsService = {
+      upsertDevice: jest.fn().mockResolvedValue({ id: 1, userId: 1, pushToken: 'ExpoPushToken[...]', platform: 'ios' }),
+      sendPushToUser: jest.fn().mockResolvedValue(undefined),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         NotificationsService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: EmailService, useValue: mockEmailService },
+        { provide: PushNotificationsService, useValue: mockPushNotificationsService },
       ],
     }).compile();
 
     service = module.get<NotificationsService>(NotificationsService);
     prisma = module.get(PrismaService);
     emailService = module.get(EmailService);
+    pushNotificationsService = module.get(PushNotificationsService);
   });
 
   it('debería estar definido', () => {

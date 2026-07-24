@@ -1,5 +1,6 @@
 import { PrismaClient, Role } from '@prisma/client';
 import { NotificationsService } from '../src/notifications/notifications.service';
+import { PushNotificationsService } from '../src/notifications/push-notifications.service';
 import { SubscriptionsService } from '../src/subscriptions/subscriptions.service';
 import { AdminService } from '../src/admin/admin.service';
 import { EmailService } from '../src/email/email.service';
@@ -11,8 +12,14 @@ const mockEmailService = {
   sendEmail: async () => ({ success: true, messageId: 'mock' }),
 } as unknown as EmailService;
 
+// Mock PushNotificationsService for script execution
+const mockPushNotificationsService = {
+  upsertDevice: async () => ({ id: 0, userId: 0, pushToken: '', platform: '' }),
+  sendPushToUser: async () => undefined,
+} as unknown as PushNotificationsService;
+
 async function main() {
-  const notificationsService = new NotificationsService(prisma as any, mockEmailService);
+  const notificationsService = new NotificationsService(prisma as any, mockEmailService, mockPushNotificationsService);
   const subscriptionsService = new SubscriptionsService(prisma as any);
   const authServiceMock = {
     revokeAllSessions: async () => ({

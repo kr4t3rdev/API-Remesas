@@ -3,6 +3,7 @@ import { NotificationChannel, NotificationType, Prisma } from '@prisma/client';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { EmailService } from '../email/email.service';
 import { getTemplate, TemplateData } from '../email/email-templates';
+import { PushNotificationsService } from './push-notifications.service';
 
 @Injectable()
 export class NotificationsService {
@@ -11,6 +12,7 @@ export class NotificationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly emailService: EmailService,
+    private readonly pushNotificationsService: PushNotificationsService,
   ) {}
 
   async listForUser(
@@ -176,7 +178,21 @@ export class NotificationsService {
       this.logger.warn(`Cannot send email: user ${params.userId} has no email address`);
     }
 
-    return Promise.all(writes);
+        return Promise.all(writes);
+
+    // Send push notification if channel includes PUSH and we have a userId
+    const pushUserId = params.userId;
+    if (channels.includes('PUSH' as NotificationChannel) && pushUserId) {
+      // Fire-and-forget: no esperamos ni bloqueamos el flujo principal
+      this.pushNotificationsService
+        .sendPushToUser(
+          pushUserId!,
+          params.title,
+          params.message,
+          params.payload as Record<string, unknown> | undefined,
+        )
+        .catch((err) => this.logger.warn(`Push send failed: ${err}`));
+    }
   }
 
   notifyNewUserRegistered(userId: number, email: string) {
