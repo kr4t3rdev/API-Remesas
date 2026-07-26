@@ -603,9 +603,17 @@ model PushDevice {
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, pushToken])
   @@index([userId])
   @@map("push_devices")
+}
+
+model PushReceipt {
+  receiptId String   @id
+  pushToken String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("push_receipts")
 }
 
 model AdminAuditLog {

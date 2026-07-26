@@ -94,18 +94,30 @@ describe('NotificationsService', () => {
   });
 
   describe('notifyUserTemporarilyBlocked', () => {
-    it('debería crear notificaciones para bloqueo temporal', async () => {
+    it('debería notificar por EMAIL y PUSH', async () => {
+      const notifyMixedSpy = jest.spyOn(service, 'notifyMixed');
+
       await service.notifyUserTemporarilyBlocked(1, new Date('2026-03-01T00:00:00.000Z'), 5);
 
-      expect(prisma.notification.create).toHaveBeenCalled();
+      expect(notifyMixedSpy).toHaveBeenCalledWith(expect.objectContaining({
+        userId: 1,
+        type: 'USER_TEMP_BLOCKED',
+        channels: ['EMAIL', 'PUSH'],
+      }));
     });
   });
 
   describe('notifyUserBanned', () => {
-    it('debería crear notificaciones para ban de usuario', async () => {
+    it('debería notificar por EMAIL y PUSH', async () => {
+      const notifyMixedSpy = jest.spyOn(service, 'notifyMixed');
+
       await service.notifyUserBanned(1, 'Violación de política', null);
 
-      expect(prisma.notification.create).toHaveBeenCalled();
+      expect(notifyMixedSpy).toHaveBeenCalledWith(expect.objectContaining({
+        userId: 1,
+        type: 'USER_BANNED',
+        channels: ['EMAIL', 'PUSH'],
+      }));
     });
   });
 
@@ -132,6 +144,53 @@ describe('NotificationsService', () => {
       });
 
       expect(emailService.sendEmail).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('notifyMixed con PUSH canal', () => {
+    const notification = {
+      userId: 1,
+      type: 'USER_BANNED' as NotificationType,
+      title: 'Cuenta bloqueada',
+      message: 'Contactá a soporte',
+      payload: { reason: 'security' },
+    };
+
+    it('debería despachar PUSH sin esperar su finalización', async () => {
+      const pendingPush = new Promise<void>(() => undefined);
+      pushNotificationsService.sendPushToUser.mockReturnValue(pendingPush);
+
+      await expect(service.notifyMixed({
+        ...notification,
+        channels: ['PUSH'],
+      })).resolves.toHaveLength(1);
+
+      expect(pushNotificationsService.sendPushToUser).toHaveBeenCalledWith(
+        1,
+        notification.title,
+        notification.message,
+        notification.payload,
+      );
+    });
+
+    it('NO debería despachar PUSH cuando el canal no lo incluye', async () => {
+      await service.notifyMixed({
+        ...notification,
+        channels: ['IN_APP'],
+      });
+
+      expect(pushNotificationsService.sendPushToUser).not.toHaveBeenCalled();
+    });
+
+    it('no debería bloquear ni rechazar si el envío PUSH falla', async () => {
+      pushNotificationsService.sendPushToUser.mockRejectedValue(new Error('Expo unavailable'));
+
+      await expect(service.notifyMixed({
+        ...notification,
+        channels: ['PUSH'],
+      })).resolves.toHaveLength(1);
+
+      await Promise.resolve();
     });
   });
 

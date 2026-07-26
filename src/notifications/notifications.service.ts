@@ -178,21 +178,20 @@ export class NotificationsService {
       this.logger.warn(`Cannot send email: user ${params.userId} has no email address`);
     }
 
-        return Promise.all(writes);
-
     // Send push notification if channel includes PUSH and we have a userId
     const pushUserId = params.userId;
-    if (channels.includes('PUSH' as NotificationChannel) && pushUserId) {
-      // Fire-and-forget: no esperamos ni bloqueamos el flujo principal
+    if (channels.includes('PUSH') && pushUserId) {
       this.pushNotificationsService
         .sendPushToUser(
-          pushUserId!,
+          pushUserId,
           params.title,
           params.message,
           params.payload as Record<string, unknown> | undefined,
         )
         .catch((err) => this.logger.warn(`Push send failed: ${err}`));
     }
+
+    return Promise.all(writes);
   }
 
   notifyNewUserRegistered(userId: number, email: string) {
@@ -218,7 +217,7 @@ export class NotificationsService {
     };
 
     return Promise.all([
-      this.notifyMixed({ userId, ...notification, channels: ['EMAIL'] }),
+      this.notifyMixed({ userId, ...notification, channels: ['EMAIL', 'PUSH'] }),
       this.notifyAdminsInApp(notification),
     ]);
   }
@@ -232,7 +231,7 @@ export class NotificationsService {
     };
 
     return Promise.all([
-      this.notifyMixed({ userId, ...notification, channels: ['EMAIL'] }),
+      this.notifyMixed({ userId, ...notification, channels: ['EMAIL', 'PUSH'] }),
       this.notifyAdminsInApp(notification),
     ]);
   }

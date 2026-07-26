@@ -15,7 +15,7 @@ export class Expo {
     return [ids];
   }
 
-  async getPushNotificationReceiptsAsync(): Promise<Record<string, unknown>> {
+  async getPushNotificationReceiptsAsync(): Promise<Record<string, ExpoPushReceipt>> {
     return {};
   }
 }
@@ -31,3 +31,11 @@ export type ExpoPushMessage = {
 export type ExpoPushTicket =
   | { status: 'ok'; id: string }
   | { status: 'error'; message: string; details?: { error?: string } };
+
+export type ExpoPushReceipt =
+  | { status: 'ok'; details?: object }
+  | {
+      status: 'error';
+      message: string;
+      details?: { error?: string; expoPushToken?: string };
+    };
