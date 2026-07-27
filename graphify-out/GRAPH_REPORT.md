@@ -1,16 +1,16 @@
-# Graph Report - API  (2026-07-23)
+# Graph Report - API  (2026-07-26)
 
 ## Corpus Check
-- 199 files · ~55,129 words
+- 206 files · ~57,009 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1543 nodes · 3028 edges · 87 communities (63 shown, 24 thin omitted)
+- 1557 nodes · 3115 edges · 77 communities (70 shown, 7 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4212d5f4`
+- Built from commit: `1720657a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -61,6 +61,7 @@
 - HealthController
 - AdminService
 - RegisterPaymentDto
+- environment.ts
 - HealthController
 - cash.tenant-isolation.spec.ts
 - expenses.tenant-isolation.spec.ts
@@ -72,41 +73,30 @@
 - subscriptions.service.ts
 - seed.ts
 - ResetPasswordDto
+- QueryNotificationsDto
 - CreateTransactionDto
 - AddBalanceDto
+- .findByCurrency
 - AdminController
+- .getAvatar
+- JwtAuthGuard
 - reports.module.ts
 - ApiBearerAuth
-- ApiOperation
-- ApiTags
-- Body
-- Controller
-- Get
-- Param
-- Patch
-- Post
-- Query
-- Roles
-- UpdateAdminUserDto
-- auth.service.ts
-- ApiBearerAuth
-- UseGuards
-- IsInt
-- Body
-- IsOptional
-- Max
-- Min
-- Type
+- FxOperationsService
+- SetPrimaryCurrencyDto
 - ApiProperty
+- IsString
+- auth.service.ts
+- Body
 
 ## God Nodes (most connected - your core abstractions)
-1. `CurrentUser` - 102 edges
-2. `PrismaService` - 72 edges
+1. `CurrentUser` - 107 edges
+2. `PrismaService` - 73 edges
 3. `ReportsService` - 27 edges
 4. `AdminService` - 26 edges
-5. `JwtAuthGuard` - 24 edges
-6. `AuthService` - 23 edges
-7. `NotificationsService` - 23 edges
+5. `NotificationsService` - 25 edges
+6. `AuthService` - 25 edges
+7. `JwtAuthGuard` - 25 edges
 8. `AdminController` - 22 edges
 9. `WorkerPaymentsService` - 21 edges
 10. `SubscriptionsService` - 20 edges
@@ -120,23 +110,19 @@
 ## Import Cycles
 - None detected.
 
-## Communities (87 total, 24 thin omitted)
+## Communities (77 total, 7 thin omitted)
 
 ### Community 0 - "ExpenseItemsService"
 Cohesion: 0.06
-Nodes (38): ApiParam, CreateExpenseItemDto, ApiProperty, ApiPropertyOptional, IsNotEmpty, IsNumber, IsOptional, IsString (+30 more)
-
-### Community 1 - "WorkerPaymentsController"
-Cohesion: 0.15
-Nodes (14): CreateCashClosingDto, ApiProperty, ApiPropertyOptional, IsDateString, IsInt, IsNumber, IsOptional, IsString (+6 more)
+Nodes (40): ApiParam, CreateExpenseItemDto, ApiProperty, ApiPropertyOptional, IsNotEmpty, IsNumber, IsOptional, IsString (+32 more)
 
 ### Community 2 - "CashService"
-Cohesion: 0.13
-Nodes (15): HttpCode, CashController, ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags, Body (+7 more)
+Cohesion: 0.06
+Nodes (35): HttpCode, CashController, ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags, Body (+27 more)
 
 ### Community 3 - "CreateExpenseDto"
-Cohesion: 0.06
-Nodes (39): CreateExpenseDto, ExpenseCategory, ApiProperty, ApiPropertyOptional, IsDateString, IsEnum, IsInt, IsNotEmpty (+31 more)
+Cohesion: 0.12
+Nodes (20): CreateExpenseDto, ExpenseCategory, ApiProperty, ApiPropertyOptional, IsDateString, IsEnum, IsInt, IsNotEmpty (+12 more)
 
 ### Community 4 - "CurrentUser"
 Cohesion: 0.08
@@ -144,35 +130,35 @@ Nodes (30): CreateObjectiveDto, ApiProperty, ApiPropertyOptional, IsInt, IsNotEm
 
 ### Community 5 - "fx-operations.service.ts"
 Cohesion: 0.12
-Nodes (15): CreateFxTransferDto, ApiProperty, ApiPropertyOptional, IsBoolean, IsEnum, IsInt, IsNumber, IsOptional (+7 more)
+Nodes (16): scripts, build, lint, prisma:generate, prisma:migrate, prisma:seed, prisma:studio, start (+8 more)
 
 ### Community 6 - "devDependencies"
 Cohesion: 0.04
 Nodes (46): devDependencies, eslint, eslint-config-prettier, eslint-plugin-prettier, jest, @nestjs/cli, @nestjs/schematics, @nestjs/testing (+38 more)
 
 ### Community 7 - "BankAccountsController"
-Cohesion: 0.09
-Nodes (28): BankAccountsController, ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, Body, Controller, Delete (+20 more)
+Cohesion: 0.08
+Nodes (27): BankAccountsController, ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, Body, Controller, Delete (+19 more)
 
 ### Community 8 - "CurrenciesController"
 Cohesion: 0.09
 Nodes (26): CurrenciesController, ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, Body, Controller, Delete (+18 more)
 
 ### Community 9 - "ReportsService"
-Cohesion: 0.19
-Nodes (3): ReportsService, Injectable, PeriodReportDto
+Cohesion: 0.17
+Nodes (5): ReportsService, Injectable, DailyReportDto, ExpensesReportDto, PeriodReportDto
 
 ### Community 10 - "dependencies"
-Cohesion: 0.05
-Nodes (42): author, dependencies, bcrypt, class-transformer, class-validator, decimal.js, @nestjs/common, @nestjs/config (+34 more)
+Cohesion: 0.11
+Nodes (19): dependencies, bcrypt, class-transformer, class-validator, decimal.js, @nestjs/common, @nestjs/config, @nestjs/core (+11 more)
 
 ### Community 11 - "API Endpoints"
 Cohesion: 0.05
 Nodes (41): 10. income_reconciliations, 11. rate_history, 12. objectives, 13. users, 1. currencies, 2. exchange_rates, 3. transactions, 4. cash_balances (+33 more)
 
 ### Community 12 - "plans.controller.ts"
-Cohesion: 0.11
-Nodes (16): PlansController, ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, Body, Controller, Delete (+8 more)
+Cohesion: 0.15
+Nodes (14): PlansController, ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, Body, Controller, Delete (+6 more)
 
 ### Community 13 - "ExchangeRatesService"
 Cohesion: 0.08
@@ -183,12 +169,12 @@ Cohesion: 0.09
 Nodes (25): CreateRateHistoryDto, RateSource, ApiProperty, IsEnum, IsNumber, IsOptional, IsString, Min (+17 more)
 
 ### Community 15 - "SubscriptionsService"
-Cohesion: 0.15
-Nodes (13): SubscriptionsController, ApiBearerAuth, ApiOperation, ApiTags, Body, Controller, Get, Param (+5 more)
+Cohesion: 0.09
+Nodes (21): SuspendLicenseDto, ApiPropertyOptional, IsOptional, IsString, SubscriptionsController, ApiBearerAuth, ApiOperation, ApiTags (+13 more)
 
 ### Community 16 - "current-user.decorator.ts"
 Cohesion: 0.18
-Nodes (13): CurrencyPositionUnavailableError, FX_ERROR_CODES, FxDomainError, InsufficientSaldoError, InvalidRateError, mapTransferMovement(), assertSaleAvailable(), calculateSaleSnapshot() (+5 more)
+Nodes (14): Catch, CurrencyPositionUnavailableError, FX_ERROR_CODES, FxDomainError, InsufficientSaldoError, InvalidRateError, assertSaleAvailable(), calculateSaleSnapshot() (+6 more)
 
 ### Community 17 - "NotificationsService"
 Cohesion: 0.29
@@ -200,183 +186,215 @@ Nodes (23): CashAdjustmentsController, ApiBearerAuth, ApiOperation, ApiQuery, Ap
 
 ### Community 19 - "app.module.ts"
 Cohesion: 0.07
-Nodes (37): Global, AdminModule, Module, AppModule, Module, AuthModule, Module, BankAccountsModule (+29 more)
+Nodes (35): Global, AdminModule, Module, AppModule, Module, AuthModule, Module, BankAccountsModule (+27 more)
 
 ### Community 20 - "AuthController"
-Cohesion: 0.11
-Nodes (17): CreateWorkerDto, ApiProperty, IsOptional, IsString, DepositDto, ApiProperty, ApiPropertyOptional, IsEnum (+9 more)
+Cohesion: 0.19
+Nodes (14): CurrentUser, ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, Body, Controller, Delete (+6 more)
 
 ### Community 21 - "AdminController"
-Cohesion: 0.06
-Nodes (27): main(), mockEmailService, prisma, EmailResult, SendEmailDto, EmailService, Injectable, QueryNotificationsDto (+19 more)
+Cohesion: 0.29
+Nodes (3): main(), NotificationsService, Injectable
 
 ### Community 22 - "auth.controller.ts"
-Cohesion: 0.15
-Nodes (7): ForgotPasswordDto, ApiProperty, IsEmail, IsNotEmpty, Injectable, VerificationTokenResult, VerificationTokenService
+Cohesion: 0.14
+Nodes (13): ForgotPasswordDto, ApiProperty, IsEmail, IsNotEmpty, LoginDto, ApiProperty, IsEmail, IsString (+5 more)
 
 ### Community 23 - "CreateAdminUserDto"
 Cohesion: 0.19
 Nodes (22): AdminRiskLevel, CreateAdminUserAccessDto, CreateAdminUserContactDto, CreateAdminUserDto, CreateAdminUserLicenseSetupDto, CreateAdminUserPreferencesDto, CreateAdminUserProfileDto, CreateAdminUserSecurityDto (+14 more)
 
+### Community 24 - "ReconciliationsController"
+Cohesion: 0.18
+Nodes (8): CreateWorkerDto, ApiProperty, IsOptional, IsString, ApiProperty, IsOptional, IsString, UpdateWorkerDto
+
 ### Community 25 - "upload.controller.ts"
 Cohesion: 0.27
-Nodes (16): GetAuditSummaryDto, GetCashFlowReportDto, GetCurrencyReportByIdParamDto, GetCurrencyReportDto, GetDailyReportDto, GetExpensesReportDto, GetFxPerformanceReportDto, GetPeriodReportDto (+8 more)
+Nodes (13): GetAuditSummaryDto, GetCurrencyReportByIdParamDto, GetCurrencyReportDto, GetDailyReportDto, GetExpensesReportDto, GetFxPerformanceReportDto, IsDateString, IsInt (+5 more)
 
 ### Community 26 - "auth.service.ts"
-Cohesion: 0.11
-Nodes (18): ActivateUserDto, ApiPropertyOptional, IsBoolean, IsOptional, ChangePasswordDto, ApiProperty, IsOptional, IsString (+10 more)
+Cohesion: 0.14
+Nodes (14): ExpensesController, ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, Body, Controller, Delete (+6 more)
 
 ### Community 27 - "TransactionsController"
 Cohesion: 0.12
 Nodes (15): TransactionsController, ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, Body, Controller, Get (+7 more)
 
 ### Community 28 - "AuthService"
-Cohesion: 0.18
-Nodes (10): Post, RegisterDto, ApiProperty, ApiPropertyOptional, IsEmail, IsOptional, IsString, Matches (+2 more)
+Cohesion: 0.22
+Nodes (9): RegisterDto, ApiProperty, ApiPropertyOptional, IsEmail, IsOptional, IsString, Matches, MaxLength (+1 more)
 
 ### Community 29 - "transactions.controller.ts"
-Cohesion: 0.36
-Nodes (4): CashService, toDecimal(), toNumber(), Injectable
+Cohesion: 0.14
+Nodes (15): CreateTransactionDto, ApiProperty, ApiPropertyOptional, IsEnum, IsInt, IsNumber, IsOptional, IsString (+7 more)
 
 ### Community 30 - "ChangePasswordDto"
-Cohesion: 0.17
-Nodes (11): RolesGuard, Injectable, CreatePlanDto, ApiProperty, ApiPropertyOptional, IsBoolean, IsNumber, IsOptional (+3 more)
+Cohesion: 0.26
+Nodes (9): CreatePlanDto, ApiProperty, ApiPropertyOptional, IsBoolean, IsNumber, IsOptional, IsString, Min (+1 more)
 
 ### Community 31 - "admin.controller.ts"
 Cohesion: 0.17
 Nodes (11): build, buildCommand, builder, deploy, healthcheckPath, healthcheckTimeout, preDeployCommand, restartPolicyMaxRetries (+3 more)
 
 ### Community 32 - "AdminUserActionDto"
-Cohesion: 0.16
-Nodes (23): ApiProperty, AccountReportItemDto, AccountsReportDto, AuditSummaryReportDtoSwagger, CashFlowReportDtoSwagger, CurrencyReportDto, DailyBreakdownItemDto, DailyExpenseByCategoryDto (+15 more)
+Cohesion: 0.18
+Nodes (23): AccountReportItemDto, AccountsReportDto, AuditSummaryReportDtoSwagger, CashFlowReportDtoSwagger, CurrencyReportDto, DailyBreakdownItemDto, DailyExpenseByCategoryDto, DailyReportDto (+15 more)
 
 ### Community 33 - "cash-audits.controller.ts"
 Cohesion: 0.08
 Nodes (24): CashAuditsController, ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags, Body, Controller (+16 more)
 
 ### Community 34 - ".create"
-Cohesion: 0.14
-Nodes (16): IsISO8601, IsObject, AdminUserActionDto, AdminUserActionPayloadDto, AdminUserControlActionType, ApiProperty, ApiPropertyOptional, IsEnum (+8 more)
+Cohesion: 0.05
+Nodes (38): IsISO8601, IsObject, AdminController, ApiBearerAuth, ApiOperation, ApiTags, Body, Controller (+30 more)
 
 ### Community 35 - "JwtAuthGuard"
-Cohesion: 0.16
-Nodes (14): Request, AuthController, ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, Body, Controller (+6 more)
+Cohesion: 0.14
+Nodes (12): Request, ApiBearerAuth, Delete, Get, Param, Patch, Roles, UseGuards (+4 more)
 
 ### Community 36 - "SubscriptionsService"
-Cohesion: 0.06
-Nodes (28): Res, CashBalancesController, ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, Controller, Get (+20 more)
+Cohesion: 0.12
+Nodes (13): Res, Controller, Get, Param, Post, UseGuards, UploadController, Module (+5 more)
 
 ### Community 37 - "SubscriptionsService"
-Cohesion: 0.28
-Nodes (10): ReportsController, ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, Controller, Get, Param (+2 more)
+Cohesion: 0.15
+Nodes (16): GetCashFlowReportDto, GetPeriodReportDto, GetProfitReportDto, ReportsController, ApiBearerAuth, ApiOperation, ApiResponse, ApiTags (+8 more)
 
 ### Community 39 - "environment.ts"
 Cohesion: 0.10
-Nodes (21): AccountReportItem, AccountsReportDto, AuditSummaryReportDto, CashFlowReportDto, CurrencyReportDto, DailyBreakdownItem, DailyExpenseByCategory, DailyExpenseCategorySummary (+13 more)
+Nodes (18): ReportsModule, Module, AccountReportItem, AuditSummaryReportDto, CashFlowReportDto, CurrencyReportDto, DailyBreakdownItem, DailyExpenseByCategory (+10 more)
 
 ### Community 40 - ".reactivateLicense"
 Cohesion: 0.08
 Nodes (21): RemittanceEventDto, ApiProperty, ApiPropertyOptional, IsEnum, IsInt, IsNumber, IsOptional, IsString (+13 more)
 
 ### Community 42 - "RegisterDto"
-Cohesion: 0.14
-Nodes (15): CreateTransactionDto, ApiProperty, ApiPropertyOptional, IsEnum, IsInt, IsNumber, IsOptional, IsString (+7 more)
+Cohesion: 0.12
+Nodes (15): CreateFxTransferDto, ApiProperty, ApiPropertyOptional, IsBoolean, IsEnum, IsInt, IsNumber, IsOptional (+7 more)
 
 ### Community 43 - "NotificationsService"
-Cohesion: 0.19
-Nodes (13): ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, Body, Controller, Delete, Get (+5 more)
+Cohesion: 0.13
+Nodes (13): CashBalancesController, ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, Controller, Get, Param (+5 more)
 
 ### Community 44 - "HealthController"
-Cohesion: 0.18
+Cohesion: 0.20
 Nodes (10): RegisterPaymentDto, ApiProperty, ApiPropertyOptional, IsDateString, IsEnum, IsInt, IsNumber, IsOptional (+2 more)
 
 ### Community 45 - "AdminService"
-Cohesion: 0.28
-Nodes (6): IsInt, IsOptional, Max, Min, PlatformSeriesQueryDto, Type
+Cohesion: 0.29
+Nodes (6): PlatformSeriesQueryDto, IsInt, IsOptional, Max, Min, Type
 
 ### Community 46 - "RegisterPaymentDto"
-Cohesion: 0.22
-Nodes (8): AssignLicenseDto, ApiProperty, ApiPropertyOptional, IsDateString, IsEnum, IsInt, IsOptional, IsString
+Cohesion: 0.24
+Nodes (6): EmailResult, SendEmailDto, EmailModule, Module, EmailService, Injectable
+
+### Community 47 - "environment.ts"
+Cohesion: 0.24
+Nodes (7): ApiProperty, IsIn, IsString, IsExpoPushToken(), RegisterPushTokenDto, Body, Post
 
 ### Community 48 - "HealthController"
-Cohesion: 0.19
-Nodes (6): AuthService, Injectable, ResendVerificationDto, ApiProperty, IsEmail, IsNotEmpty
+Cohesion: 0.15
+Nodes (11): AuthController, ApiOperation, ApiResponse, ApiTags, Body, Controller, Post, ApiProperty (+3 more)
 
 ### Community 49 - "cash.tenant-isolation.spec.ts"
 Cohesion: 0.24
 Nodes (5): HealthController, Controller, Get, HealthModule, Module
 
 ### Community 50 - "expenses.tenant-isolation.spec.ts"
-Cohesion: 0.14
-Nodes (10): Catch, FxDomainExceptionFilter, FxOperationsController, ApiBearerAuth, ApiTags, Controller, UseFilters, UseGuards (+2 more)
+Cohesion: 0.20
+Nodes (10): CreateTransactionDto, ApiProperty, ApiPropertyOptional, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional (+2 more)
 
 ### Community 51 - "admin.controller.ts"
-Cohesion: 0.40
-Nodes (4): SetPrimaryCurrencyDto, ApiProperty, IsInt, IsNotEmpty
+Cohesion: 0.20
+Nodes (9): AddBalanceDto, ApiProperty, ApiPropertyOptional, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional (+1 more)
 
 ### Community 52 - "nest-cli.json"
 Cohesion: 0.33
 Nodes (5): collection, compilerOptions, deleteOutDir, $schema, sourceRoot
 
 ### Community 53 - "notifications.service.ts"
-Cohesion: 0.39
+Cohesion: 0.47
 Nodes (5): generateHtmlTemplate(), generateTextTemplate(), getTemplate(), TemplateData, TemplateOutput
 
+### Community 54 - "Controller"
+Cohesion: 0.20
+Nodes (5): expo-server-sdk, Expo, ExpoPushMessage, ExpoPushReceipt, ExpoPushTicket
+
+### Community 55 - "ForgotPasswordDto"
+Cohesion: 0.22
+Nodes (6): FxOperationsController, ApiBearerAuth, ApiTags, Controller, UseFilters, UseGuards
+
 ### Community 56 - "subscriptions.service.ts"
-Cohesion: 0.15
-Nodes (11): Roles(), RenewLicenseDto, ApiProperty, IsEnum, IsInt, SuspendLicenseDto, ApiPropertyOptional, IsOptional (+3 more)
+Cohesion: 0.25
+Nodes (8): AssignLicenseDto, ApiProperty, ApiPropertyOptional, IsDateString, IsEnum, IsInt, IsOptional, IsString
 
 ### Community 60 - "ResetPasswordDto"
-Cohesion: 0.20
+Cohesion: 0.29
 Nodes (7): ResetPasswordDto, ApiProperty, IsNotEmpty, IsString, Matches, MaxLength, MinLength
 
+### Community 62 - "QueryNotificationsDto"
+Cohesion: 0.22
+Nodes (8): QueryNotificationsDto, IsBoolean, IsInt, IsOptional, Max, Min, Transform, Type
+
 ### Community 63 - "CreateTransactionDto"
-Cohesion: 0.20
-Nodes (10): CreateTransactionDto, ApiProperty, ApiPropertyOptional, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional (+2 more)
+Cohesion: 0.25
+Nodes (7): author, description, keywords, license, main, name, version
 
 ### Community 64 - "AddBalanceDto"
-Cohesion: 0.22
-Nodes (9): AddBalanceDto, ApiProperty, ApiPropertyOptional, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional (+1 more)
+Cohesion: 0.33
+Nodes (5): ChangePasswordDto, ApiProperty, IsOptional, IsString, MinLength
+
+### Community 65 - ".findByCurrency"
+Cohesion: 0.18
+Nodes (5): AuthService, Injectable, Injectable, VerificationTokenResult, VerificationTokenService
 
 ### Community 66 - "AdminController"
-Cohesion: 0.29
-Nodes (6): ApiBearerAuth, ApiTags, Controller, Roles, AdminController, UseGuards
+Cohesion: 0.20
+Nodes (9): DepositDto, ApiProperty, ApiPropertyOptional, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional (+1 more)
 
-### Community 81 - "UpdateAdminUserDto"
-Cohesion: 0.25
-Nodes (7): ApiPropertyOptional, IsBoolean, IsEmail, IsOptional, IsString, MaxLength, UpdateAdminUserDto
+### Community 68 - "JwtAuthGuard"
+Cohesion: 0.15
+Nodes (9): Roles(), JwtAuthGuard, Injectable, RolesGuard, Injectable, RenewLicenseDto, ApiProperty, IsEnum (+1 more)
+
+### Community 69 - "reports.module.ts"
+Cohesion: 0.32
+Nodes (4): mockEmailService, mockPushNotificationsService, prisma, RegisterPushTokenDto
+
+### Community 71 - "FxOperationsService"
+Cohesion: 0.40
+Nodes (3): mapTransferMovement(), FxOperationsService, Injectable
+
+### Community 72 - "SetPrimaryCurrencyDto"
+Cohesion: 0.40
+Nodes (4): SetPrimaryCurrencyDto, ApiProperty, IsInt, IsNotEmpty
 
 ### Community 82 - "auth.service.ts"
 Cohesion: 0.13
-Nodes (9): JwtStrategy, Injectable, closingA, closingB, PrismaService, Injectable, CYCLE_DAYS, CYCLE_USD (+1 more)
-
-### Community 83 - "ApiBearerAuth"
-Cohesion: 0.18
-Nodes (3): ApiOperation, Get, Query
+Nodes (8): JwtStrategy, Injectable, PrismaService, Injectable, rows, CYCLE_DAYS, CYCLE_USD, rows
 
 ### Community 86 - "Body"
-Cohesion: 0.23
-Nodes (5): Body, CurrentUser, Param, Patch, Post
+Cohesion: 0.14
+Nodes (10): NotificationsController, ApiBearerAuth, ApiOperation, ApiTags, Controller, Get, Param, Patch (+2 more)
 
 ## Knowledge Gaps
-- **162 isolated node(s):** `DailyExpenseByCategory`, `DailyExpenseCategorySummary`, `DailyBreakdownItem`, `PeriodTransactionCurrencySummary`, `TransactionTypeLite` (+157 more)
+- **168 isolated node(s):** `ExpoPushMessage`, `ExpoPushTicket`, `ExpoPushReceipt`, `RegisterPushTokenDto`, `$schema` (+163 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **24 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `CurrentUser` connect `BankAccountsController` to `ExpenseItemsService`, `WorkerPaymentsController`, `CashService`, `CreateExpenseDto`, `CurrentUser`, `fx-operations.service.ts`, `CurrenciesController`, `ExchangeRatesService`, `RateHistoryController`, `CreateCashAdjustmentDto`, `AuthController`, `AdminController`, `upload.controller.ts`, `TransactionsController`, `cash-audits.controller.ts`, `SubscriptionsService`, `SubscriptionsService`, `.reactivateLicense`, `RegisterDto`, `NotificationsService`, `expenses.tenant-isolation.spec.ts`?**
-  _High betweenness centrality (0.260) - this node is a cross-community bridge._
-- **Why does `PrismaService` connect `auth.service.ts` to `ExpenseItemsService`, `WorkerPaymentsController`, `CreateExpenseDto`, `CurrentUser`, `BankAccountsController`, `CurrenciesController`, `plans.controller.ts`, `ExchangeRatesService`, `RateHistoryController`, `current-user.decorator.ts`, `CreateCashAdjustmentDto`, `app.module.ts`, `AuthController`, `AdminController`, `auth.controller.ts`, `auth.service.ts`, `TransactionsController`, `transactions.controller.ts`, `ChangePasswordDto`, `cash-audits.controller.ts`, `SubscriptionsService`, `.reactivateLicense`, `RegisterDto`, `cash.tenant-isolation.spec.ts`, `expenses.tenant-isolation.spec.ts`, `notifications.service.ts`, `Controller`, `ForgotPasswordDto`?**
-  _High betweenness centrality (0.094) - this node is a cross-community bridge._
-- **Why does `JwtAuthGuard` connect `SubscriptionsService` to `ExpenseItemsService`, `WorkerPaymentsController`, `CreateExpenseDto`, `CurrentUser`, `BankAccountsController`, `CurrenciesController`, `ExchangeRatesService`, `RateHistoryController`, `CreateCashAdjustmentDto`, `AuthController`, `AdminController`, `upload.controller.ts`, `auth.service.ts`, `ChangePasswordDto`, `cash-audits.controller.ts`, `.reactivateLicense`, `RegisterDto`, `expenses.tenant-isolation.spec.ts`, `subscriptions.service.ts`?**
-  _High betweenness centrality (0.077) - this node is a cross-community bridge._
-- **What connects `DailyExpenseByCategory`, `DailyExpenseCategorySummary`, `DailyBreakdownItem` to the rest of the system?**
-  _162 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Why does `CurrentUser` connect `AuthController` to `ExpenseItemsService`, `CashService`, `CreateExpenseDto`, `CurrentUser`, `BankAccountsController`, `CurrenciesController`, `ReportsService`, `ExchangeRatesService`, `RateHistoryController`, `CreateCashAdjustmentDto`, `ReconciliationsController`, `auth.service.ts`, `TransactionsController`, `transactions.controller.ts`, `AdminUserActionDto`, `cash-audits.controller.ts`, `.create`, `SubscriptionsService`, `SubscriptionsService`, `.reactivateLicense`, `RegisterDto`, `NotificationsService`, `environment.ts`, `ForgotPasswordDto`, `QueryNotificationsDto`, `JwtAuthGuard`, `Body`?**
+  _High betweenness centrality (0.373) - this node is a cross-community bridge._
+- **Why does `PrismaService` connect `auth.service.ts` to `ExpenseItemsService`, `CashService`, `CreateExpenseDto`, `CurrentUser`, `BankAccountsController`, `CurrenciesController`, `ReportsService`, `ExchangeRatesService`, `RateHistoryController`, `SubscriptionsService`, `current-user.decorator.ts`, `CreateCashAdjustmentDto`, `app.module.ts`, `AdminController`, `auth.controller.ts`, `ReconciliationsController`, `TransactionsController`, `transactions.controller.ts`, `ChangePasswordDto`, `cash-audits.controller.ts`, `.create`, `SubscriptionsService`, `environment.ts`, `.reactivateLicense`, `EmailService`, `NotificationsService`, `cash.tenant-isolation.spec.ts`, `.findByCurrency`, `.getAvatar`, `ApiBearerAuth`, `FxOperationsService`?**
+  _High betweenness centrality (0.129) - this node is a cross-community bridge._
+- **Why does `Expo` connect `Controller` to `WorkerPaymentsController`?**
+  _High betweenness centrality (0.118) - this node is a cross-community bridge._
+- **What connects `ExpoPushMessage`, `ExpoPushTicket`, `ExpoPushReceipt` to the rest of the system?**
+  _168 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `ExpenseItemsService` be split into smaller, more focused modules?**
-  _Cohesion score 0.060655737704918035 - nodes in this community are weakly interconnected._
-- **Should `WorkerPaymentsController` be split into smaller, more focused modules?**
-  _Cohesion score 0.14736842105263157 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.057859703020993344 - nodes in this community are weakly interconnected._
 - **Should `CashService` be split into smaller, more focused modules?**
-  _Cohesion score 0.1282051282051282 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06393442622950819 - nodes in this community are weakly interconnected._
+- **Should `CreateExpenseDto` be split into smaller, more focused modules?**
+  _Cohesion score 0.12 - nodes in this community are weakly interconnected._

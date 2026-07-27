@@ -44,6 +44,16 @@ export class PushNotificationsService {
     });
   }
 
+  async removeDevice(userId: number, dto: { pushToken: string }) {
+    if (!Expo.isExpoPushToken(dto.pushToken)) {
+      throw new BadRequestException('Invalid Expo push token');
+    }
+
+    await this.prisma.pushDevice.deleteMany({
+      where: { userId, pushToken: dto.pushToken },
+    });
+  }
+
   async sendPushToUser(
     userId: number,
     title: string,

@@ -262,4 +262,36 @@ describe("PushNotificationsService", () => {
 
     expect(warnSpy.mock.calls.flat().join(" ")).not.toContain(staleToken);
   });
+
+  describe("removeDevice", () => {
+    it("borra el PushDevice del user únicamente cuando coincide userId y pushToken", async () => {
+      await service.removeDevice(22, {
+        pushToken: "ExpoPushToken[device-1]",
+      });
+
+      expect(prisma.pushDevice.deleteMany).toHaveBeenCalledWith({
+        where: { userId: 22, pushToken: "ExpoPushToken[device-1]" },
+      });
+    });
+
+    it("rechaza tokens Expo inválidos", async () => {
+      await expect(
+        service.removeDevice(22, { pushToken: "not-a-token" }),
+      ).rejects.toMatchObject({ status: 400 });
+
+      expect(prisma.pushDevice.deleteMany).not.toHaveBeenCalled();
+    });
+
+    it("no borra tokens ajenos (otro user)", async () => {
+      prisma.pushDevice.deleteMany.mockResolvedValue({ count: 0 });
+
+      await service.removeDevice(99, {
+        pushToken: "ExpoPushToken[device-1]",
+      });
+
+      expect(prisma.pushDevice.deleteMany).toHaveBeenCalledWith({
+        where: { userId: 99, pushToken: "ExpoPushToken[device-1]" },
+      });
+    });
+  });
 });
