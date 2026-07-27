@@ -596,13 +596,14 @@ model Notification {
 model PushDevice {
   id        Int      @id @default(autoincrement())
   userId    Int
-  pushToken String   @unique
+  pushToken String
   platform  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, pushToken])
   @@index([userId])
   @@map("push_devices")
 }

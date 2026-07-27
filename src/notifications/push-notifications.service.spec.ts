@@ -39,22 +39,51 @@ describe("PushNotificationsService", () => {
     jest.restoreAllMocks();
   });
 
-  it("transfiere atómicamente el ownership buscando por pushToken global", async () => {
+  it("upsert por compound (userId + pushToken) para evitar transferir ownership", async () => {
     await service.upsertDevice(22, {
       pushToken: "ExpoPushToken[device-1]",
       platform: "ios",
     });
 
     expect(prisma.pushDevice.upsert).toHaveBeenCalledWith({
-      where: { pushToken: "ExpoPushToken[device-1]" },
+      where: {
+        userId_pushToken: {
+          userId: 22,
+          pushToken: "ExpoPushToken[device-1]",
+        },
+      },
       create: {
         userId: 22,
         pushToken: "ExpoPushToken[device-1]",
         platform: "ios",
       },
       update: {
-        userId: 22,
         platform: "ios",
+      },
+    });
+  });
+
+  it("no transfiere el ownership a otro user (upsert compuesto)", async () => {
+    // user 99 registra el mismo token: NO debe pisar al user 22.
+    await service.upsertDevice(99, {
+      pushToken: "ExpoPushToken[device-1]",
+      platform: "android",
+    });
+
+    expect(prisma.pushDevice.upsert).toHaveBeenCalledWith({
+      where: {
+        userId_pushToken: {
+          userId: 99,
+          pushToken: "ExpoPushToken[device-1]",
+        },
+      },
+      create: {
+        userId: 99,
+        pushToken: "ExpoPushToken[device-1]",
+        platform: "android",
+      },
+      update: {
+        platform: "android",
       },
     });
   });

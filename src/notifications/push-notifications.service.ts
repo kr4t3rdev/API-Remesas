@@ -30,7 +30,10 @@ export class PushNotificationsService {
 
     return this.prisma.pushDevice.upsert({
       where: {
-        pushToken: dto.pushToken,
+        userId_pushToken: {
+          userId,
+          pushToken: dto.pushToken,
+        },
       },
       create: {
         userId,
@@ -38,7 +41,6 @@ export class PushNotificationsService {
         platform: dto.platform,
       },
       update: {
-        userId,
         platform: dto.platform,
       },
     });
