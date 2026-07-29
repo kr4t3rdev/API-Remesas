@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   UseGuards,
   Query,
+  Delete,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -103,5 +104,19 @@ export class RateHistoryController {
     @Param('toId', ParseIntPipe) toId: number,
   ) {
     return this.rateHistoryService.getLatestRate(userId, fromId, toId);
+  }
+
+  @Delete()
+  @ApiOperation({ summary: 'Resetear historial de tasas' })
+  @ApiQuery({ name: 'currencyId', required: false, type: Number })
+  @ApiResponse({ status: 200, description: 'Historial reseteado' })
+  resetHistory(
+    @CurrentUser('id') userId: number,
+    @Query('currencyId') currencyId?: number,
+  ) {
+    if (currencyId) {
+      return this.rateHistoryService.resetHistory(userId, Number(currencyId));
+    }
+    return this.rateHistoryService.resetHistory(userId);
   }
 }

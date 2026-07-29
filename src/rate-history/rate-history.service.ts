@@ -128,4 +128,24 @@ export class RateHistoryService {
       manualCount: rates.filter(r => r.source === 'MANUAL').length,
     };
   }
+
+  async resetHistory(userId: number, currencyId?: number) {
+    const where: any = { userId };
+
+    if (currencyId) {
+      where.OR = [
+        { currencyFromId: currencyId },
+        { currencyToId: currencyId },
+      ];
+    }
+
+    const result = await this.prisma.rateHistory.deleteMany({ where });
+
+    return {
+      message: currencyId
+        ? `Historial de tasas reseteado para la moneda ${currencyId}`
+        : 'Historial de tasas reseteado correctamente',
+      count: result.count,
+    };
+  }
 }

@@ -22,33 +22,25 @@ export class ExchangeRatesService {
   }
 
   async findCurrent(userId: number) {
-    const currencies = await this.prisma.currency.findMany({
-      where: { isActive: true, code: { not: 'CUP' } },
-    });
-
     const cupCurrency = await this.prisma.currency.findFirst({
       where: { code: 'CUP' },
     });
 
-    const rates = await Promise.all(
-      currencies.map(async (currency) => {
-        const latestRate = await this.prisma.exchangeRate.findFirst({
-          where: { userId, currencyId: currency.id },
-          orderBy: { effectiveDate: 'desc' },
-        });
+    const rates = await this.prisma.exchangeRate.findMany({
+      where: {
+        userId,
+        currency: { isActive: true, code: { not: 'CUP' } },
+      },
+      include: { currency: true },
+    });
 
-        if (!latestRate) return null;
+    const serializedRates = rates.map((rate) => ({
+      ...rate,
+      buyRate: Number(rate.referenceRate) * (1 - Number(rate.buyMargin)),
+      sellRate: Number(rate.referenceRate) * (1 + Number(rate.sellMargin)),
+    }));
 
-        return {
-          ...latestRate,
-          currency,
-          buyRate: Number(latestRate.referenceRate) * (1 - Number(latestRate.buyMargin)),
-          sellRate: Number(latestRate.referenceRate) * (1 + Number(latestRate.sellMargin)),
-        };
-      }),
-    );
-
-    return { rates: rates.filter(Boolean), cupCurrencyId: cupCurrency?.id };
+    return { rates: serializedRates, cupCurrencyId: cupCurrency?.id };
   }
 
   async findByCurrency(userId: number, currencyId: number) {
