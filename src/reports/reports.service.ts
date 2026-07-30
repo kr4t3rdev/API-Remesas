@@ -155,8 +155,7 @@ export class ReportsService {
       0,
     );
 
-    const totalCostsForNet =
-      gastosInCup.totalInCup !== null ? gastosInCup.totalInCup : totalGastos;
+    const totalCostsForNet = gastosInCup.totalInCup ?? 0;
     const net = totalVentas - totalCompras - totalCostsForNet;
     const marginPct = totalVentas > 0
       ? (totalProfit / totalVentas) * 100
@@ -216,8 +215,7 @@ export class ReportsService {
       0,
     );
     const gastosInCup = await this.sumExpensesInCup(userId, expenses);
-    const totalExpensesInCup =
-      gastosInCup.totalInCup !== null ? gastosInCup.totalInCup : totalExpensesAmount;
+    const totalExpensesInCup = gastosInCup.totalInCup;
 
     const marginProfit = transactions.reduce(
       (sum, t) => sum + Number(t.marginProfit),
@@ -233,7 +231,7 @@ export class ReportsService {
         totalExpensesInCup,
         unconvertedExpensesCount: gastosInCup.unconvertedCount,
         marginProfit,
-        netProfit: Number((marginProfit - totalExpensesInCup).toFixed(2)),
+        netProfit: Number((marginProfit - (totalExpensesInCup ?? 0)).toFixed(2)),
       },
       dailyBreakdown: dailyReports,
       transactionsByCurrency: this.groupByCurrency(transactions),
@@ -683,7 +681,7 @@ export class ReportsService {
       }),
       this.prisma.expense.findMany({
         where: { userId, date: { gte: startDay, lte: endDay } },
-        select: { date: true, amount: true, currency: { select: { code: true } } },
+        select: { date: true, amount: true, currencyId: true, currency: { select: { code: true } } },
       }),
     ]);
 
@@ -729,11 +727,16 @@ export class ReportsService {
       const bucket = buckets.get(key);
       if (!bucket) continue;
       bucket.expenses += 1;
-      const isCup = expense.currency?.code === 'CUP';
-      if (isCup) {
-        bucket.expensesTotalCup += Number(expense.amount);
-      } else {
+      const rate = await this.getRateToCup(
+        userId,
+        expense.currencyId,
+        expense.currency?.code,
+        expense.date,
+      );
+      if (rate === null) {
         bucket.expensesUnconverted += 1;
+      } else {
+        bucket.expensesTotalCup += Number(expense.amount) * rate;
       }
     }
 

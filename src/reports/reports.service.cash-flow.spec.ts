@@ -70,4 +70,42 @@ describe('ReportsService report periods and cash flow', () => {
     expect(result).not.toHaveProperty('inflows');
     expect(result).not.toHaveProperty('outflows');
   });
+
+  it('converts non-CUP expenses in the daily breakdown using the rate effective on the expense date', async () => {
+    const expense = {
+      amount: new Decimal(10),
+      currencyId: 2,
+      date: new Date('2026-07-09T12:00:00.000Z'),
+      currency: { code: 'USD' },
+    };
+    const prisma = {
+      transaction: {
+        findMany: jest.fn()
+          .mockResolvedValueOnce([])
+          .mockResolvedValueOnce([]),
+      },
+      expense: {
+        findMany: jest.fn()
+          .mockResolvedValueOnce([expense])
+          .mockResolvedValueOnce([expense]),
+      },
+      exchangeRate: {
+        findFirst: jest.fn().mockResolvedValue({ referenceRate: new Decimal(270) }),
+      },
+    };
+
+    const result = await new ReportsService(prisma as any).getPeriodReport(
+      7,
+      '2026-07-10',
+      '2026-07-10',
+    );
+
+    expect(result.dailyBreakdown).toContainEqual(
+      expect.objectContaining({
+        expenses: 1,
+        expensesTotalCup: 2700,
+        expensesUnconverted: 0,
+      }),
+    );
+  });
 });
