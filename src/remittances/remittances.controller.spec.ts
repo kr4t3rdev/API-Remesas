@@ -25,4 +25,12 @@ describe('RemittancesController', () => {
     expect(() => controller.ingest('unknown', { userId: 999 } as any)).toThrow(UnauthorizedException);
     expect(service.ingest).not.toHaveBeenCalled();
   });
+
+  it('exposes tenant-scoped reconciliation behind the authenticated route', async () => {
+    const service = { reconcile: jest.fn().mockResolvedValue({ ok: true }) } as any;
+    const controller = new RemittancesController(service);
+
+    await expect(controller.reconcile(8)).resolves.toEqual({ ok: true });
+    expect(service.reconcile).toHaveBeenCalledWith(8);
+  });
 });

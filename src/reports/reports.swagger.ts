@@ -45,8 +45,8 @@ export class DailyReportProfitDto {
   margin!: number;
   @ApiProperty({ description: 'Suma de Transaction.marginProfit' })
   marginProfit!: number;
-  @ApiProperty({ description: 'totalVentas - totalCompras - gastos (CUP)' })
-  net!: number;
+  @ApiProperty({ nullable: true, description: 'Realized FX margin minus CUP-converted expenses; null when conversion is incomplete' })
+  net!: number | null;
 }
 
 export class DailyReportDto {
@@ -90,8 +90,8 @@ export class PeriodReportSummaryDto {
   unconvertedExpensesCount!: number;
   @ApiProperty()
   marginProfit!: number;
-  @ApiProperty()
-  netProfit!: number;
+  @ApiProperty({ nullable: true })
+  netProfit!: number | null;
 }
 
 export class PeriodReportPeriodDto {
@@ -291,6 +291,10 @@ export class FxPerformancePositionDto {
   saldo!: number;
   @ApiProperty({ type: Number, nullable: true })
   costoPromedio!: number | null;
+  @ApiProperty({ enum: ['UNREVIEWED', 'REVIEWED'] })
+  reviewStatus!: 'UNREVIEWED' | 'REVIEWED';
+  @ApiProperty({ type: String, format: 'date-time', nullable: true })
+  reviewedAt!: Date | null;
   @ApiProperty()
   availableForSale!: boolean;
 }

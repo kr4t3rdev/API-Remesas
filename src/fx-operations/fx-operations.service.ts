@@ -3,10 +3,12 @@ import { CurrencyMovementType, FxOperationKind, Prisma, TransactionType, Transfe
 import { Decimal } from '@prisma/client/runtime/library';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { CreateFxTransferDto } from './dto/create-fx-transfer.dto';
+import { OpenCurrencyPositionDto } from './dto/open-currency-position.dto';
 import { assertSaleAvailable, calculateSaleSnapshot, calculateWeightedAveragePurchase } from './domain/position-calculator';
 import { mapTransferMovement } from './domain/movement-mapper';
 import { validateServerRate } from './rate-validator';
 import { CurrencyPositionUnavailableError, InsufficientSaldoError, InvalidRateError } from './domain/domain-errors';
+import { serializableTransaction } from '../common/transactions/serializable-transaction';
 
 const MAX_TRANSACTION_TOTAL = new Decimal('9999999999999.99');
 const PERSISTED_RATE_RELATIVE_TOLERANCE = new Decimal('0.0001');
@@ -33,6 +35,27 @@ export function calculatePersistedRate(type: TransactionType, referenceRate: Dec
 @Injectable()
 export class FxOperationsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private async resolvePrimaryCurrency(userId: number) {
+    const userDelegate = (this.prisma as any).user;
+    if (typeof userDelegate?.findUnique === 'function') {
+      const user = await userDelegate.findUnique({
+        where: { id: userId },
+        select: {
+          primaryCurrencyId: true,
+          primaryCurrency: { select: { id: true, code: true, isActive: true } },
+        },
+      });
+      if (user?.primaryCurrencyId != null) {
+        if (user.primaryCurrency?.isActive) return user.primaryCurrency;
+        throw new NotFoundException('Active primary currency not found');
+      }
+    }
+
+    const cupCurrency = await this.prisma.currency.findUnique({ where: { code: 'CUP' } });
+    if (!cupCurrency?.isActive) throw new NotFoundException('Active primary currency not found');
+    return cupCurrency;
+  }
 
   private assertSameTransferIntent(existing: any, userId: number, dto: CreateFxTransferDto) {
     const sameIntent = existing.userId === userId && existing.type === dto.type
@@ -83,14 +106,14 @@ export class FxOperationsService {
     const amount = new Decimal(dto.amount);
     const requestedRate = new Decimal(dto.rate);
     const currency = await this.prisma.currency.findUnique({ where: { id: dto.currencyId } });
-    const cupCurrency = await this.prisma.currency.findUnique({ where: { code: 'CUP' } });
+    const primaryCurrency = await this.resolvePrimaryCurrency(userId);
 
-    if (!currency || !currency.isActive || currency.code === 'CUP' || !cupCurrency || !cupCurrency.isActive) {
+    if (!currency || !currency.isActive || currency.id === primaryCurrency.id) {
       throw new NotFoundException('Active non-CUP FX currency not found');
     }
 
     try {
-      return await this.prisma.$transaction(async (tx) => {
+      return await serializableTransaction(this.prisma, async (tx) => {
       const currentRate = await tx.exchangeRate.findUnique({
         where: { userId_currencyId: { userId, currencyId: dto.currencyId } },
       });
@@ -110,6 +133,14 @@ export class FxOperationsService {
       if (dto.type === TransactionType.VENTA && !existing) throw new CurrencyPositionUnavailableError();
       if (dto.type === TransactionType.COMPRA && existing?.reviewStatus === 'UNREVIEWED' && !existing.saldo.eq(0)) {
         throw new CurrencyPositionUnavailableError();
+      }
+      if (dto.type === TransactionType.COMPRA && (!existing || existing.reviewStatus === 'UNREVIEWED')) {
+        const historicalCash = typeof tx.cashBalance.findUnique === 'function'
+          ? await tx.cashBalance.findUnique({ where: { userId_currencyId: { userId, currencyId: dto.currencyId } } })
+          : null;
+        if (historicalCash && new Decimal(historicalCash.balance).gt(0)) {
+          throw new CurrencyPositionUnavailableError();
+        }
       }
       const position = existing ?? await tx.currencyPosition.create({
         data: {
@@ -143,6 +174,7 @@ export class FxOperationsService {
           amount,
           rate,
           requestedRate,
+          // Legacy schema name: totalCup stores the total in the user's configured primary currency.
           totalCup: amount.mul(rate),
           marginProfit: realizedProfit ?? new Decimal(0),
           notes: dto.notes,
@@ -185,7 +217,7 @@ export class FxOperationsService {
           data: {
             userId,
             currencyFromId: dto.currencyId,
-            currencyToId: cupCurrency.id,
+            currencyToId: primaryCurrency.id,
             rate,
             source: 'MANUAL',
             referenceType: 'FX_TRANSACTION',
@@ -219,8 +251,8 @@ export class FxOperationsService {
       const destinationType = dto.destinationType ?? TransferAccountType.CASH;
       const sourceBankAccountId = dto.sourceBankAccountId;
       const destinationBankAccountId = dto.destinationBankAccountId;
-      const sourceCurrencyId = dto.type === TransactionType.COMPRA ? cupCurrency.id : dto.currencyId;
-      const destinationCurrencyId = dto.type === TransactionType.COMPRA ? dto.currencyId : cupCurrency.id;
+      const sourceCurrencyId = dto.type === TransactionType.COMPRA ? primaryCurrency.id : dto.currencyId;
+      const destinationCurrencyId = dto.type === TransactionType.COMPRA ? dto.currencyId : primaryCurrency.id;
       const sourceAmount = dto.type === TransactionType.COMPRA ? amount.mul(rate) : amount;
       const destinationAmount = dto.type === TransactionType.COMPRA ? amount : amount.mul(rate);
       const adjustCashSource = async (currencyId: number) => {
@@ -265,13 +297,13 @@ export class FxOperationsService {
         }
       } else if (dto.type === TransactionType.COMPRA) {
         await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: dto.currencyId } }, update: { balance: { increment: amount } }, create: { userId, currencyId: dto.currencyId, balance: amount } });
-        await adjustCashSource(cupCurrency.id);
+        await adjustCashSource(primaryCurrency.id);
       } else {
         await adjustCashSource(dto.currencyId);
         await tx.cashBalance.upsert({
-          where: { userId_currencyId: { userId, currencyId: cupCurrency.id } },
+          where: { userId_currencyId: { userId, currencyId: primaryCurrency.id } },
           update: { balance: { increment: amount.mul(rate) } },
-          create: { userId, currencyId: cupCurrency.id, balance: amount.mul(rate) },
+          create: { userId, currencyId: primaryCurrency.id, balance: amount.mul(rate) },
         });
       }
 
@@ -315,7 +347,7 @@ export class FxOperationsService {
       }
 
       return { transaction, movement, position: { ...position, saldo: nextSaldo, costoPromedio: average }, realizedProfit };
-      }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+      });
     } catch (error) {
       if (idempotencyKey && error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
         const existing = await this.prisma.transaction.findUnique({
@@ -329,5 +361,58 @@ export class FxOperationsService {
       }
       throw error;
     }
+  }
+
+  async openPosition(userId: number, dto: OpenCurrencyPositionDto) {
+    const currency = await this.prisma.currency.findUnique({ where: { id: dto.currencyId } });
+    const primaryCurrency = await this.resolvePrimaryCurrency(userId);
+    if (!currency || !currency.isActive || currency.id === primaryCurrency.id) {
+      throw new NotFoundException('Active non-CUP FX currency not found');
+    }
+    const openingCost = new Decimal(dto.openingCost);
+
+    return serializableTransaction(this.prisma, async (tx) => {
+      const cashBalance = await tx.cashBalance.findUnique({
+        where: { userId_currencyId: { userId, currencyId: dto.currencyId } },
+      });
+      if (!cashBalance || new Decimal(cashBalance.balance).lte(0)) {
+        throw new ConflictException({ code: 'FX_OPENING_CASH_UNAVAILABLE', message: 'A positive cash balance is required to open this position' });
+      }
+      const openingSaldo = new Decimal(cashBalance.balance);
+      const existing = await tx.currencyPosition.findUnique({
+        where: { userId_currencyId: { userId, currencyId: dto.currencyId } },
+      });
+      if (existing?.reviewStatus === 'REVIEWED') {
+        throw new ConflictException({ code: 'FX_POSITION_ALREADY_REVIEWED', message: 'Currency position is already reviewed' });
+      }
+      if (existing && !new Decimal(existing.saldo).eq(openingSaldo)) {
+        throw new ConflictException({ code: 'FX_OPENING_MISMATCH', message: 'Cash balance and position saldo do not match' });
+      }
+
+      const data = {
+        saldo: openingSaldo,
+        costoPromedio: openingCost,
+        reviewStatus: 'REVIEWED' as const,
+        openingSaldo,
+        openingCost,
+        reviewedAt: new Date(),
+      };
+      const position = existing
+        ? await tx.currencyPosition.update({ where: { id: existing.id }, data })
+        : await tx.currencyPosition.create({ data: { userId, currencyId: dto.currencyId, ...data } });
+      const movement = await tx.currencyMovement.create({
+        data: {
+          userId,
+          currencyId: dto.currencyId,
+          positionId: position.id,
+          type: CurrencyMovementType.OPENING,
+          amount: openingSaldo,
+          rate: openingCost,
+          costSnapshot: openingCost,
+          realizedProfit: null,
+        },
+      });
+      return { position, movement, cashBalance };
+    });
   }
 }

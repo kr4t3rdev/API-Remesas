@@ -9,6 +9,7 @@ import { calculatePersistedRate } from './fx-operations.service';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { CreateFxTransferDto } from './dto/create-fx-transfer.dto';
+import { OpenCurrencyPositionDto } from './dto/open-currency-position.dto';
 
 describe('FX operations foundation', () => {
   it('rejects bank-backed legs when an FX transfer belongs to a worker', async () => {
@@ -146,6 +147,88 @@ describe('FX operations foundation', () => {
     expect(() => calculatePersistedRate('COMPRA' as any, new Decimal(100), new Decimal(1100))).toThrow(InvalidRateError);
   });
 
+  it('opens a historical position from the existing cash balance and records an opening movement', async () => {
+    const positionCreate = jest.fn().mockResolvedValue({ id: 31, userId: 7, currencyId: 2, saldo: new Decimal(100), costoPromedio: new Decimal(250), reviewStatus: 'REVIEWED' });
+    const movementCreate = jest.fn().mockResolvedValue({ id: 32 });
+    const prisma = {
+      currency: { findUnique: jest.fn()
+        .mockResolvedValueOnce({ id: 2, code: 'USD', isActive: true })
+        .mockResolvedValueOnce({ id: 1, code: 'CUP', isActive: true }) },
+      $transaction: jest.fn(async (callback: any) => callback({
+        cashBalance: { findUnique: jest.fn().mockResolvedValue({ balance: new Decimal(100) }) },
+        currencyPosition: { findUnique: jest.fn().mockResolvedValue(null), create: positionCreate },
+        currencyMovement: { create: movementCreate },
+      })),
+    } as any;
+
+    const dto: OpenCurrencyPositionDto = { currencyId: 2, openingCost: 250 };
+    await expect(new FxOperationsService(prisma).openPosition(7, dto)).resolves.toEqual(expect.objectContaining({ movement: { id: 32 } }));
+    expect(positionCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ saldo: new Decimal(100), openingSaldo: new Decimal(100), openingCost: new Decimal(250), reviewStatus: 'REVIEWED' }) });
+    expect(movementCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ type: 'OPENING', amount: new Decimal(100), rate: new Decimal(250), costSnapshot: new Decimal(250) }) });
+  });
+
+  it('retries opening a position after a serializable write conflict', async () => {
+    const conflict = new (require('@prisma/client').Prisma.PrismaClientKnownRequestError)('write conflict', { code: 'P2034', clientVersion: '5.8.1' });
+    const prisma = {
+      currency: { findUnique: jest.fn()
+        .mockResolvedValueOnce({ id: 2, code: 'USD', isActive: true })
+        .mockResolvedValueOnce({ id: 1, code: 'CUP', isActive: true }) },
+      $transaction: jest.fn()
+        .mockRejectedValueOnce(conflict)
+        .mockImplementationOnce(async (callback: any) => callback({
+          cashBalance: { findUnique: jest.fn().mockResolvedValue({ balance: new Decimal(100) }) },
+          currencyPosition: { findUnique: jest.fn().mockResolvedValue(null), create: jest.fn().mockResolvedValue({ id: 31 }) },
+          currencyMovement: { create: jest.fn().mockResolvedValue({ id: 32 }) },
+        })),
+    } as any;
+
+    await expect(new FxOperationsService(prisma).openPosition(7, { currencyId: 2, openingCost: 250 }))
+      .resolves.toEqual(expect.objectContaining({ movement: { id: 32 } }));
+    expect(prisma.$transaction).toHaveBeenCalledTimes(2);
+  });
+
+  it('exhausts serializable retries for manual FX transfers', async () => {
+    const conflict = new (require('@prisma/client').Prisma.PrismaClientKnownRequestError)('write conflict', { code: 'P2034', clientVersion: '5.8.1' });
+    const prisma = {
+      transaction: { findUnique: jest.fn().mockResolvedValue(null) },
+      currency: { findUnique: jest.fn()
+        .mockResolvedValueOnce({ id: 2, code: 'USD', isActive: true })
+        .mockResolvedValueOnce({ id: 1, code: 'CUP', isActive: true }) },
+      $transaction: jest.fn().mockRejectedValue(conflict),
+    } as any;
+
+    await expect(new FxOperationsService(prisma).createTransfer(7, {
+      type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 260,
+    }, 'retry-exhausted')).rejects.toBe(conflict);
+    expect(prisma.$transaction).toHaveBeenCalledTimes(3);
+  });
+
+  it('rejects opening a historical position for the base CUP currency', async () => {
+    const prisma = {
+      currency: { findUnique: jest.fn().mockResolvedValue({ id: 1, code: 'CUP', isActive: true }) },
+    } as any;
+
+    await expect(new FxOperationsService(prisma).openPosition(7, { currencyId: 1, openingCost: 1 }))
+      .rejects.toThrow('Active non-CUP FX currency not found');
+  });
+
+  it('rejects automatic purchase when positive historical cash has not been opened', async () => {
+    const prisma = {
+      transaction: { findUnique: jest.fn() },
+      currency: { findUnique: jest.fn()
+        .mockResolvedValueOnce({ id: 2, code: 'USD', isActive: true })
+        .mockResolvedValueOnce({ id: 1, code: 'CUP', isActive: true }) },
+      $transaction: jest.fn(async (callback: any) => callback({
+        exchangeRate: { findUnique: jest.fn().mockResolvedValue({ referenceRate: new Decimal(250) }) },
+        currencyPosition: { findUnique: jest.fn().mockResolvedValue({ id: 9, saldo: new Decimal(0), costoPromedio: new Decimal(0), reviewStatus: 'UNREVIEWED' }) },
+        cashBalance: { findUnique: jest.fn().mockResolvedValue({ balance: new Decimal(100) }) },
+      })),
+    } as any;
+
+    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 260 }))
+      .rejects.toThrow(CurrencyPositionUnavailableError);
+  });
+
   it('rounds a reasonable active-rate margin and exposes the effective persisted rate', () => {
     const result = calculatePersistedRate('COMPRA' as any, new Decimal(300), new Decimal(260));
     expect(result.margin.toString()).toBe('0.1333');
@@ -233,6 +316,57 @@ describe('FX operations foundation', () => {
     expect(updateRate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ buyMargin: new Decimal(0.2) }) }));
     expect(updateRate.mock.calls[0][0].data).not.toHaveProperty('sellMargin');
     expect(createRateHistory).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ referenceType: 'FX_TRANSACTION', referenceId: 11 }) }));
+  });
+  it('settles cash FX against the configured non-CUP primary currency', async () => {
+    const sourceCashUpdate = jest.fn().mockResolvedValue({ count: 1 });
+    const destinationCashUpsert = jest.fn().mockResolvedValue({});
+    const prisma = {
+      user: { findUnique: jest.fn().mockResolvedValue({ primaryCurrencyId: 3, primaryCurrency: { id: 3, code: 'EUR', isActive: true } }) },
+      currency: { findUnique: jest.fn().mockResolvedValue({ id: 2, code: 'USD', isActive: true }) },
+      $transaction: jest.fn(async (callback: any) => callback({
+        exchangeRate: { findUnique: jest.fn().mockResolvedValue({ referenceRate: new Decimal(1.1) }) },
+        currencyPosition: { findUnique: jest.fn().mockResolvedValue({ id: 9, saldo: new Decimal(0), costoPromedio: new Decimal(0), reviewStatus: 'REVIEWED' }), update: jest.fn().mockResolvedValue({}) },
+        transaction: { create: jest.fn().mockResolvedValue({ id: 11 }) },
+        currencyMovement: { create: jest.fn().mockResolvedValue({ id: 12 }) },
+        cashBalance: { updateMany: sourceCashUpdate, upsert: destinationCashUpsert },
+      })),
+    } as any;
+
+    await new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 1.1 });
+
+    expect(sourceCashUpdate).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ userId: 7, currencyId: 3 }) }));
+    expect(destinationCashUpsert).toHaveBeenCalledWith(expect.objectContaining({ where: { userId_currencyId: { userId: 7, currencyId: 2 } } }));
+  });
+
+  it('uses configured primary currency for bank settlement and persisted RateHistory', async () => {
+    const bankFindFirst = jest.fn()
+      .mockResolvedValueOnce({ id: 30, userId: 7, currencyId: 3, isActive: true })
+      .mockResolvedValueOnce({ id: 20, userId: 7, currencyId: 2, isActive: true });
+    const rateHistoryCreate = jest.fn().mockResolvedValue({});
+    const prisma = {
+      transaction: { findUnique: jest.fn().mockResolvedValue(null) },
+      user: { findUnique: jest.fn().mockResolvedValue({ primaryCurrencyId: 3, primaryCurrency: { id: 3, code: 'EUR', isActive: true } }) },
+      currency: { findUnique: jest.fn().mockResolvedValue({ id: 2, code: 'USD', isActive: true }) },
+      $transaction: jest.fn(async (callback: any) => callback({
+        exchangeRate: { findUnique: jest.fn().mockResolvedValue({ referenceRate: new Decimal(1.25) }), update: jest.fn().mockResolvedValue({}) },
+        rateHistory: { create: rateHistoryCreate },
+        currencyPosition: { findUnique: jest.fn().mockResolvedValue({ id: 9, saldo: new Decimal(0), costoPromedio: new Decimal(0), reviewStatus: 'REVIEWED' }), update: jest.fn().mockResolvedValue({}) },
+        transaction: { create: jest.fn().mockResolvedValue({ id: 11 }) },
+        currencyMovement: { create: jest.fn().mockResolvedValue({ id: 12 }) },
+        bankAccount: { findFirst: bankFindFirst, updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
+        cashBalance: { updateMany: jest.fn(), upsert: jest.fn() },
+      })),
+    } as any;
+
+    await new FxOperationsService(prisma).createTransfer(7, {
+      type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 1.1, persistRate: true,
+      sourceType: 'BANK_ACCOUNT' as any, sourceBankAccountId: 30,
+      destinationType: 'BANK_ACCOUNT' as any, destinationBankAccountId: 20,
+    }, 'non-cup-primary');
+
+    expect(bankFindFirst).toHaveBeenNthCalledWith(1, { where: { id: 30, userId: 7, isActive: true } });
+    expect(bankFindFirst).toHaveBeenNthCalledWith(2, { where: { id: 20, userId: 7, isActive: true } });
+    expect(rateHistoryCreate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ currencyFromId: 2, currencyToId: 3 }) }));
   });
   it('does not replay a different intent after a concurrent unique-key race', async () => {
     const raced = { id: 11, userId: 7, idempotencyKey: 'fx-race', type: 'COMPRA', currencyId: 2, amount: new Decimal(50), rate: new Decimal(260), notes: null, fxMovements: [{ id: 12 }] };

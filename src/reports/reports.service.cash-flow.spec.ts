@@ -89,8 +89,8 @@ describe('ReportsService report periods and cash flow', () => {
           .mockResolvedValueOnce([expense])
           .mockResolvedValueOnce([expense]),
       },
-      exchangeRate: {
-        findFirst: jest.fn().mockResolvedValue({ referenceRate: new Decimal(270) }),
+      rateHistory: {
+        findFirst: jest.fn().mockResolvedValue({ rate: new Decimal(270) }),
       },
     };
 
@@ -107,5 +107,94 @@ describe('ReportsService report periods and cash flow', () => {
         expensesUnconverted: 0,
       }),
     );
+  });
+
+  it('uses the latest immutable rate history entry at the expense date', async () => {
+    const expense = {
+      amount: new Decimal(10),
+      currencyId: 2,
+      date: new Date('2026-07-08T12:00:00.000Z'),
+      currency: { code: 'USD' },
+    };
+    const findFirst = jest.fn().mockResolvedValue({ rate: new Decimal(270) });
+    const prisma = {
+      transaction: { findMany: jest.fn().mockResolvedValue([]) },
+      expense: { findMany: jest.fn().mockResolvedValue([expense]) },
+      rateHistory: { findFirst },
+      exchangeRate: { findFirst: jest.fn().mockResolvedValue({ referenceRate: new Decimal(999) }) },
+    };
+
+    const result = await new ReportsService(prisma as any).getPeriodReport(
+      7,
+      '2026-07-09',
+      '2026-07-09',
+    );
+
+    expect(result.dailyBreakdown).toEqual(expect.arrayContaining([expect.objectContaining({ expensesTotalCup: 2700 })]));
+    expect(prisma.exchangeRate.findFirst).not.toHaveBeenCalled();
+    expect(findFirst).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({
+        userId: 7,
+        currencyFromId: 2,
+        currencyTo: { code: 'CUP' },
+        createdAt: { lte: expense.date },
+      }),
+      orderBy: { createdAt: 'desc' },
+    }));
+  });
+
+  it('uses the configured primary currency as the historical conversion target', async () => {
+    const expense = {
+      amount: new Decimal(10),
+      currencyId: 2,
+      date: new Date('2026-07-08T12:00:00.000Z'),
+      currency: { code: 'USD' },
+    };
+    const findFirst = jest.fn().mockResolvedValue({ rate: new Decimal(270) });
+    const prisma = {
+      user: { findUnique: jest.fn().mockResolvedValue({ primaryCurrency: { code: 'MLC', isActive: true } }) },
+      transaction: { findMany: jest.fn().mockResolvedValue([]) },
+      expense: { findMany: jest.fn().mockResolvedValue([expense]) },
+      rateHistory: { findFirst },
+    };
+
+    await new ReportsService(prisma as any).getPeriodReport(7, '2026-07-09', '2026-07-09');
+
+    expect(findFirst).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ currencyTo: { code: 'MLC' } }),
+    }));
+  });
+
+  it('computes daily net from realized FX margin instead of purchase and sale cash flow', async () => {
+    const prisma = {
+      transaction: { findMany: jest.fn().mockResolvedValue([
+        { type: 'COMPRA', totalCup: new Decimal(20000), marginProfit: new Decimal(0), currency: { code: 'USD' } },
+        { type: 'VENTA', totalCup: new Decimal(5400), marginProfit: new Decimal(400), currency: { code: 'USD' } },
+      ]) },
+      expense: { findMany: jest.fn().mockResolvedValue([
+        { amount: new Decimal(100), currencyId: 1, date: new Date('2026-07-09T12:00:00.000Z'), currency: { code: 'CUP' } },
+      ]) },
+    };
+
+    const result = await new ReportsService(prisma as any).getDailyReport(7, '2026-07-09');
+
+    expect(result.profit).toEqual({ margin: 7.41, marginProfit: 400, net: 300 });
+  });
+
+  it('omits an exact daily and period net when any expense cannot be converted', async () => {
+    const expense = { amount: new Decimal(10), currencyId: 2, date: new Date('2026-07-09T12:00:00.000Z'), currency: { code: 'USD' } };
+    const prisma = {
+      transaction: { findMany: jest.fn().mockResolvedValue([]) },
+      expense: { findMany: jest.fn().mockResolvedValue([expense]) },
+      rateHistory: { findFirst: jest.fn().mockResolvedValue(null) },
+    };
+    const service = new ReportsService(prisma as any);
+
+    await expect(service.getDailyReport(7, '2026-07-09')).resolves.toEqual(expect.objectContaining({
+      profit: expect.objectContaining({ net: null }),
+    }));
+    await expect(service.getPeriodReport(7, '2026-07-09', '2026-07-09')).resolves.toEqual(expect.objectContaining({
+      summary: expect.objectContaining({ netProfit: null }),
+    }));
   });
 });

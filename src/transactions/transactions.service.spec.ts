@@ -26,8 +26,16 @@ describe('TransactionsService tenant isolation', () => {
   it('forwards authenticated userId when creating', async () => {
     const { service, fx } = setup();
     const dto = { type: 'COMPRA', amount: 10, currencyId: 3, rate: 240 } as any;
-    await service.create(USER_A, dto);
-    expect(fx.createTransfer).toHaveBeenCalledWith(USER_A, dto);
+    await service.create(USER_A, dto, 'legacy-transfer-1');
+    expect(fx.createTransfer).toHaveBeenCalledWith(USER_A, dto, 'legacy-transfer-1');
+  });
+
+  it('preserves legacy creation compatibility without an idempotency key', async () => {
+    const { service, fx } = setup();
+    const dto = { type: 'COMPRA', amount: 10, currencyId: 3, rate: 240 } as any;
+
+    await expect(service.create(USER_A, dto)).resolves.toEqual(rows[0]);
+    expect(fx.createTransfer).toHaveBeenCalledWith(USER_A, dto, undefined);
   });
 
   it('lists only owner A using an exact tenant filter', async () => {

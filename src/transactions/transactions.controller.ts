@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Post,
@@ -8,12 +9,14 @@ import {
   UseGuards,
   Query,
   UseFilters,
+  Headers,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiBearerAuth,
   ApiResponse,
+  ApiHeader,
 } from '@nestjs/swagger';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
@@ -31,13 +34,18 @@ export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
   @Post()
+  @ApiHeader({ name: 'Idempotency-Key', required: true, description: 'Unique key for safely retrying the transaction request' })
   @ApiOperation({ summary: 'Crear transacción (compra/venta)' })
   @ApiResponse({ status: 201, description: 'Transacción creada' })
   create(
     @CurrentUser('id') userId: number,
     @Body() createDto: CreateTransactionDto,
+    @Headers('Idempotency-Key') idempotencyKey?: string,
   ) {
-    return this.transactionsService.create(userId, createDto);
+    if (!idempotencyKey?.trim()) {
+      throw new BadRequestException('Idempotency-Key header is required for transactions');
+    }
+    return this.transactionsService.create(userId, createDto, idempotencyKey.trim());
   }
 
   @Get()

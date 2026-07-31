@@ -51,29 +51,45 @@ export class ReportsService {
     return { start, end };
   }
 
+  private async getPrimaryCurrencyCode(userId: number): Promise<string> {
+    const userDelegate = (this.prisma as any).user;
+    const user = typeof userDelegate?.findUnique === 'function'
+      ? await userDelegate.findUnique({
+        where: { id: userId },
+        select: { primaryCurrency: { select: { code: true, isActive: true } } },
+      })
+      : null;
+
+    return user?.primaryCurrency?.isActive
+      ? user.primaryCurrency.code
+      : CUP_CURRENCY_CODE;
+  }
+
   /**
-   * Obtiene la tasa vigente (referenceRate) de una moneda a CUP para una fecha
-   * dada. Si la moneda ya es CUP devuelve 1. Si no hay tasa registrada devuelve
-   * null (no se puede convertir).
+   * Obtiene la última tasa histórica registrada antes de una fecha para una
+   * conversión a la moneda primaria configurada. ExchangeRate es mutable y no
+   * puede reconstruir reportes históricos; RateHistory es append-only.
    */
-  private async getRateToCup(
+  private async getRateToPrimary(
     userId: number,
     currencyId: number,
     currencyCode: string | undefined,
     referenceDate: Date,
+    primaryCurrencyCode: string,
   ): Promise<number | null> {
-    if (currencyCode === CUP_CURRENCY_CODE) return 1;
+    if (currencyCode === primaryCurrencyCode) return 1;
 
-    const rate = await this.prisma.exchangeRate.findFirst({
+    const rate = await this.prisma.rateHistory.findFirst({
       where: {
         userId,
-        currencyId,
-        effectiveDate: { lte: referenceDate },
+        currencyFromId: currencyId,
+        currencyTo: { code: primaryCurrencyCode },
+        createdAt: { lte: referenceDate },
       },
-      orderBy: { effectiveDate: 'desc' },
+      orderBy: { createdAt: 'desc' },
     });
 
-    return rate ? Number(rate.referenceRate) : null;
+    return rate ? Number(rate.rate) : null;
   }
 
   /**
@@ -92,16 +108,18 @@ export class ReportsService {
   ): Promise<{ totalInCup: number | null; unconvertedCount: number }> {
     if (!expenses.length) return { totalInCup: 0, unconvertedCount: 0 };
 
+    const primaryCurrencyCode = await this.getPrimaryCurrencyCode(userId);
     let total = 0;
     let hasAnyConversion = false;
     let unconverted = 0;
 
     for (const expense of expenses) {
-      const rate = await this.getRateToCup(
+      const rate = await this.getRateToPrimary(
         userId,
         expense.currencyId,
         expense.currency.code,
         expense.date,
+        primaryCurrencyCode,
       );
       if (rate === null) {
         unconverted += 1;
@@ -155,8 +173,9 @@ export class ReportsService {
       0,
     );
 
-    const totalCostsForNet = gastosInCup.totalInCup ?? 0;
-    const net = totalVentas - totalCompras - totalCostsForNet;
+    const net = gastosInCup.unconvertedCount > 0
+      ? null
+      : totalProfit - (gastosInCup.totalInCup ?? 0);
     const marginPct = totalVentas > 0
       ? (totalProfit / totalVentas) * 100
       : 0;
@@ -180,7 +199,7 @@ export class ReportsService {
       profit: {
         margin: Number(marginPct.toFixed(2)),
         marginProfit: totalProfit,
-        net: Number(net.toFixed(2)),
+        net: net === null ? null : Number(net.toFixed(2)),
       },
     };
   }
@@ -231,7 +250,9 @@ export class ReportsService {
         totalExpensesInCup,
         unconvertedExpensesCount: gastosInCup.unconvertedCount,
         marginProfit,
-        netProfit: Number((marginProfit - (totalExpensesInCup ?? 0)).toFixed(2)),
+        netProfit: gastosInCup.unconvertedCount > 0
+          ? null
+          : Number((marginProfit - (totalExpensesInCup ?? 0)).toFixed(2)),
       },
       dailyBreakdown: dailyReports,
       transactionsByCurrency: this.groupByCurrency(transactions),
@@ -684,6 +705,7 @@ export class ReportsService {
         select: { date: true, amount: true, currencyId: true, currency: { select: { code: true } } },
       }),
     ]);
+    const primaryCurrencyCode = await this.getPrimaryCurrencyCode(userId);
 
     const buckets = new Map<
       string,
@@ -727,11 +749,12 @@ export class ReportsService {
       const bucket = buckets.get(key);
       if (!bucket) continue;
       bucket.expenses += 1;
-      const rate = await this.getRateToCup(
+      const rate = await this.getRateToPrimary(
         userId,
         expense.currencyId,
         expense.currency?.code,
         expense.date,
+        primaryCurrencyCode,
       );
       if (rate === null) {
         bucket.expensesUnconverted += 1;
@@ -773,6 +796,6 @@ export class ReportsService {
     });
     const sales = movements.map((movement: any) => ({ id: movement.id, currency: movement.currency.code, amount: Number(movement.amount), rate: Number(movement.rate), costoPromedio: Number(movement.costSnapshot ?? 0), rendimiento: Number(movement.realizedProfit ?? 0), createdAt: movement.createdAt }));
     const positions = await this.prisma.currencyPosition.findMany({ where: { userId, ...(currencyCode ? { currency: { code: currencyCode } } : {}) }, include: { currency: true }, orderBy: { currencyId: 'asc' } });
-    return { period: { startDate, endDate }, currency: currencyCode ?? null, totalRendimiento: sales.reduce((sum: number, sale: any) => sum + sale.rendimiento, 0), movements: sales, positions: positions.map((position: any) => ({ currencyId: position.currencyId, currency: position.currency.code, saldo: Number(position.saldo), costoPromedio: position.costoPromedio == null ? null : Number(position.costoPromedio), availableForSale: position.reviewStatus === 'REVIEWED' && Number(position.saldo) > 0 })) };
+    return { period: { startDate, endDate }, currency: currencyCode ?? null, totalRendimiento: sales.reduce((sum: number, sale: any) => sum + sale.rendimiento, 0), movements: sales, positions: positions.map((position: any) => ({ currencyId: position.currencyId, currency: position.currency.code, saldo: Number(position.saldo), costoPromedio: position.costoPromedio == null ? null : Number(position.costoPromedio), reviewStatus: position.reviewStatus, reviewedAt: position.reviewedAt, availableForSale: position.reviewStatus === 'REVIEWED' && Number(position.saldo) > 0 })) };
   }
 }

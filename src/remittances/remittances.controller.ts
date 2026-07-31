@@ -16,6 +16,9 @@ export class RemittancesController {
   @UseGuards(JwtAuthGuard) @ApiBearerAuth() @Get()
   list(@CurrentUser('id') userId: number) { return this.service.list(userId); }
 
+  @UseGuards(JwtAuthGuard) @ApiBearerAuth() @Get('reconciliation')
+  reconcile(@CurrentUser('id') userId: number) { return this.service.reconcile(userId); }
+
   @UseGuards(JwtAuthGuard) @ApiBearerAuth() @Post(':id/retry')
   retry(@CurrentUser('id') userId: number, @Param('id', ParseIntPipe) id: number, @Body() event: RemittanceEventDto) { return this.service.retry(userId, id, event); }
 }

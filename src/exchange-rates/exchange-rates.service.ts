@@ -7,6 +7,14 @@ import { Decimal } from '@prisma/client/runtime/library';
 export class ExchangeRatesService {
   constructor(private prisma: PrismaService) {}
 
+  private async resolvePrimaryCurrencyId(userId: number, fallbackId?: number) {
+    const userDelegate = (this.prisma as any).user;
+    const user = typeof userDelegate?.findUnique === 'function'
+      ? await userDelegate.findUnique({ where: { id: userId }, select: { primaryCurrencyId: true } })
+      : null;
+    return user?.primaryCurrencyId ?? fallbackId;
+  }
+
   async findAll(userId: number) {
     const rates = await this.prisma.exchangeRate.findMany({
       where: { userId },
@@ -25,7 +33,6 @@ export class ExchangeRatesService {
     const cupCurrency = await this.prisma.currency.findFirst({
       where: { code: 'CUP' },
     });
-
     const rates = await this.prisma.exchangeRate.findMany({
       where: {
         userId,
@@ -62,6 +69,7 @@ export class ExchangeRatesService {
     const cupCurrency = await this.prisma.currency.findFirst({
       where: { code: 'CUP' },
     });
+    const primaryCurrencyId = await this.resolvePrimaryCurrencyId(userId, cupCurrency?.id);
 
     const existingRate = await this.prisma.exchangeRate.findUnique({
       where: { userId_currencyId: { userId, currencyId } },
@@ -87,13 +95,13 @@ export class ExchangeRatesService {
         include: { currency: true },
       });
 
-      if (cupCurrency) {
+      if (primaryCurrencyId) {
         try {
           await tx.rateHistory.create({
             data: {
               userId,
               currencyFromId: currencyId,
-              currencyToId: cupCurrency.id,
+              currencyToId: primaryCurrencyId,
               rate: new Decimal(updateDto.referenceRate),
               source: 'MANUAL',
               referenceType: 'exchange_rate',

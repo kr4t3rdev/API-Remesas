@@ -32,8 +32,33 @@ export class RemittancesService {
   }
 
   private validateEvent(event: RemittanceEventDto) {
-    if (!event.provider?.trim() || !event.sourceId?.trim() || event.foreignCurrencyId === event.localCurrencyId || event.foreignAmount <= 0 || event.localAmount <= 0 || event.rate <= 0) {
+    if (!event.provider?.trim() || !event.sourceId?.trim() || event.foreignAmount <= 0 || event.localAmount <= 0 || event.rate <= 0) {
       throw new UnprocessableEntityException({ code: 'REMITTANCE_INVALID_EVENT', message: 'Remittance event is invalid' });
+    }
+  }
+
+  private async validateCurrencyRoles(userId: number, event: RemittanceEventDto) {
+    const [user, foreignCurrency] = await Promise.all([
+      this.prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          primaryCurrencyId: true,
+          primaryCurrency: { select: { id: true, code: true, isActive: true } },
+        },
+      }),
+      this.prisma.currency.findUnique({ where: { id: event.foreignCurrencyId } }),
+    ]);
+    const primaryCurrency = user?.primaryCurrency;
+    if (
+      !primaryCurrency?.isActive
+      || event.localCurrencyId !== primaryCurrency.id
+      || !foreignCurrency?.isActive
+      || foreignCurrency.id === primaryCurrency.id
+    ) {
+      throw new UnprocessableEntityException({
+        code: 'REMITTANCE_INVALID_CURRENCY_ROLES',
+        message: 'Remittance local currency must be the active configured primary currency and foreign currency must be active and different',
+      });
     }
   }
 
@@ -44,6 +69,7 @@ export class RemittancesService {
   async ingest(userId: number, event: RemittanceEventDto) {
     this.ensureEnabled();
     this.validateEvent(event);
+    await this.validateCurrencyRoles(userId, event);
     const existing = await this.prisma.remittance.findUnique({ where: { userId_provider_sourceId: { userId, provider: event.provider, sourceId: event.sourceId } }, include: { movements: true } });
     if (existing) {
       if (existing.status === RemittanceStatus.COMPLETED) return { ...existing, duplicate: true };
@@ -80,29 +106,34 @@ export class RemittancesService {
       return await this.prisma.$transaction(async (tx: any) => {
       const current = await tx.remittance.findUnique({ where: { userId_provider_sourceId: { userId, provider: event.provider, sourceId: event.sourceId } } });
       if (current?.status === RemittanceStatus.COMPLETED) return { ...current, duplicate: true };
-      const outgoing = await tx.currencyPosition.findUnique({ where: { userId_currencyId: { userId, currencyId: event.foreignCurrencyId } } });
-      if (!outgoing || outgoing.reviewStatus !== 'REVIEWED') throw new ConflictException({ code: 'FX_POSITION_UNAVAILABLE', message: 'Currency position is unavailable for remittance' });
-      const assertSaleAvailable = (this.fxOperations as any)?.constructor?.assertSaleAvailable ?? FxOperationsService.assertSaleAvailable;
-      try { assertSaleAvailable(outgoing, new Decimal(event.foreignAmount)); } catch { throw new ConflictException({ code: 'FX_INSUFFICIENT_SALDO', message: 'Insufficient saldo for remittance' }); }
-      const incoming = await tx.currencyPosition.findUnique({ where: { userId_currencyId: { userId, currencyId: event.localCurrencyId } } });
-      if (!incoming) throw new ConflictException({ code: 'FX_POSITION_UNAVAILABLE', message: 'Destination currency position is unavailable' });
       const remittance = current ?? await tx.remittance.create({ data: { userId, provider: event.provider, sourceId: event.sourceId, status: RemittanceStatus.COMPLETED, idempotencyKey: event.idempotencyKey } });
       const foreignAmount = new Decimal(event.foreignAmount); const localAmount = new Decimal(event.localAmount); const rate = new Decimal(event.rate);
-      const costSnapshot = new Decimal(outgoing.costoPromedio ?? 0); const realizedProfit = rate.sub(costSnapshot).mul(foreignAmount);
-      const debited = await tx.currencyPosition.updateMany({
-        where: { id: outgoing.id, reviewStatus: 'REVIEWED', saldo: { gte: foreignAmount } },
-        data: { saldo: { decrement: foreignAmount } },
+      const sourceCash = await tx.cashBalance.updateMany({
+        where: { userId, currencyId: event.localCurrencyId, balance: { gte: localAmount } },
+        data: { balance: { decrement: localAmount } },
       });
-      if (debited.count !== 1) throw new ConflictException({ code: 'FX_INSUFFICIENT_SALDO', message: 'Insufficient saldo for remittance' });
-      const saleMovement = await tx.currencyMovement.create({ data: { userId, currencyId: event.foreignCurrencyId, positionId: outgoing.id, type: CurrencyMovementType.REMITTANCE, amount: foreignAmount.neg(), rate, costSnapshot, realizedProfit, remittanceId: remittance.id } });
-      const purchaseMovement = await tx.currencyMovement.create({ data: { userId, currencyId: event.localCurrencyId, positionId: incoming.id, type: CurrencyMovementType.REMITTANCE, amount: localAmount, rate, costSnapshot: rate, realizedProfit: null, remittanceId: remittance.id } });
-      const nextSaldo = new Decimal(incoming.saldo).add(localAmount); const currentCost = new Decimal(incoming.costoPromedio ?? 0);
-      const nextCost = nextSaldo.eq(0) ? rate : new Decimal(incoming.saldo).mul(currentCost).add(localAmount.mul(rate)).div(nextSaldo);
-      await tx.currencyPosition.update({ where: { id: incoming.id }, data: { saldo: nextSaldo, costoPromedio: nextCost, reviewStatus: 'REVIEWED' } });
+      if (sourceCash.count !== 1) throw new ConflictException({ code: 'FX_INSUFFICIENT_CASH', message: 'Insufficient cash for remittance' });
+
+      const destination = await tx.currencyPosition.findUnique({ where: { userId_currencyId: { userId, currencyId: event.foreignCurrencyId } } });
+      if (destination?.reviewStatus === 'UNREVIEWED' && !new Decimal(destination.saldo).eq(0)) {
+        throw new ConflictException({ code: 'FX_POSITION_UNAVAILABLE', message: 'Destination currency position requires opening review' });
+      }
+      const destinationPosition = destination ?? await tx.currencyPosition.create({
+        data: { userId, currencyId: event.foreignCurrencyId, saldo: 0, costoPromedio: 0, reviewStatus: 'REVIEWED', reviewedAt: new Date() },
+      });
+      const destinationSaldo = new Decimal(destinationPosition.saldo).add(foreignAmount);
+      const destinationCost = new Decimal(destinationPosition.costoPromedio ?? 0);
+      const nextCost = destinationSaldo.eq(0) ? rate : new Decimal(destinationPosition.saldo).mul(destinationCost).add(foreignAmount.mul(rate)).div(destinationSaldo);
+      const purchaseMovement = await tx.currencyMovement.create({ data: { userId, currencyId: event.foreignCurrencyId, positionId: destinationPosition.id, type: CurrencyMovementType.REMITTANCE, amount: foreignAmount, rate, costSnapshot: rate, realizedProfit: null, remittanceId: remittance.id } });
+      const cashMovement = await tx.currencyMovement.create({ data: { userId, currencyId: event.localCurrencyId, positionId: null, type: CurrencyMovementType.REMITTANCE, amount: localAmount.neg(), rate, costSnapshot: null, realizedProfit: null, remittanceId: remittance.id } });
+      if (destination) {
+        await tx.currencyPosition.update({ where: { id: destination.id }, data: { saldo: destinationSaldo, costoPromedio: nextCost, reviewStatus: 'REVIEWED', reviewedAt: destination.reviewedAt ?? new Date() } });
+      } else {
+        await tx.currencyPosition.update({ where: { id: destinationPosition.id }, data: { saldo: destinationSaldo, costoPromedio: nextCost } });
+      }
       if (current) await tx.remittance.update({ where: { id: current.id }, data: { status: RemittanceStatus.COMPLETED } });
-      await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: event.foreignCurrencyId } }, update: { balance: { decrement: foreignAmount } }, create: { userId, currencyId: event.foreignCurrencyId, balance: foreignAmount.neg() } });
-      await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: event.localCurrencyId } }, update: { balance: { increment: localAmount } }, create: { userId, currencyId: event.localCurrencyId, balance: localAmount } });
-      return { ...remittance, status: RemittanceStatus.COMPLETED, movements: [saleMovement, purchaseMovement], realizedProfit };
+      await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: event.foreignCurrencyId } }, update: { balance: { increment: foreignAmount } }, create: { userId, currencyId: event.foreignCurrencyId, balance: foreignAmount } });
+      return { ...remittance, status: RemittanceStatus.COMPLETED, movements: [purchaseMovement, cashMovement], realizedProfit: null };
       }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
@@ -155,18 +186,145 @@ export class RemittancesService {
   }
 
   async reconcile(userId: number) {
-    const [remittances, movements, manualRemittances] = await Promise.all([
+    const [user, remittances, positions, movements, cashBalances, manualRemittances] = await Promise.all([
+      this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { primaryCurrencyId: true, primaryCurrency: { select: { id: true, code: true, isActive: true } } },
+      }),
       this.prisma.remittance.findMany({ where: { userId, status: RemittanceStatus.COMPLETED } }),
-      this.prisma.currencyMovement.findMany({ where: { userId, type: CurrencyMovementType.REMITTANCE } }),
+      this.prisma.currencyPosition.findMany({ where: { userId }, include: { currency: { select: { code: true, symbol: true } } } }),
+      this.prisma.currencyMovement.findMany({ where: { userId }, include: { currency: { select: { code: true } } } }),
+      this.prisma.cashBalance.findMany({ where: { userId }, include: { currency: { select: { code: true } } } }),
       this.prisma.transaction.count({ where: { userId, operationKind: 'REMITTANCE' } }),
     ]);
+
+    const positionsById = new Map(positions.map((position: any) => [position.id, position]));
+    const movementsByPosition = new Map<number, Decimal>();
+    const movementCountByPosition = new Map<number, number>();
+    const movementsByRemittance = new Map<number, any[]>();
+    let movementsHaveValidPositions = true;
+    const primaryCurrencyId = user?.primaryCurrency?.isActive ? user.primaryCurrency.id : null;
+
+    for (const movement of movements as any[]) {
+      const position = movement.positionId ? positionsById.get(movement.positionId) : null;
+      if (!movement.positionId) {
+        const isPrimaryCashMovement = movement.currencyId === primaryCurrencyId
+          && (movement.type === CurrencyMovementType.REMITTANCE || movement.type === CurrencyMovementType.OPENING);
+        if (!isPrimaryCashMovement) movementsHaveValidPositions = false;
+      } else if (!position || position.userId !== userId || position.currencyId !== movement.currencyId) {
+        movementsHaveValidPositions = false;
+      } else {
+        const amount = new Decimal(movement.amount);
+        const delta = movement.type === CurrencyMovementType.SALE ? amount.abs().neg() : amount;
+        const current = movementsByPosition.get(movement.positionId) ?? new Decimal(0);
+        movementsByPosition.set(movement.positionId, current.add(delta));
+        movementCountByPosition.set(movement.positionId, (movementCountByPosition.get(movement.positionId) ?? 0) + 1);
+      }
+      if (movement.remittanceId) {
+        const remittanceMovements = movementsByRemittance.get(movement.remittanceId) ?? [];
+        remittanceMovements.push(movement);
+        movementsByRemittance.set(movement.remittanceId, remittanceMovements);
+      }
+    }
+
+    const positionsReport = (positions as any[]).map((position) => {
+      const positionSaldo = new Decimal(position.saldo);
+      const movementSaldo = movementsByPosition.get(position.id) ?? new Decimal(0);
+      const cash = (cashBalances as any[]).find((balance) => balance.currencyId === position.currencyId);
+      const difference = positionSaldo.sub(movementSaldo);
+      const cashBalance = cash ? new Decimal(cash.balance) : null;
+      return {
+        currencyId: position.currencyId,
+        currency: position.currency,
+        positionSaldo: positionSaldo.toNumber(),
+        movementSaldo: movementSaldo.toNumber(),
+        difference: difference.toNumber(),
+        cashBalance: cashBalance?.toNumber() ?? null,
+        cashPositionDifference: cashBalance?.sub(positionSaldo).toNumber() ?? null,
+        reviewStatus: position.reviewStatus,
+        movementCount: movementCountByPosition.get(position.id) ?? 0,
+        ok: difference.eq(0) && positionSaldo.gte(0) && cashBalance !== null && cashBalance.eq(positionSaldo),
+      };
+    });
+
+    const remittanceIssues = (remittances as any[]).map((remittance) => {
+      const linkedMovements = movementsByRemittance.get(remittance.id) ?? [];
+      const localLegs = linkedMovements.filter((movement) => movement.positionId == null && movement.type === CurrencyMovementType.REMITTANCE);
+      const foreignLegs = linkedMovements.filter((movement) => movement.positionId != null && movement.type === CurrencyMovementType.REMITTANCE);
+      const localLeg = localLegs[0];
+      const foreignLeg = foreignLegs[0];
+      const expectedLocalAmount = foreignLeg
+        ? new Decimal(foreignLeg.amount).abs().mul(new Decimal(foreignLeg.rate)).toDecimalPlaces(2)
+        : null;
+      const localLegValid = localLegs.length === 1
+        && foreignLegs.length === 1
+        && localLeg.currencyId === primaryCurrencyId
+        && new Decimal(localLeg.amount).isNegative()
+        && expectedLocalAmount !== null
+        && new Decimal(localLeg.amount).abs().eq(expectedLocalAmount)
+        && new Decimal(localLeg.rate).eq(new Decimal(foreignLeg.rate));
+      const movementCount = linkedMovements.length;
+      return { remittanceId: remittance.id, movementCount, localLegValid, ok: movementCount === 2 && localLegValid };
+    });
+
+    const providerLocalMovements = (movements as any[]).filter((movement) =>
+      movement.positionId == null
+      && movement.type === CurrencyMovementType.REMITTANCE
+      && movement.currencyId === primaryCurrencyId,
+    );
+    const primaryOpenings = (movements as any[]).filter((movement) =>
+      movement.positionId == null
+      && movement.type === CurrencyMovementType.OPENING
+      && movement.currencyId === primaryCurrencyId
+      && new Decimal(movement.amount).isPositive(),
+    );
+    const primaryCash = (cashBalances as any[]).find((balance) => balance.currencyId === primaryCurrencyId);
+    let primaryCashLedger: any;
+    if (remittances.length === 0) {
+      primaryCashLedger = { status: 'NOT_APPLICABLE', ok: true };
+    } else if (primaryOpenings.length !== 1 || !primaryCash) {
+      primaryCashLedger = {
+        status: 'NOT_VERIFIABLE',
+        ok: null,
+        reason: 'No unique primary-cash opening baseline exists in the movement ledger',
+      };
+    } else {
+      const openingBalance = new Decimal(primaryOpenings[0].amount);
+      const remittanceDelta = providerLocalMovements.reduce((total, movement) => total.add(new Decimal(movement.amount)), new Decimal(0));
+      const expectedBalance = openingBalance.add(remittanceDelta);
+      const actualBalance = new Decimal(primaryCash.balance);
+      primaryCashLedger = {
+        status: 'VERIFIED',
+        openingBalance: openingBalance.toNumber(),
+        remittanceDelta: remittanceDelta.toNumber(),
+        expectedBalance: expectedBalance.toNumber(),
+        actualBalance: actualBalance.toNumber(),
+        difference: actualBalance.sub(expectedBalance).toNumber(),
+        ok: actualBalance.eq(expectedBalance),
+      };
+    }
+    const checks = {
+      positionsMatchMovements: positionsReport.every((position) => position.difference === 0),
+      positionsNonNegative: positionsReport.every((position) => position.positionSaldo >= 0),
+      movementsHaveValidPositions,
+      localRemittanceMovementsValid: remittanceIssues.every((remittance) => remittance.localLegValid),
+      cashBalancesNonNegative: (cashBalances as any[]).every((cash) => new Decimal(cash.balance).gte(0)),
+      cashMatchesPositions: positionsReport.every((position) => position.cashPositionDifference === 0),
+      primaryCashLedgerReconciled: primaryCashLedger.ok === true,
+      completedRemittancesHaveTwoMovements: remittanceIssues.every((remittance) => remittance.movementCount === 2),
+    };
+
     return {
-      ok: remittances.every((r: any) => movements.some((m: any) => m.remittanceId === r.id)),
+      ok: Object.values(checks).every(Boolean),
       completedRemittances: remittances.length + manualRemittances,
       providerRemittances: remittances.length,
       manualRemittances,
-      linkedProviderMovements: movements.length,
+      linkedProviderMovements: (movements as any[]).filter((movement) => movement.remittanceId != null).length,
       linkedMovements: movements.length,
+      checks,
+      positions: positionsReport,
+      remittanceIssues,
+      primaryCashLedger,
     };
   }
 }

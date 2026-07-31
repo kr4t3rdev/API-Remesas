@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { QueryTransactionDto } from './dto/query-transaction.dto';
@@ -14,8 +11,8 @@ export class TransactionsService {
     private fxOperationsService: FxOperationsService,
   ) {}
 
-  async create(userId: number, createDto: CreateTransactionDto) {
-    const result = await this.fxOperationsService.createTransfer(userId, createDto);
+  async create(userId: number, createDto: CreateTransactionDto, idempotencyKey?: string) {
+    const result = await this.fxOperationsService.createTransfer(userId, createDto, idempotencyKey?.trim() || undefined);
     return result.transaction;
   }
 

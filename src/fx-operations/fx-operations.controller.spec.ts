@@ -10,4 +10,13 @@ describe('FxOperationsController', () => {
 
     expect(service.createTransfer).toHaveBeenCalledWith(7, dto, 'fx-123');
   });
+
+  it.each([undefined, '', '   '])('rejects a blank Idempotency-Key before invoking the transfer service', async (key) => {
+    const service = { createTransfer: jest.fn() };
+    const controller = new FxOperationsController(service as any);
+    const dto = { type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 260 };
+
+    expect(() => controller.createTransfer(7, dto, key)).toThrow('Idempotency-Key header is required for FX transfers');
+    expect(service.createTransfer).not.toHaveBeenCalled();
+  });
 });

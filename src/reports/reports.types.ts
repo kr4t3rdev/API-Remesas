@@ -28,7 +28,7 @@ export interface DailyReportDto {
   profit: {
     margin: number;
     marginProfit: number;
-    net: number;
+    net: number | null;
   };
 }
 
@@ -55,7 +55,7 @@ export interface PeriodReportDto {
     totalExpensesInCup: number | null;
     unconvertedExpensesCount: number;
     marginProfit: number;
-    netProfit: number;
+    netProfit: number | null;
   };
   dailyBreakdown: DailyBreakdownItem[];
   transactionsByCurrency: PeriodTransactionCurrencySummary;
@@ -189,6 +189,8 @@ export interface FxPerformancePosition {
   currency: string;
   saldo: number;
   costoPromedio: number | null;
+  reviewStatus: 'UNREVIEWED' | 'REVIEWED';
+  reviewedAt: Date | null;
   availableForSale: boolean;
 }
 
