@@ -4,6 +4,7 @@ import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { QueryExpenseDto } from './dto/query-expense.dto';
 import { Decimal } from '@prisma/client/runtime/library';
+import { serializableTransaction } from '../common/transactions/serializable-transaction';
 
 @Injectable()
 export class ExpensesService {
@@ -11,7 +12,8 @@ export class ExpensesService {
 
   async create(createDto: CreateExpenseDto, userId: number) {
     const amount = new Decimal(createDto.amount);
-    return this.prisma.$transaction(async (tx) => {
+    return serializableTransaction(this.prisma, async (tx) => {
+      await this.validateCurrency(tx, createDto.currencyId);
       await this.debitSource(tx, userId, createDto.sourceType, createDto.sourceBankAccountId, createDto.currencyId, amount);
 
       return tx.expense.create({ data: {
@@ -33,18 +35,33 @@ export class ExpensesService {
     const where: any = { userId };
 
     if (query.category) where.category = query.category;
-    if (query.currencyId) where.currencyId = query.currencyId;
+    if (query.currencyId !== undefined) where.currencyId = query.currencyId;
     if (query.startDate || query.endDate) {
       where.date = {};
       if (query.startDate) where.date.gte = new Date(query.startDate);
-      if (query.endDate) where.date.lte = new Date(query.endDate);
+      if (query.endDate) {
+        const endDate = new Date(query.endDate);
+        endDate.setHours(23, 59, 59, 999);
+        where.date.lte = endDate;
+      }
     }
 
-    return this.prisma.expense.findMany({
-      where,
-      include: { currency: true, sourceBankAccount: true },
-      orderBy: { date: 'desc' },
-    });
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 50;
+    const skip = (page - 1) * pageSize;
+
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.expense.findMany({
+        where,
+        include: { currency: true, sourceBankAccount: true },
+        orderBy: [{ date: 'desc' }, { id: 'desc' }],
+        skip,
+        take: pageSize,
+      }),
+      this.prisma.expense.count({ where }),
+    ]);
+
+    return { items, total, page, pageSize };
   }
 
   async findOne(id: number, userId: number) {
@@ -61,7 +78,7 @@ export class ExpensesService {
   }
 
   async update(id: number, updateDto: UpdateExpenseDto, userId: number) {
-    return this.prisma.$transaction(async (tx) => {
+    return serializableTransaction(this.prisma, async (tx) => {
       await tx.$queryRaw`SELECT id FROM "expenses" WHERE id = ${id} AND "userId" = ${userId} FOR UPDATE`;
       const expense = await tx.expense.findFirst({ where: { id, userId } });
       if (!expense) throw new NotFoundException('Gasto no encontrado');
@@ -71,23 +88,43 @@ export class ExpensesService {
         sourceType: updateDto.sourceType ?? expense.sourceType,
         sourceBankAccountId: updateDto.sourceType === 'CASH' ? undefined : (updateDto.sourceBankAccountId ?? expense.sourceBankAccountId ?? undefined),
       };
-      await this.refundSource(tx, userId, expense.sourceType, expense.sourceBankAccountId ?? undefined, expense.currencyId, new Decimal(expense.amount));
-      await this.debitSource(tx, userId, next.sourceType, next.sourceBankAccountId, next.currencyId, next.amount);
+      const financialChange =
+        !next.amount.eq(new Decimal(expense.amount)) ||
+        next.currencyId !== expense.currencyId ||
+        next.sourceType !== expense.sourceType ||
+        next.sourceBankAccountId !== (expense.sourceBankAccountId ?? undefined);
+      if (financialChange) {
+        await this.validateCurrency(tx, next.currencyId);
+        await this.refundSource(tx, userId, expense.sourceType, expense.sourceBankAccountId ?? undefined, expense.currencyId, new Decimal(expense.amount));
+        await this.debitSource(tx, userId, next.sourceType, next.sourceBankAccountId, next.currencyId, next.amount);
+      }
       const data: any = { ...updateDto, ...next };
       if (updateDto.date) data.date = new Date(updateDto.date);
       data.sourceBankAccountId = next.sourceType === 'BANK_ACCOUNT' ? next.sourceBankAccountId : null;
-      return tx.expense.update({ where: { id }, data, include: { currency: true, sourceBankAccount: true } });
+      const updated = await tx.expense.updateMany({ where: { id, userId }, data });
+      if (updated.count !== 1) throw new NotFoundException('Gasto no encontrado');
+      return tx.expense.findFirst({
+        where: { id, userId },
+        include: { currency: true, sourceBankAccount: true },
+      });
     });
   }
 
   async remove(id: number, userId: number) {
-    return this.prisma.$transaction(async (tx) => {
+    return serializableTransaction(this.prisma, async (tx) => {
       await tx.$queryRaw`SELECT id FROM "expenses" WHERE id = ${id} AND "userId" = ${userId} FOR UPDATE`;
       const expense = await tx.expense.findFirst({ where: { id, userId } });
       if (!expense) throw new NotFoundException('Gasto no encontrado');
       await this.refundSource(tx, userId, expense.sourceType, expense.sourceBankAccountId ?? undefined, expense.currencyId, new Decimal(expense.amount));
-      return tx.expense.delete({ where: { id } });
+      const deleted = await tx.expense.deleteMany({ where: { id, userId } });
+      if (deleted.count !== 1) throw new NotFoundException('Gasto no encontrado');
+      return expense;
     });
+  }
+
+  private async validateCurrency(tx: any, currencyId: number) {
+    const currency = await tx.currency.findFirst({ where: { id: currencyId, isActive: true }, select: { id: true } });
+    if (!currency) throw new BadRequestException('La moneda especificada no existe o está inactiva');
   }
 
   private async debitSource(tx: any, userId: number, sourceType: string, bankAccountId: number | undefined, currencyId: number, amount: Decimal) {

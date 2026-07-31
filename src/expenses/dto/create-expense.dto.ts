@@ -9,7 +9,9 @@ import {
   IsEnum,
   Min,
   ValidateIf,
+  MaxLength,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { TransferAccountType } from '@prisma/client';
 
 export enum ExpenseCategory {
@@ -55,5 +57,7 @@ export class CreateExpenseDto {
   @ApiPropertyOptional({ example: 'Nota opcional' })
   @IsOptional()
   @IsString()
+  @MaxLength(1000)
+  @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
   notes?: string;
 }

@@ -2,25 +2,11 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { PrismaService } from '../database/prisma/prisma.service';
 import { CreateWorkerDto, UpdateWorkerDto, CreateTransactionDto, AddBalanceDto, DepositDto } from './dto';
 import { Decimal } from '@prisma/client/runtime/library';
-import { Prisma } from '@prisma/client';
+import { serializableTransaction } from '../common/transactions/serializable-transaction';
 
 @Injectable()
 export class WorkerPaymentsService {
   constructor(private prisma: PrismaService) {}
-
-  /** Execute monetary mutations at serializable isolation and retry transient write conflicts. */
-  private async serializableTransaction<T>(callback: (tx: any) => Promise<T>): Promise<T> {
-    const maxAttempts = 3;
-    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-      try {
-        return await this.prisma.$transaction(callback, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
-      } catch (error) {
-        const isConflict = error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2034';
-        if (!isConflict || attempt === maxAttempts) throw error;
-      }
-    }
-    throw new Error('Serializable transaction failed');
-  }
 
   private generateInitials(name: string): string {
     const parts = name.trim().split(/\s+/);
@@ -115,7 +101,7 @@ export class WorkerPaymentsService {
   async addBalance(workerId: number, dto: AddBalanceDto, userId: number) {
     if (dto.amount <= 0) throw new BadRequestException('El monto debe ser mayor a cero');
     this.validateSelection(dto.sourceType, dto.sourceId, dto.currencyId, 'Origen');
-    return this.serializableTransaction(async (tx: any) => {
+    return serializableTransaction(this.prisma, async (tx: any) => {
       const balance = await this.getWorkerBalance(workerId, dto.currencyId, userId, tx);
       const source = await this.validateSource(dto, userId, dto.amount, tx);
       const before = Number(balance.balance); const after = before + dto.amount;
@@ -129,7 +115,7 @@ export class WorkerPaymentsService {
 
   async deposit(workerId: number, dto: DepositDto, userId: number) {
     if (dto.amount <= 0) throw new BadRequestException('El monto debe ser mayor a cero');
-    return this.serializableTransaction(async (tx: any) => {
+    return serializableTransaction(this.prisma, async (tx: any) => {
       const balance = await this.getWorkerBalance(workerId, dto.currencyId, userId, tx);
       const destination = await this.validateDestination(dto.destinationType, dto.destinationId, dto.currencyId, userId, tx);
       const before = Number(balance.balance); if (before < dto.amount) throw new BadRequestException('Saldo insuficiente del trabajador');
@@ -143,7 +129,7 @@ export class WorkerPaymentsService {
 
   async createTransaction(workerId: number, dto: CreateTransactionDto, userId: number) {
     if (dto.amount <= 0) throw new BadRequestException('El monto debe ser mayor a cero');
-    return this.serializableTransaction(async (tx: any) => {
+    return serializableTransaction(this.prisma, async (tx: any) => {
       const balance = await this.getWorkerBalance(workerId, dto.currencyId, userId, tx);
       const destination = await this.validateDestination(dto.destinationType, dto.destinationId, dto.currencyId, userId, tx);
       const before = Number(balance.balance); if (before < dto.amount) throw new BadRequestException('Saldo insuficiente del trabajador');
