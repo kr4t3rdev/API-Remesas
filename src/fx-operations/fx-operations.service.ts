@@ -255,6 +255,7 @@ export class FxOperationsService {
       const destinationCurrencyId = dto.type === TransactionType.COMPRA ? dto.currencyId : primaryCurrency.id;
       const sourceAmount = dto.type === TransactionType.COMPRA ? amount.mul(rate) : amount;
       const destinationAmount = dto.type === TransactionType.COMPRA ? amount : amount.mul(rate);
+      const workerSale = dto.workerId !== undefined && dto.type === TransactionType.VENTA;
       const adjustCashSource = async (currencyId: number) => {
         if (tx.cashBalance.updateMany) {
           const result = await tx.cashBalance.updateMany({
@@ -299,7 +300,7 @@ export class FxOperationsService {
         await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: dto.currencyId } }, update: { balance: { increment: amount } }, create: { userId, currencyId: dto.currencyId, balance: amount } });
         await adjustCashSource(primaryCurrency.id);
       } else {
-        await adjustCashSource(dto.currencyId);
+        if (!workerSale) await adjustCashSource(dto.currencyId);
         await tx.cashBalance.upsert({
           where: { userId_currencyId: { userId, currencyId: primaryCurrency.id } },
           update: { balance: { increment: amount.mul(rate) } },
@@ -310,7 +311,7 @@ export class FxOperationsService {
       if (dto.workerId !== undefined) {
         const worker = await tx.worker.findFirst({ where: { id: dto.workerId, userId }, select: { id: true } });
         if (!worker) throw new NotFoundException('Trabajador no encontrado');
-        const workerCurrencyId = dto.workerCurrencyId!;
+        const workerCurrencyId = dto.type === TransactionType.VENTA ? dto.currencyId : dto.workerCurrencyId!;
         const workerBalance = await tx.workerBalance.findUnique({
           where: { workerId_currencyId: { workerId: dto.workerId, currencyId: workerCurrencyId } },
           include: { currency: true },

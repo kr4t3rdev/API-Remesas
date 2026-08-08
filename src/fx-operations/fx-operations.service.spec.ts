@@ -64,6 +64,46 @@ describe('FX operations foundation', () => {
     expect(workerBalanceUpdateMany).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 41, balance: { gte: new Decimal(10) } }, data: { balance: { decrement: new Decimal(10) }, accumulatedProfit: { increment: new Decimal(3.5) } } }));
   });
 
+  it('uses the worker balance as the source for a worker sale', async () => {
+    const cashSourceUpdateMany = jest.fn().mockResolvedValue({ count: 1 });
+    const cashDestinationUpsert = jest.fn().mockResolvedValue({});
+    const workerBalanceUpdateMany = jest.fn().mockResolvedValue({ count: 1 });
+    const prisma = {
+      currency: { findUnique: jest.fn()
+        .mockResolvedValueOnce({ id: 2, code: 'USD', isActive: true })
+        .mockResolvedValueOnce({ id: 1, code: 'CUP', isActive: true }) },
+      $transaction: jest.fn(async (callback: any) => callback({
+        exchangeRate: { findUnique: jest.fn().mockResolvedValue({ referenceRate: new Decimal(250) }) },
+        currencyPosition: { findUnique: jest.fn().mockResolvedValue({ id: 9, saldo: new Decimal(25), costoPromedio: new Decimal(200), reviewStatus: 'REVIEWED' }), update: jest.fn(), updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
+        transaction: { create: jest.fn().mockResolvedValue({ id: 11 }) },
+        currencyMovement: { create: jest.fn().mockResolvedValue({ id: 12 }) },
+        cashBalance: { updateMany: cashSourceUpdateMany, upsert: cashDestinationUpsert },
+        worker: { findFirst: jest.fn().mockResolvedValue({ id: 4 }) },
+        workerBalance: { findUnique: jest.fn().mockResolvedValue({ id: 41, balance: new Decimal(25), currency: { id: 2, isActive: true } }), updateMany: workerBalanceUpdateMany },
+        workerTransaction: { create: jest.fn().mockResolvedValue({ id: 91 }) },
+      })),
+    } as any;
+
+    await new FxOperationsService(prisma).createTransfer(7, {
+      type: 'VENTA' as any,
+      currencyId: 2,
+      amount: 10,
+      rate: 250,
+      workerId: 4,
+      workerProfit: 3.5,
+      workerCurrencyId: 2,
+    } as any);
+
+    expect(cashSourceUpdateMany).not.toHaveBeenCalled();
+    expect(cashDestinationUpsert).toHaveBeenCalledWith(expect.objectContaining({
+      where: { userId_currencyId: { userId: 7, currencyId: 1 } },
+      update: { balance: { increment: new Decimal(2500) } },
+    }));
+    expect(workerBalanceUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 41, balance: { gte: new Decimal(10) } },
+    }));
+  });
+
   it('rejects an FX transfer when the worker has no balance for the selected currency', async () => {
     const prisma = {
       currency: { findUnique: jest.fn()
