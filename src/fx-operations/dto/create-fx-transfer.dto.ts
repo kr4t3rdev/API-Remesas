@@ -64,6 +64,7 @@ export class CreateFxTransferDto {
   workerId?: number;
 
   @ApiPropertyOptional({ description: 'Profit credited to the worker balance in workerCurrencyId' })
+  @IsOptional()
   @ValidateIf((dto) => dto.workerId !== undefined)
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)

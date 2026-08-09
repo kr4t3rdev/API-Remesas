@@ -31,16 +31,21 @@ describe('FX operations foundation', () => {
       workerId: 4, workerProfit: 1, workerCurrencyId: 2,
     } as any)).rejects.toThrow('Worker FX transfers must use CASH accounts only');
   });
-  it('requires complete worker context when attaching FX profit', async () => {
+  it('requires a worker balance currency when attaching an FX worker context', async () => {
     const prisma = { currency: { findUnique: jest.fn() } } as any;
     await expect(new FxOperationsService(prisma).createTransfer(7, {
       type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 260, workerId: 4,
-    } as any)).rejects.toThrow('workerId, workerProfit and workerCurrencyId must be provided together');
+    } as any)).rejects.toThrow('workerId and workerCurrencyId must be provided together');
   });
 
-  it('records worker profit inside the same FX transaction', async () => {
+  it('moves a worker purchase from primary balance into the purchased-currency balance', async () => {
     const workerTransactionCreate = jest.fn().mockResolvedValue({ id: 91 });
     const workerBalanceUpdateMany = jest.fn().mockResolvedValue({ count: 1 });
+    const cashBalanceUpdateMany = jest.fn();
+    const cashBalanceUpsert = jest.fn();
+    const workerBalanceFindUnique = jest.fn()
+      .mockResolvedValueOnce({ id: 41, balance: new Decimal(3000), costBasisPrimary: new Decimal(0), currency: { id: 1, isActive: true } })
+      .mockResolvedValueOnce({ id: 42, balance: new Decimal(5), costBasisPrimary: new Decimal(1000), currency: { id: 2, isActive: true } });
     const prisma = {
       currency: { findUnique: jest.fn()
         .mockResolvedValueOnce({ id: 2, code: 'USD', isActive: true })
@@ -50,18 +55,21 @@ describe('FX operations foundation', () => {
         currencyPosition: { findUnique: jest.fn().mockResolvedValue({ id: 9, saldo: new Decimal(0), costoPromedio: new Decimal(0), reviewStatus: 'REVIEWED' }), update: jest.fn().mockResolvedValue({}) },
         transaction: { create: jest.fn().mockResolvedValue({ id: 11 }) },
         currencyMovement: { create: jest.fn().mockResolvedValue({ id: 12 }) },
-        cashBalance: { updateMany: jest.fn().mockResolvedValue({ count: 1 }), upsert: jest.fn().mockResolvedValue({}) },
+        cashBalance: { updateMany: cashBalanceUpdateMany, upsert: cashBalanceUpsert },
         worker: { findFirst: jest.fn().mockResolvedValue({ id: 4 }) },
-        workerBalance: { findUnique: jest.fn().mockResolvedValue({ id: 41, balance: new Decimal(25), currency: { id: 2, isActive: true } }), updateMany: workerBalanceUpdateMany },
+        workerBalance: { findUnique: workerBalanceFindUnique, upsert: jest.fn().mockResolvedValue({ id: 42, balance: new Decimal(5), costBasisPrimary: new Decimal(1000) }), updateMany: workerBalanceUpdateMany },
         workerTransaction: { create: workerTransactionCreate },
       })),
     } as any;
     await new FxOperationsService(prisma).createTransfer(7, {
       type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 200,
-      workerId: 4, workerProfit: 3.5, workerCurrencyId: 2,
+      workerId: 4, workerCurrencyId: 1,
     } as any);
-    expect(workerTransactionCreate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ workerId: 4, currencyId: 2, amount: new Decimal(10), balanceBefore: new Decimal(25), balanceAfter: new Decimal(15), profit: new Decimal(3.5) }) }));
-    expect(workerBalanceUpdateMany).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 41, balance: { gte: new Decimal(10) } }, data: { balance: { decrement: new Decimal(10) }, accumulatedProfit: { increment: new Decimal(3.5) } } }));
+    expect(cashBalanceUpdateMany).not.toHaveBeenCalled();
+    expect(cashBalanceUpsert).not.toHaveBeenCalled();
+    expect(workerBalanceUpdateMany).toHaveBeenNthCalledWith(1, expect.objectContaining({ where: { id: 41, balance: { gte: new Decimal(2000) } }, data: { balance: { decrement: new Decimal(2000) } } }));
+    expect(workerBalanceUpdateMany).toHaveBeenNthCalledWith(2, expect.objectContaining({ where: { id: 42 }, data: { balance: { increment: new Decimal(10) }, costBasisPrimary: { increment: new Decimal(2000) } } }));
+    expect(workerTransactionCreate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ type: 'FX_CONVERSION', currencyId: 2, amount: new Decimal(10) }) }));
   });
 
   it('uses the worker balance as the source for a worker sale', async () => {
@@ -69,6 +77,7 @@ describe('FX operations foundation', () => {
     const cashDestinationUpsert = jest.fn().mockResolvedValue({});
     const transactionCreate = jest.fn().mockResolvedValue({ id: 11 });
     const workerBalanceUpdateMany = jest.fn().mockResolvedValue({ count: 1 });
+    const workerTransactionCreate = jest.fn().mockResolvedValue({ id: 91 });
     const prisma = {
       currency: { findUnique: jest.fn()
         .mockResolvedValueOnce({ id: 2, code: 'USD', isActive: true })
@@ -81,7 +90,7 @@ describe('FX operations foundation', () => {
         cashBalance: { updateMany: cashSourceUpdateMany, upsert: cashDestinationUpsert },
         worker: { findFirst: jest.fn().mockResolvedValue({ id: 4 }) },
         workerBalance: { findUnique: jest.fn().mockResolvedValue({ id: 41, balance: new Decimal(25), currency: { id: 2, isActive: true } }), updateMany: workerBalanceUpdateMany },
-        workerTransaction: { create: jest.fn().mockResolvedValue({ id: 91 }) },
+        workerTransaction: { create: workerTransactionCreate },
       })),
     } as any;
 
@@ -91,7 +100,6 @@ describe('FX operations foundation', () => {
       amount: 10,
       rate: 250,
       workerId: 4,
-      workerProfit: 3.5,
       workerCurrencyId: 2,
     } as any);
 
@@ -101,10 +109,14 @@ describe('FX operations foundation', () => {
       update: { balance: { increment: new Decimal(2500) } },
     }));
     expect(transactionCreate).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({ workerCurrencyId: 2 }),
+      data: expect.objectContaining({ workerCurrencyId: 2, workerProfit: undefined }),
     }));
     expect(workerBalanceUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
       where: { id: 41, balance: { gte: new Decimal(10) } },
+      data: expect.objectContaining({ accumulatedProfit: { increment: new Decimal(0) } }),
+    }));
+    expect(workerTransactionCreate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ profit: new Decimal(0) }),
     }));
   });
 
@@ -178,16 +190,16 @@ describe('FX operations foundation', () => {
         transaction: { create: transactionCreate }, currencyMovement: { create: jest.fn().mockResolvedValue({ id: 12 }) },
         cashBalance: { updateMany: jest.fn().mockResolvedValue({ count: 1 }), upsert: jest.fn() },
         worker: { findFirst: jest.fn().mockResolvedValue({ id: 4 }) },
-        workerBalance: { findUnique: jest.fn().mockResolvedValue({ id: 41, balance: new Decimal(5), currency: { id: 2, isActive: true } }), updateMany: workerBalanceUpdateMany },
+        workerBalance: { findUnique: jest.fn().mockResolvedValue({ id: 41, balance: new Decimal(5), currency: { id: 1, isActive: true } }), upsert: jest.fn().mockResolvedValue({ id: 42, balance: new Decimal(0), costBasisPrimary: new Decimal(0) }), updateMany: workerBalanceUpdateMany },
         workerTransaction: { create: jest.fn() },
       })),
     } as any;
     await expect(new FxOperationsService(prisma).createTransfer(7, {
       type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 200,
-      workerId: 4, workerProfit: 1, workerCurrencyId: 2,
+      workerId: 4, workerProfit: 1, workerCurrencyId: 1,
     } as any)).rejects.toThrow(InsufficientSaldoError);
     expect(transactionCreate).toHaveBeenCalledTimes(1);
-    expect(workerBalanceUpdateMany).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 41, balance: { gte: new Decimal(10) } } }));
+    expect(workerBalanceUpdateMany).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 41, balance: { gte: new Decimal(2000) } } }));
   });
 
   it('rolls back FX when the worker tenant check fails', async () => {
@@ -353,7 +365,7 @@ describe('FX operations foundation', () => {
     await expect(new FxOperationsService(prisma).createTransfer(7, {
       type: 'COMPRA' as any, currencyId: 2, amount: 50, rate: 260,
       workerId: 4, workerProfit: 4, workerCurrencyId: 2,
-    }, 'fx-worker')).rejects.toThrow('Idempotency key was already used for a different transfer');
+    }, 'fx-worker')).resolves.toEqual({ transaction: existing, movement: existing.fxMovements[0] });
   });
   it('includes operation kind and rate persistence in idempotency intent', async () => {
     const existing = { id: 11, userId: 7, type: 'COMPRA', currencyId: 2, amount: 50, rate: 260, notes: null, operationKind: 'TRANSFER', persistRate: false, sourceType: 'CASH', destinationType: 'CASH', fxMovements: [] };
@@ -448,6 +460,50 @@ describe('FX operations foundation', () => {
     expect(bankFindFirst).toHaveBeenNthCalledWith(1, { where: { id: 30, userId: 7, isActive: true } });
     expect(bankFindFirst).toHaveBeenNthCalledWith(2, { where: { id: 20, userId: 7, isActive: true } });
     expect(rateHistoryCreate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ currencyFromId: 2, currencyToId: 3 }) }));
+  });
+  it('settles a standard sale across the FX position and configured primary cash', async () => {
+    const positionUpdateMany = jest.fn().mockResolvedValue({ count: 1 });
+    const sourceCashUpdateMany = jest.fn().mockResolvedValue({ count: 1 });
+    const destinationCashUpsert = jest.fn().mockResolvedValue({});
+    const transactionCreate = jest.fn().mockResolvedValue({ id: 11 });
+    const movementCreate = jest.fn().mockResolvedValue({ id: 12 });
+    const prisma = {
+      transaction: { findUnique: jest.fn().mockResolvedValue(null) },
+      currency: { findUnique: jest.fn()
+        .mockResolvedValueOnce({ id: 2, code: 'USD', isActive: true })
+        .mockResolvedValueOnce({ id: 1, code: 'CUP', isActive: true }) },
+      $transaction: jest.fn(async (callback: any) => callback({
+        exchangeRate: { findUnique: jest.fn().mockResolvedValue({ referenceRate: new Decimal(250) }) },
+        currencyPosition: {
+          findUnique: jest.fn().mockResolvedValue({ id: 9, saldo: new Decimal(100), costoPromedio: new Decimal(250), reviewStatus: 'REVIEWED' }),
+          updateMany: positionUpdateMany,
+        },
+        transaction: { create: transactionCreate },
+        currencyMovement: { create: movementCreate },
+        cashBalance: { updateMany: sourceCashUpdateMany, upsert: destinationCashUpsert },
+      })),
+    } as any;
+
+    const result = await new FxOperationsService(prisma).createTransfer(7, {
+      type: 'VENTA' as any, currencyId: 2, amount: 10, rate: 270,
+    }, 'standard-sale');
+
+    expect(positionUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 9, reviewStatus: 'REVIEWED', saldo: { gte: new Decimal(10) } },
+      data: { saldo: { decrement: new Decimal(10) } },
+    }));
+    expect(sourceCashUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { userId: 7, currencyId: 2, balance: { gte: new Decimal(10) } },
+      data: { balance: { decrement: new Decimal(10) } },
+    }));
+    expect(destinationCashUpsert).toHaveBeenCalledWith(expect.objectContaining({
+      where: { userId_currencyId: { userId: 7, currencyId: 1 } },
+      update: { balance: { increment: new Decimal(2700) } },
+    }));
+    expect(transactionCreate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ totalCup: new Decimal(2700), marginProfit: new Decimal(200) }),
+    }));
+    expect((result as any).realizedProfit).toEqual(new Decimal(200));
   });
   it('does not replay a different intent after a concurrent unique-key race', async () => {
     const raced = { id: 11, userId: 7, idempotencyKey: 'fx-race', type: 'COMPRA', currencyId: 2, amount: new Decimal(50), rate: new Decimal(260), notes: null, fxMovements: [{ id: 12 }] };

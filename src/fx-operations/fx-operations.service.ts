@@ -68,10 +68,7 @@ export class FxOperationsService {
       && (existing.operationKind ?? FxOperationKind.TRANSFER) === (dto.operationKind ?? FxOperationKind.TRANSFER)
       && (existing.persistRate ?? false) === (dto.persistRate ?? false)
       && (existing.workerId ?? null) === (dto.workerId ?? null)
-      && (existing.workerCurrencyId ?? null) === (dto.workerCurrencyId ?? null)
-      && ((existing.workerProfit ?? null) === null
-        ? dto.workerProfit === undefined
-        : dto.workerProfit !== undefined && new Decimal(existing.workerProfit).eq(new Decimal(dto.workerProfit)));
+      && (existing.workerCurrencyId ?? null) === (dto.workerCurrencyId ?? null);
     if (!sameIntent) throw new ConflictException('Idempotency key was already used for a different transfer');
   }
 
@@ -79,8 +76,8 @@ export class FxOperationsService {
 
   async createTransfer(userId: number, dto: CreateFxTransferDto, idempotencyKey?: string) {
     const workerFieldsProvided = dto.workerId !== undefined || dto.workerProfit !== undefined || dto.workerCurrencyId !== undefined;
-    if (workerFieldsProvided && (dto.workerId === undefined || dto.workerProfit === undefined || dto.workerCurrencyId === undefined)) {
-      throw new BadRequestException('workerId, workerProfit and workerCurrencyId must be provided together');
+    if (workerFieldsProvided && (dto.workerId === undefined || dto.workerCurrencyId === undefined)) {
+      throw new BadRequestException('workerId and workerCurrencyId must be provided together');
     }
     if (dto.workerId !== undefined && (
       dto.sourceType === TransferAccountType.BANK_ACCOUNT
@@ -187,7 +184,9 @@ export class FxOperationsService {
           destinationType: dto.destinationType ?? TransferAccountType.CASH,
           destinationBankAccountId: dto.destinationBankAccountId,
           workerId: dto.workerId,
-          workerProfit: dto.workerProfit === undefined ? undefined : new Decimal(dto.workerProfit),
+          // Worker performance is calculated during Deposit from cost basis and
+          // the valuation rate; legacy manual workerProfit input is ignored.
+          workerProfit: undefined,
           workerCurrencyId: effectiveWorkerCurrencyId,
         },
       });
@@ -280,33 +279,35 @@ export class FxOperationsService {
         if (result.count !== 1) throw new InsufficientSaldoError();
       };
 
-      if (sourceType === TransferAccountType.BANK_ACCOUNT) {
+      if (dto.workerId === undefined || dto.type === TransactionType.VENTA) {
+        if (sourceType === TransferAccountType.BANK_ACCOUNT) {
         await adjustBankAccount(sourceBankAccountId, sourceCurrencyId, sourceAmount.neg(), true);
-      } else if (destinationType === TransferAccountType.BANK_ACCOUNT) {
-        // Cash source is kept in the legacy cash ledger below; bank destination is applied here.
-      }
-      if (destinationType === TransferAccountType.BANK_ACCOUNT) {
-        await adjustBankAccount(destinationBankAccountId, destinationCurrencyId, destinationAmount, false);
-      }
+        } else if (destinationType === TransferAccountType.BANK_ACCOUNT) {
+          // Cash source is kept in the legacy cash ledger below; bank destination is applied here.
+        }
+        if (destinationType === TransferAccountType.BANK_ACCOUNT) {
+          await adjustBankAccount(destinationBankAccountId, destinationCurrencyId, destinationAmount, false);
+        }
 
-      if (sourceType === TransferAccountType.BANK_ACCOUNT || destinationType === TransferAccountType.BANK_ACCOUNT) {
-        // For bank-backed legs, only apply the remaining cash leg. Bank legs were updated above.
-        if (sourceType === TransferAccountType.CASH) {
-          await adjustCashSource(sourceCurrencyId);
+        if (sourceType === TransferAccountType.BANK_ACCOUNT || destinationType === TransferAccountType.BANK_ACCOUNT) {
+          // For bank-backed legs, only apply the remaining cash leg. Bank legs were updated above.
+          if (sourceType === TransferAccountType.CASH) {
+            await adjustCashSource(sourceCurrencyId);
+          }
+          if (destinationType === TransferAccountType.CASH) {
+            await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: destinationCurrencyId } }, update: { balance: { increment: destinationAmount } }, create: { userId, currencyId: destinationCurrencyId, balance: destinationAmount } });
+          }
+        } else if (dto.type === TransactionType.COMPRA) {
+          await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: dto.currencyId } }, update: { balance: { increment: amount } }, create: { userId, currencyId: dto.currencyId, balance: amount } });
+          await adjustCashSource(primaryCurrency.id);
+        } else {
+          if (!workerSale) await adjustCashSource(dto.currencyId);
+          await tx.cashBalance.upsert({
+            where: { userId_currencyId: { userId, currencyId: primaryCurrency.id } },
+            update: { balance: { increment: amount.mul(rate) } },
+            create: { userId, currencyId: primaryCurrency.id, balance: amount.mul(rate) },
+          });
         }
-        if (destinationType === TransferAccountType.CASH) {
-          await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: destinationCurrencyId } }, update: { balance: { increment: destinationAmount } }, create: { userId, currencyId: destinationCurrencyId, balance: destinationAmount } });
-        }
-      } else if (dto.type === TransactionType.COMPRA) {
-        await tx.cashBalance.upsert({ where: { userId_currencyId: { userId, currencyId: dto.currencyId } }, update: { balance: { increment: amount } }, create: { userId, currencyId: dto.currencyId, balance: amount } });
-        await adjustCashSource(primaryCurrency.id);
-      } else {
-        if (!workerSale) await adjustCashSource(dto.currencyId);
-        await tx.cashBalance.upsert({
-          where: { userId_currencyId: { userId, currencyId: primaryCurrency.id } },
-          update: { balance: { increment: amount.mul(rate) } },
-          create: { userId, currencyId: primaryCurrency.id, balance: amount.mul(rate) },
-        });
       }
 
       if (dto.workerId !== undefined) {
@@ -319,7 +320,38 @@ export class FxOperationsService {
         });
         if (!workerBalance) throw new NotFoundException('Worker balance not found for currency');
         if (!workerBalance.currency?.isActive) throw new NotFoundException('Worker currency is inactive');
-        const profit = new Decimal(dto.workerProfit!);
+        if (dto.type === TransactionType.COMPRA) {
+          if (workerCurrencyId !== primaryCurrency.id) throw new BadRequestException('Worker purchases must use the primary currency as source');
+          const purchasedBalance = await tx.workerBalance.upsert({
+            where: { workerId_currencyId: { workerId: dto.workerId, currencyId: dto.currencyId } },
+            update: {},
+            create: { workerId: dto.workerId, currencyId: dto.currencyId, balance: 0, costBasisPrimary: 0, accumulatedProfit: 0, totalDelivered: 0 },
+          });
+          const sourceAmount = amount.mul(rate).toDecimalPlaces(2);
+          const sourceBefore = new Decimal(workerBalance.balance);
+          const sourceAfter = sourceBefore.sub(sourceAmount);
+          const destinationBefore = new Decimal(purchasedBalance.balance);
+          const destinationAfter = destinationBefore.add(amount);
+          const sourceUpdate = await tx.workerBalance.updateMany({
+            where: { id: workerBalance.id, balance: { gte: sourceAmount } },
+            data: { balance: { decrement: sourceAmount } },
+          });
+          if (sourceUpdate.count !== 1) throw new InsufficientSaldoError();
+          const destinationUpdate = await tx.workerBalance.updateMany({
+            where: { id: purchasedBalance.id },
+            data: { balance: { increment: amount }, costBasisPrimary: { increment: sourceAmount } },
+          });
+          if (destinationUpdate.count !== 1) throw new NotFoundException('Worker destination balance not found');
+          await tx.workerTransaction.create({
+            data: { workerId: dto.workerId, currencyId: workerCurrencyId, type: 'FX_CONVERSION', amount: sourceAmount, balanceBefore: sourceBefore, balanceAfter: sourceAfter, description: `Compra de ${dto.currencyId}` },
+          });
+          await tx.workerTransaction.create({
+            data: { workerId: dto.workerId, currencyId: dto.currencyId, type: 'FX_CONVERSION', amount, balanceBefore: destinationBefore, balanceAfter: destinationAfter, description: `Fondos comprados en ${dto.currencyId}` },
+          });
+        } else {
+        // Worker performance is settled by Deposit now; keep legacy VENTA
+        // payloads valid when the mobile client omits the former manual value.
+        const profit = new Decimal(0);
         // The worker funds the FX operation. Debit the selected worker currency
         // atomically; for COMPRA this is the purchased amount, never the CUP
         // source amount (amount * rate).
@@ -346,6 +378,7 @@ export class FxOperationsService {
             description: 'Ganancia por operación FX',
           },
         });
+        }
       }
 
       return { transaction, movement, position: { ...position, saldo: nextSaldo, costoPromedio: average }, realizedProfit };

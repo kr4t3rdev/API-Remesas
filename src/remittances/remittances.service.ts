@@ -35,6 +35,14 @@ export class RemittancesService {
     if (!event.provider?.trim() || !event.sourceId?.trim() || event.foreignAmount <= 0 || event.localAmount <= 0 || event.rate <= 0) {
       throw new UnprocessableEntityException({ code: 'REMITTANCE_INVALID_EVENT', message: 'Remittance event is invalid' });
     }
+    const expectedLocalAmount = new Decimal(event.foreignAmount).mul(new Decimal(event.rate)).toDecimalPlaces(2);
+    const actualLocalAmount = new Decimal(event.localAmount).toDecimalPlaces(2);
+    if (!actualLocalAmount.eq(expectedLocalAmount)) {
+      throw new UnprocessableEntityException({
+        code: 'REMITTANCE_AMOUNT_MISMATCH',
+        message: 'Remittance local amount must equal foreign amount multiplied by the exchange rate',
+      });
+    }
   }
 
   private async validateCurrencyRoles(userId: number, event: RemittanceEventDto) {
@@ -74,6 +82,9 @@ export class RemittancesService {
     if (existing) {
       if (existing.status === RemittanceStatus.COMPLETED) return { ...existing, duplicate: true };
       if (event.status === RemittanceStatus.COMPLETED) return this.complete(userId, event);
+      if (existing.status === RemittanceStatus.PENDING && event.status === RemittanceStatus.FAILED) {
+        return this.prisma.remittance.update({ where: { id: existing.id }, data: { status: RemittanceStatus.FAILED } });
+      }
       return existing;
     }
     if (event.status !== RemittanceStatus.COMPLETED) {

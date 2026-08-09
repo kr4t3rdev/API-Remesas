@@ -638,6 +638,8 @@ model AdminAuditLog {
 enum WorkerTransactionType {
   TRANSACTION
   BALANCE_ADD
+  FX_CONVERSION
+  DEPOSIT
 }
 
 model Worker {
@@ -670,6 +672,7 @@ model WorkerBalance {
   currencyId        Int
   currency          Currency @relation(fields: [currencyId], references: [id])
   balance           Decimal  @db.Decimal(15, 2) @default(0)
+  costBasisPrimary  Decimal  @db.Decimal(15, 2) @default(0)
   accumulatedProfit Decimal  @db.Decimal(15, 2) @default(0)
   totalDelivered    Decimal  @db.Decimal(15, 2) @default(0)
 

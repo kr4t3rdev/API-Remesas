@@ -95,6 +95,24 @@ describe('RemittancesService', () => {
   });
   it('preserves identity on retry', async () => { state.remittances.push({ id: 1, userId: 7, provider: 'stripe', sourceId: 'old', status: 'FAILED' }); const result = await service().retry(7, 1, event()); expect(result.sourceId).toBe('old'); expect(result.status).toBe('COMPLETED'); });
   it('rejects provider auth and validation before writes', async () => { expect(() => service().assertProviderToken('bad')).toThrow(UnauthorizedException); await expect(service().ingest(7, { ...event(), sourceId: '' })).rejects.toThrow(UnprocessableEntityException); expect(prisma.remittance.create).not.toHaveBeenCalled(); });
+  it('rejects a remittance whose local amount does not match the foreign amount and rate', async () => {
+    await expect(service().ingest(7, { ...event(), localAmount: 2600 })).rejects.toMatchObject({
+      response: expect.objectContaining({ code: 'REMITTANCE_AMOUNT_MISMATCH' }),
+    });
+    expect(prisma.remittance.create).not.toHaveBeenCalled();
+    expect(prisma.currencyMovement.create).not.toHaveBeenCalled();
+  });
+  it('persists a provider failure after a pending callback', async () => {
+    await service().ingest(7, event('PENDING'));
+
+    const result = await service().ingest(7, event('FAILED'));
+
+    expect(result.status).toBe('FAILED');
+    expect(prisma.remittance.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 1 },
+      data: { status: 'FAILED' },
+    }));
+  });
   it('resolves the tenant from mapped provider credentials', () => {
     config.get.mockImplementation((key: string) => key === 'REMITTANCE_PROVIDER_TENANT_TOKENS' ? JSON.stringify({ tenantToken: 8 }) : undefined);
     expect(service().resolveProviderTenant('tenantToken')).toBe(8);
@@ -111,7 +129,7 @@ describe('RemittancesService', () => {
     await expect(service().ingest(7, event())).rejects.toMatchObject({ response: expect.objectContaining({ code: 'FX_INSUFFICIENT_CASH' }) });
     expect(prisma.currencyMovement.create).not.toHaveBeenCalled();
   });
-  it('prevents two concurrent completions from spending the same local source cash', async () => { const large = { ...event(), foreignAmount: 60, localAmount: 6000 }; const results = await Promise.allSettled([service().ingest(7, large), service().ingest(7, { ...large, sourceId: 'src-2' })]); expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1); expect(state.positions[0].saldo.toString()).toBe('160'); expect(state.positions[1].saldo.toString()).toBe('10000'); expect(state.cash.find((cash: any) => cash.currencyId === 1).balance.toString()).toBe('4000'); });
+  it('prevents two concurrent completions from spending the same local source cash', async () => { const large = { ...event(), foreignAmount: 20, localAmount: 5400 }; const results = await Promise.allSettled([service().ingest(7, large), service().ingest(7, { ...large, sourceId: 'src-2' })]); expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1); expect(state.positions[0].saldo.toString()).toBe('120'); expect(state.positions[1].saldo.toString()).toBe('10000'); expect(state.cash.find((cash: any) => cash.currencyId === 1).balance.toString()).toBe('4600'); });
   it('unifies manual remittances in the listing without representing them as provider callbacks', async () => {
     prisma.remittance.findMany = jest.fn().mockResolvedValue([{ id: 1, provider: 'stripe', sourceId: 'evt', status: 'COMPLETED', createdAt: new Date('2026-07-15') }]);
     prisma.transaction.findMany.mockResolvedValue([{ id: 9, operationKind: 'REMITTANCE', type: 'COMPRA', amount: new Decimal(10), rate: new Decimal(260), totalCup: new Decimal(2600), createdAt: new Date('2026-07-16'), currency: { id: 2, code: 'USD' } }]);

@@ -6,19 +6,20 @@ import { validate } from 'class-validator';
 import { AddBalanceDto, DepositDto, CreateTransactionDto } from './dto';
 
 describe('WorkerPaymentsService multicurrency ledger', () => {
-  const workerBalance = { id: 10, workerId: 1, currencyId: 1, balance: new Decimal(100), accumulatedProfit: new Decimal(0), totalDelivered: new Decimal(0) };
+  const workerBalance = { id: 10, workerId: 1, currencyId: 1, balance: new Decimal(100), costBasisPrimary: new Decimal(0), accumulatedProfit: new Decimal(0), totalDelivered: new Decimal(0) };
   const tx: any = {
-  worker: { findFirst: jest.fn().mockResolvedValue({ id: 1 }) },
+  worker: { findFirst: jest.fn().mockResolvedValue({ id: 1, user: { primaryCurrencyId: 1 } }) },
     currency: { findFirst: jest.fn().mockResolvedValue({ id: 1 }) },
     workerBalance: { upsert: jest.fn().mockResolvedValue(workerBalance), update: jest.fn().mockResolvedValue(workerBalance) },
     workerTransaction: { create: jest.fn().mockResolvedValue({ id: 1 }) },
     cashBalance: { findUnique: jest.fn(), update: jest.fn() },
     bankAccount: { findFirst: jest.fn(), update: jest.fn() },
+    exchangeRate: { findUnique: jest.fn().mockResolvedValue({ buyRate: new Decimal(250) }) },
   };
   const prisma: any = { ...tx, $transaction: jest.fn((callback: any) => callback(tx)), worker: { findFirst: tx.worker.findFirst }, currency: tx.currency };
   let service: WorkerPaymentsService;
   beforeAll(() => { service = new WorkerPaymentsService(prisma); });
-  beforeEach(() => { jest.clearAllMocks(); tx.worker.findFirst.mockResolvedValue({ id: 1 }); tx.currency.findFirst.mockResolvedValue({ id: 1 }); tx.workerBalance.upsert.mockResolvedValue(workerBalance); });
+  beforeEach(() => { jest.clearAllMocks(); tx.worker.findFirst.mockResolvedValue({ id: 1, user: { primaryCurrencyId: 1 } }); tx.currency.findFirst.mockResolvedValue({ id: 1 }); tx.workerBalance.upsert.mockResolvedValue(workerBalance); });
 
   it('rejects missing or inactive currencies before creating a worker balance', async () => {
     tx.currency.findFirst.mockResolvedValueOnce(null);
@@ -33,6 +34,11 @@ describe('WorkerPaymentsService multicurrency ledger', () => {
   it('requires currency for every monetary operation', async () => {
     await expect(service.addBalance(1, { amount: 10 } as any, 7)).rejects.toBeInstanceOf(BadRequestException);
     await expect(service.deposit(1, { amount: 10 } as any, 7)).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('requires a destination to reconcile a worker deposit', async () => {
+    await expect(service.deposit(1, { amount: 10, currencyId: 1 }, 7)).rejects.toThrow(/destino es obligatorio/i);
+    expect(tx.workerTransaction.create).not.toHaveBeenCalled();
   });
 
   it('keeps separate balances for two currencies', async () => {
@@ -76,6 +82,39 @@ describe('WorkerPaymentsService multicurrency ledger', () => {
     expect(tx.cashBalance.update).toHaveBeenCalledWith(expect.objectContaining({
       where: { userId_currencyId: { userId: 7, currencyId: 1 } },
       data: { balance: { increment: new Decimal(10) } },
+    }));
+  });
+
+  it('calculates automatic performance when foreign worker funds are deposited', async () => {
+    const foreignBalance = {
+      ...workerBalance,
+      currencyId: 2,
+      balance: new Decimal(10),
+      costBasisPrimary: new Decimal(2000),
+    };
+    tx.workerBalance.upsert.mockResolvedValue(foreignBalance);
+    tx.worker.update = jest.fn().mockResolvedValue({});
+    tx.exchangeRate.findUnique.mockResolvedValue({ buyRate: new Decimal(250) });
+    tx.cashBalance.findUnique.mockResolvedValue({ userId: 7, currencyId: 2, balance: new Decimal(20) });
+    tx.cashBalance.update.mockResolvedValue({});
+
+    await service.deposit(1, { amount: 4, destinationType: 'CASH', currencyId: 2 }, 7);
+
+    expect(tx.workerBalance.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: foreignBalance.id },
+      data: expect.objectContaining({
+        balance: { decrement: new Decimal(4) },
+        costBasisPrimary: { decrement: new Decimal(800) },
+        accumulatedProfit: { increment: new Decimal(200) },
+        totalDelivered: { increment: new Decimal(4) },
+      }),
+    }));
+    expect(tx.worker.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 1 },
+      data: { accumulatedProfit: { increment: new Decimal(200) } },
+    }));
+    expect(tx.workerTransaction.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ type: 'DEPOSIT', amount: new Decimal(4), profit: new Decimal(200) }),
     }));
   });
 
