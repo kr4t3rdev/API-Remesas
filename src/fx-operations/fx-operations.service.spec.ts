@@ -77,7 +77,15 @@ describe('FX operations foundation', () => {
     const cashDestinationUpsert = jest.fn().mockResolvedValue({});
     const transactionCreate = jest.fn().mockResolvedValue({ id: 11 });
     const workerBalanceUpdateMany = jest.fn().mockResolvedValue({ count: 1 });
+    const workerBalanceUpsert = jest.fn().mockResolvedValue({
+      id: 42,
+      balance: new Decimal(5000),
+      costBasisPrimary: new Decimal(4000),
+    });
     const workerTransactionCreate = jest.fn().mockResolvedValue({ id: 91 });
+    const workerBalanceFindUnique = jest.fn()
+      .mockResolvedValueOnce({ id: 41, balance: new Decimal(25), costBasisPrimary: new Decimal(5000), currency: { id: 2, isActive: true } })
+      .mockResolvedValueOnce({ id: 42, balance: new Decimal(5000), costBasisPrimary: new Decimal(4000), currency: { id: 1, isActive: true } });
     const prisma = {
       currency: { findUnique: jest.fn()
         .mockResolvedValueOnce({ id: 2, code: 'USD', isActive: true })
@@ -89,7 +97,11 @@ describe('FX operations foundation', () => {
         currencyMovement: { create: jest.fn().mockResolvedValue({ id: 12 }) },
         cashBalance: { updateMany: cashSourceUpdateMany, upsert: cashDestinationUpsert },
         worker: { findFirst: jest.fn().mockResolvedValue({ id: 4 }) },
-        workerBalance: { findUnique: jest.fn().mockResolvedValue({ id: 41, balance: new Decimal(25), currency: { id: 2, isActive: true } }), updateMany: workerBalanceUpdateMany },
+        workerBalance: {
+          findUnique: workerBalanceFindUnique,
+          upsert: workerBalanceUpsert,
+          updateMany: workerBalanceUpdateMany,
+        },
         workerTransaction: { create: workerTransactionCreate },
       })),
     } as any;
@@ -104,19 +116,30 @@ describe('FX operations foundation', () => {
     } as any);
 
     expect(cashSourceUpdateMany).not.toHaveBeenCalled();
-    expect(cashDestinationUpsert).toHaveBeenCalledWith(expect.objectContaining({
-      where: { userId_currencyId: { userId: 7, currencyId: 1 } },
-      update: { balance: { increment: new Decimal(2500) } },
+    expect(cashDestinationUpsert).not.toHaveBeenCalled();
+    expect(workerBalanceUpsert).toHaveBeenCalledWith(expect.objectContaining({
+      where: { workerId_currencyId: { workerId: 4, currencyId: 1 } },
+      update: {
+        balance: { increment: new Decimal(2500) },
+        costBasisPrimary: { increment: new Decimal(2000) },
+      },
     }));
     expect(transactionCreate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ workerCurrencyId: 2, workerProfit: undefined }),
     }));
     expect(workerBalanceUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
       where: { id: 41, balance: { gte: new Decimal(10) } },
-      data: expect.objectContaining({ accumulatedProfit: { increment: new Decimal(0) } }),
+      data: {
+        balance: { decrement: new Decimal(10) },
+        costBasisPrimary: { decrement: new Decimal(2000) },
+        accumulatedProfit: { increment: new Decimal(0) },
+      },
     }));
-    expect(workerTransactionCreate).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({ profit: new Decimal(0) }),
+    expect(workerTransactionCreate).toHaveBeenNthCalledWith(1, expect.objectContaining({
+      data: expect.objectContaining({ type: 'FX_CONVERSION', currencyId: 2, amount: new Decimal(10), balanceAfter: new Decimal(15) }),
+    }));
+    expect(workerTransactionCreate).toHaveBeenNthCalledWith(2, expect.objectContaining({
+      data: expect.objectContaining({ type: 'FX_CONVERSION', currencyId: 1, amount: new Decimal(2500), balanceAfter: new Decimal(7500) }),
     }));
   });
 
@@ -134,7 +157,7 @@ describe('FX operations foundation', () => {
         currencyMovement: { create: jest.fn().mockResolvedValue({ id: 12 }) },
         cashBalance: { updateMany: jest.fn(), upsert: jest.fn().mockResolvedValue({}) },
         worker: { findFirst: jest.fn().mockResolvedValue({ id: 4 }) },
-        workerBalance: { findUnique: workerBalanceFindUnique, updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
+        workerBalance: { findUnique: workerBalanceFindUnique, upsert: jest.fn().mockResolvedValue({ id: 42, balance: new Decimal(0), costBasisPrimary: new Decimal(0) }), updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
         workerTransaction: { create: jest.fn().mockResolvedValue({ id: 91 }) },
       })),
     } as any;

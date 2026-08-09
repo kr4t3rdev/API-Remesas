@@ -279,7 +279,7 @@ export class FxOperationsService {
         if (result.count !== 1) throw new InsufficientSaldoError();
       };
 
-      if (dto.workerId === undefined || dto.type === TransactionType.VENTA) {
+      if (dto.workerId === undefined) {
         if (sourceType === TransferAccountType.BANK_ACCOUNT) {
         await adjustBankAccount(sourceBankAccountId, sourceCurrencyId, sourceAmount.neg(), true);
         } else if (destinationType === TransferAccountType.BANK_ACCOUNT) {
@@ -349,35 +349,77 @@ export class FxOperationsService {
             data: { workerId: dto.workerId, currencyId: dto.currencyId, type: 'FX_CONVERSION', amount, balanceBefore: destinationBefore, balanceAfter: destinationAfter, description: `Fondos comprados en ${dto.currencyId}` },
           });
         } else {
-        // Worker performance is settled by Deposit now; keep legacy VENTA
-        // payloads valid when the mobile client omits the former manual value.
-        const profit = new Decimal(0);
-        // The worker funds the FX operation. Debit the selected worker currency
-        // atomically; for COMPRA this is the purchased amount, never the CUP
-        // source amount (amount * rate).
-        const debitAmount = amount;
-        const balanceBefore = new Decimal(workerBalance.balance);
-        const balanceAfter = balanceBefore.sub(debitAmount);
-        const updatedWorkerBalance = await tx.workerBalance.updateMany({
-          where: { id: workerBalance.id, balance: { gte: debitAmount } },
-          data: {
-            balance: { decrement: debitAmount },
-            accumulatedProfit: { increment: profit },
-          },
-        });
-        if (updatedWorkerBalance.count !== 1) throw new InsufficientSaldoError();
-        await tx.workerTransaction.create({
-          data: {
-            workerId: dto.workerId,
-            currencyId: workerCurrencyId,
-            type: 'TRANSACTION',
-            amount: debitAmount,
-            profit,
-            balanceBefore,
-            balanceAfter,
-            description: 'Ganancia por operación FX',
-          },
-        });
+          // A worker sale converts the worker's held currency into the user's
+          // primary currency, so both legs remain in the worker's custody.
+          // Performance is settled later by Deposit from the carried cost basis.
+          const profit = new Decimal(0);
+          const debitAmount = amount;
+          const proceeds = amount.mul(rate).toDecimalPlaces(2);
+          const balanceBefore = new Decimal(workerBalance.balance);
+          const balanceAfter = balanceBefore.sub(debitAmount);
+          // Use the worker's own carried cost, not the user's position cost:
+          // worker custody can have a different acquisition history.
+          const costBasis = balanceBefore.gt(0)
+            ? new Decimal(workerBalance.costBasisPrimary ?? 0)
+              .mul(debitAmount)
+              .div(balanceBefore)
+              .toDecimalPlaces(2)
+            : new Decimal(0);
+          const updatedWorkerBalance = await tx.workerBalance.updateMany({
+            where: { id: workerBalance.id, balance: { gte: debitAmount } },
+            data: {
+              balance: { decrement: debitAmount },
+              costBasisPrimary: { decrement: costBasis },
+              accumulatedProfit: { increment: profit },
+            },
+          });
+          if (updatedWorkerBalance.count !== 1) throw new InsufficientSaldoError();
+
+          const destinationBalance = workerCurrencyId === primaryCurrency.id
+            ? { balance: balanceAfter, costBasisPrimary: new Decimal(workerBalance.costBasisPrimary ?? 0).sub(costBasis) }
+            : await tx.workerBalance.findUnique({
+              where: { workerId_currencyId: { workerId: dto.workerId, currencyId: primaryCurrency.id } },
+            });
+          const destinationBefore = new Decimal(destinationBalance?.balance ?? 0);
+          const destinationAfter = destinationBefore.add(proceeds);
+          await tx.workerBalance.upsert({
+            where: { workerId_currencyId: { workerId: dto.workerId, currencyId: primaryCurrency.id } },
+            update: {
+              balance: { increment: proceeds },
+              costBasisPrimary: { increment: costBasis },
+            },
+            create: {
+              workerId: dto.workerId,
+              currencyId: primaryCurrency.id,
+              balance: proceeds,
+              costBasisPrimary: costBasis,
+              accumulatedProfit: 0,
+              totalDelivered: 0,
+            },
+          });
+          await tx.workerTransaction.create({
+            data: {
+              workerId: dto.workerId,
+              currencyId: workerCurrencyId,
+              type: 'FX_CONVERSION',
+              amount: debitAmount,
+              profit,
+              balanceBefore,
+              balanceAfter,
+              description: `Venta de ${dto.currencyId}`,
+            },
+          });
+          await tx.workerTransaction.create({
+            data: {
+              workerId: dto.workerId,
+              currencyId: primaryCurrency.id,
+              type: 'FX_CONVERSION',
+              amount: proceeds,
+              balanceBefore: destinationBefore,
+              balanceAfter: destinationAfter,
+              description: `Fondos recibidos en ${primaryCurrency.id}`,
+            },
+          });
         }
       }
 

@@ -143,15 +143,16 @@ export class WorkerPaymentsService {
       const before = Number(balance.balance); if (before < dto.amount) throw new BadRequestException('Saldo insuficiente del trabajador');
       const deliveredAmount = new Decimal(dto.amount);
       const valuationRate = await this.getPrimaryValuationRate(dto.currencyId!, primaryCurrencyId, userId, tx);
-      const costBasisPrimary = dto.currencyId === primaryCurrencyId
-        ? new Decimal(0)
-        : new Decimal(balance.costBasisPrimary ?? 0).mul(deliveredAmount).div(new Decimal(before)).toDecimalPlaces(2);
+      const costBasisPrimary = new Decimal(balance.costBasisPrimary ?? 0)
+        .mul(deliveredAmount)
+        .div(new Decimal(before))
+        .toDecimalPlaces(2);
       const deliveredValuePrimary = dto.currencyId === primaryCurrencyId ? deliveredAmount : deliveredAmount.mul(valuationRate).toDecimalPlaces(2);
-      const performancePrimary = dto.currencyId === primaryCurrencyId
-        ? new Decimal(0)
-        : deliveredValuePrimary.sub(costBasisPrimary).toDecimalPlaces(2);
+      const performancePrimary = costBasisPrimary.gt(0)
+        ? deliveredValuePrimary.sub(costBasisPrimary).toDecimalPlaces(2)
+        : new Decimal(0);
       const transaction = await tx.workerTransaction.create({ data: { workerId, currencyId: dto.currencyId, type: 'DEPOSIT', amount: deliveredAmount, profit: performancePrimary, balanceBefore: new Decimal(before), balanceAfter: new Decimal(before).sub(deliveredAmount), description: dto.destinationType ? `Depósito a ${dto.destinationType === 'CASH' ? 'Caja' : 'Cuenta bancaria'}` : 'Depósito' } });
-      const updatedBalance = await tx.workerBalance.update({ where: { id: balance.id }, data: { balance: { decrement: deliveredAmount }, ...(dto.currencyId === primaryCurrencyId ? {} : { costBasisPrimary: { decrement: costBasisPrimary } }), totalDelivered: { increment: deliveredAmount }, ...(performancePrimary.eq(0) ? {} : { accumulatedProfit: { increment: performancePrimary } }) } });
+      const updatedBalance = await tx.workerBalance.update({ where: { id: balance.id }, data: { balance: { decrement: deliveredAmount }, ...(costBasisPrimary.gt(0) ? { costBasisPrimary: { decrement: costBasisPrimary } } : {}), totalDelivered: { increment: deliveredAmount }, ...(performancePrimary.eq(0) ? {} : { accumulatedProfit: { increment: performancePrimary } }) } });
       if (!performancePrimary.eq(0)) await tx.worker.update({ where: { id: workerId }, data: { accumulatedProfit: { increment: performancePrimary } } });
       if (destination?.kind === 'CASH') await tx.cashBalance.update({ where: { userId_currencyId: { userId, currencyId: dto.currencyId! } }, data: { balance: { increment: new Decimal(dto.amount) } } });
       if (destination?.kind === 'BANK_ACCOUNT') await tx.bankAccount.update({ where: { id: dto.destinationId! }, data: { balance: { increment: new Decimal(dto.amount) } } });

@@ -118,6 +118,38 @@ describe('WorkerPaymentsService multicurrency ledger', () => {
     }));
   });
 
+  it('calculates performance when FX sale proceeds are deposited in the primary currency', async () => {
+    const primaryBalance = {
+      ...workerBalance,
+      currencyId: 1,
+      balance: new Decimal(2500),
+      costBasisPrimary: new Decimal(2000),
+    };
+    tx.workerBalance.upsert.mockResolvedValue(primaryBalance);
+    tx.worker.update = jest.fn().mockResolvedValue({});
+    tx.cashBalance.findUnique.mockResolvedValue({ userId: 7, currencyId: 1, balance: new Decimal(20) });
+    tx.cashBalance.update.mockResolvedValue({});
+
+    await service.deposit(1, { amount: 2500, destinationType: 'CASH', currencyId: 1 }, 7);
+
+    expect(tx.workerBalance.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: primaryBalance.id },
+      data: expect.objectContaining({
+        balance: { decrement: new Decimal(2500) },
+        costBasisPrimary: { decrement: new Decimal(2000) },
+        accumulatedProfit: { increment: new Decimal(500) },
+        totalDelivered: { increment: new Decimal(2500) },
+      }),
+    }));
+    expect(tx.worker.update).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: 1 },
+      data: { accumulatedProfit: { increment: new Decimal(500) } },
+    }));
+    expect(tx.workerTransaction.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ type: 'DEPOSIT', amount: new Decimal(2500), profit: new Decimal(500) }),
+    }));
+  });
+
   it.each([
     ['addBalance', () => service.addBalance(1, { amount: 10, sourceId: 9, currencyId: 1 } as any, 7)],
     ['deposit', () => service.deposit(1, { amount: 10, destinationId: 9, currencyId: 1 } as any, 7)],
