@@ -82,6 +82,9 @@ export class FxOperationsService {
     if (workerFieldsProvided && (dto.workerId === undefined || dto.workerProfit === undefined || dto.workerCurrencyId === undefined)) {
       throw new BadRequestException('workerId, workerProfit and workerCurrencyId must be provided together');
     }
+    if (dto.workerId !== undefined && dto.type === TransactionType.VENTA && dto.workerCurrencyId !== dto.currencyId) {
+      throw new BadRequestException('Worker sales must use the sold currency as workerCurrencyId');
+    }
     if (dto.workerId !== undefined && (
       dto.sourceType === TransferAccountType.BANK_ACCOUNT
       || dto.destinationType === TransferAccountType.BANK_ACCOUNT
@@ -93,6 +96,9 @@ export class FxOperationsService {
     if (dto.workerProfit !== undefined && dto.workerProfit < 0) {
       throw new BadRequestException('Worker profit cannot be negative');
     }
+    const effectiveWorkerCurrencyId = dto.workerId !== undefined && dto.type === TransactionType.VENTA
+      ? dto.currencyId
+      : dto.workerCurrencyId;
     if (idempotencyKey) {
       const existing = await this.prisma.transaction.findUnique({
         where: { userId_idempotencyKey: { userId, idempotencyKey } },
@@ -187,7 +193,7 @@ export class FxOperationsService {
           destinationBankAccountId: dto.destinationBankAccountId,
           workerId: dto.workerId,
           workerProfit: dto.workerProfit === undefined ? undefined : new Decimal(dto.workerProfit),
-          workerCurrencyId: dto.workerCurrencyId,
+          workerCurrencyId: effectiveWorkerCurrencyId,
         },
       });
 
@@ -311,7 +317,7 @@ export class FxOperationsService {
       if (dto.workerId !== undefined) {
         const worker = await tx.worker.findFirst({ where: { id: dto.workerId, userId }, select: { id: true } });
         if (!worker) throw new NotFoundException('Trabajador no encontrado');
-        const workerCurrencyId = dto.type === TransactionType.VENTA ? dto.currencyId : dto.workerCurrencyId!;
+        const workerCurrencyId = effectiveWorkerCurrencyId!;
         const workerBalance = await tx.workerBalance.findUnique({
           where: { workerId_currencyId: { workerId: dto.workerId, currencyId: workerCurrencyId } },
           include: { currency: true },

@@ -67,6 +67,7 @@ describe('FX operations foundation', () => {
   it('uses the worker balance as the source for a worker sale', async () => {
     const cashSourceUpdateMany = jest.fn().mockResolvedValue({ count: 1 });
     const cashDestinationUpsert = jest.fn().mockResolvedValue({});
+    const transactionCreate = jest.fn().mockResolvedValue({ id: 11 });
     const workerBalanceUpdateMany = jest.fn().mockResolvedValue({ count: 1 });
     const prisma = {
       currency: { findUnique: jest.fn()
@@ -75,7 +76,7 @@ describe('FX operations foundation', () => {
       $transaction: jest.fn(async (callback: any) => callback({
         exchangeRate: { findUnique: jest.fn().mockResolvedValue({ referenceRate: new Decimal(250) }) },
         currencyPosition: { findUnique: jest.fn().mockResolvedValue({ id: 9, saldo: new Decimal(25), costoPromedio: new Decimal(200), reviewStatus: 'REVIEWED' }), update: jest.fn(), updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
-        transaction: { create: jest.fn().mockResolvedValue({ id: 11 }) },
+        transaction: { create: transactionCreate },
         currencyMovement: { create: jest.fn().mockResolvedValue({ id: 12 }) },
         cashBalance: { updateMany: cashSourceUpdateMany, upsert: cashDestinationUpsert },
         worker: { findFirst: jest.fn().mockResolvedValue({ id: 4 }) },
@@ -99,9 +100,26 @@ describe('FX operations foundation', () => {
       where: { userId_currencyId: { userId: 7, currencyId: 1 } },
       update: { balance: { increment: new Decimal(2500) } },
     }));
+    expect(transactionCreate).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ workerCurrencyId: 2 }),
+    }));
     expect(workerBalanceUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
       where: { id: 41, balance: { gte: new Decimal(10) } },
     }));
+  });
+
+  it('rejects a worker sale when the worker currency differs from the sold currency', async () => {
+    const prisma = { currency: { findUnique: jest.fn() } } as any;
+
+    await expect(new FxOperationsService(prisma).createTransfer(7, {
+      type: 'VENTA' as any,
+      currencyId: 2,
+      amount: 10,
+      rate: 250,
+      workerId: 4,
+      workerProfit: 3.5,
+      workerCurrencyId: 3,
+    } as any)).rejects.toThrow('Worker sales must use the sold currency as workerCurrencyId');
   });
 
   it('rejects an FX transfer when the worker has no balance for the selected currency', async () => {
