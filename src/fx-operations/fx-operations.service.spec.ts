@@ -143,26 +143,15 @@ describe('FX operations foundation', () => {
     }));
   });
 
-  it('uses the selected worker balance when its currency differs from the sold currency', async () => {
-    const transactionCreate = jest.fn().mockResolvedValue({ id: 11 });
-    const workerBalanceFindUnique = jest.fn().mockResolvedValue({ id: 41, balance: new Decimal(25), currency: { id: 3, isActive: true } });
+  it('rejects a worker sale when its source currency differs from the sold currency', async () => {
     const prisma = {
       currency: { findUnique: jest.fn()
         .mockResolvedValueOnce({ id: 2, code: 'USD', isActive: true })
         .mockResolvedValueOnce({ id: 1, code: 'CUP', isActive: true }) },
-      $transaction: jest.fn(async (callback: any) => callback({
-        exchangeRate: { findUnique: jest.fn().mockResolvedValue({ referenceRate: new Decimal(250) }) },
-        currencyPosition: { findUnique: jest.fn().mockResolvedValue({ id: 9, saldo: new Decimal(25), costoPromedio: new Decimal(200), reviewStatus: 'REVIEWED' }), updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
-        transaction: { create: transactionCreate },
-        currencyMovement: { create: jest.fn().mockResolvedValue({ id: 12 }) },
-        cashBalance: { updateMany: jest.fn(), upsert: jest.fn().mockResolvedValue({}) },
-        worker: { findFirst: jest.fn().mockResolvedValue({ id: 4 }) },
-        workerBalance: { findUnique: workerBalanceFindUnique, upsert: jest.fn().mockResolvedValue({ id: 42, balance: new Decimal(0), costBasisPrimary: new Decimal(0) }), updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
-        workerTransaction: { create: jest.fn().mockResolvedValue({ id: 91 }) },
-      })),
+      $transaction: jest.fn(),
     } as any;
 
-    await new FxOperationsService(prisma).createTransfer(7, {
+    await expect(new FxOperationsService(prisma).createTransfer(7, {
       type: 'VENTA' as any,
       currencyId: 2,
       amount: 10,
@@ -170,14 +159,8 @@ describe('FX operations foundation', () => {
       workerId: 4,
       workerProfit: 3.5,
       workerCurrencyId: 3,
-    } as any);
-
-    expect(workerBalanceFindUnique).toHaveBeenCalledWith(expect.objectContaining({
-      where: { workerId_currencyId: { workerId: 4, currencyId: 3 } },
-    }));
-    expect(transactionCreate).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({ currencyId: 2, workerCurrencyId: 3 }),
-    }));
+    } as any)).rejects.toThrow('Worker sales must use the traded currency as source');
+    expect(prisma.$transaction).not.toHaveBeenCalled();
   });
 
   it('rejects an FX transfer when the worker has no balance for the selected currency', async () => {

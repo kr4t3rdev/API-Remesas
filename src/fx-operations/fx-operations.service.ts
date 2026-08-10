@@ -79,6 +79,9 @@ export class FxOperationsService {
     if (workerFieldsProvided && (dto.workerId === undefined || dto.workerCurrencyId === undefined)) {
       throw new BadRequestException('workerId and workerCurrencyId must be provided together');
     }
+    if (dto.workerId !== undefined && dto.type === TransactionType.VENTA && dto.workerCurrencyId !== dto.currencyId) {
+      throw new BadRequestException('Worker sales must use the traded currency as source');
+    }
     if (dto.workerId !== undefined && (
       dto.sourceType === TransferAccountType.BANK_ACCOUNT
       || dto.destinationType === TransferAccountType.BANK_ACCOUNT
