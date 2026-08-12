@@ -55,6 +55,12 @@ export class AdminController {
     return this.adminService.createUserFromAdminConsole(actorUserId, dto);
   }
 
+  @Get('users/blocked')
+  @ApiOperation({ summary: 'Usuarios bloqueados o baneados' })
+  getBlockedUsers() {
+    return this.adminService.getBlockedUsers();
+  }
+
   @Get('users/:id')
   @ApiOperation({ summary: 'Detalle operativo de un usuario' })
   getUserDetail(@Param('id', ParseIntPipe) id: number) {
@@ -79,12 +85,6 @@ export class AdminController {
     @Body() dto: AdminUserActionDto,
   ) {
     return this.adminService.applyUserControlAction(id, actorUserId, dto);
-  }
-
-  @Get('users/blocked')
-  @ApiOperation({ summary: 'Usuarios bloqueados o baneados' })
-  getBlockedUsers() {
-    return this.adminService.getBlockedUsers();
   }
 
   @Get('licenses/expiring')
