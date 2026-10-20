@@ -303,6 +303,40 @@ describe('AuthService', () => {
     );
   });
 
+  describe('checkEmailExists / checkNicknameExists', () => {
+    it('devuelve exists=true cuando el email ya está registrado', async () => {
+      prisma.user.findFirst.mockResolvedValue({ id: 7 });
+
+      await expect(service.checkEmailExists('User@Mail.com')).resolves.toEqual({ exists: true });
+      expect(prisma.user.findFirst).toHaveBeenCalledWith({
+        where: { email: { equals: 'User@Mail.com', mode: 'insensitive' } },
+        select: { id: true },
+      });
+    });
+
+    it('devuelve exists=false cuando el email está libre', async () => {
+      prisma.user.findFirst.mockResolvedValue(null);
+
+      await expect(service.checkEmailExists('nuevo@mail.com')).resolves.toEqual({ exists: false });
+    });
+
+    it('devuelve exists=true cuando el nickname ya está en uso', async () => {
+      prisma.user.findFirst.mockResolvedValue({ id: 3 });
+
+      await expect(service.checkNicknameExists('Juanito')).resolves.toEqual({ exists: true });
+      expect(prisma.user.findFirst).toHaveBeenCalledWith({
+        where: { nickname: { equals: 'Juanito', mode: 'insensitive' } },
+        select: { id: true },
+      });
+    });
+
+    it('devuelve exists=false cuando el nickname está libre', async () => {
+      prisma.user.findFirst.mockResolvedValue(null);
+
+      await expect(service.checkNicknameExists('libre_1')).resolves.toEqual({ exists: false });
+    });
+  });
+
   it('debería rechazar reset con token expirado', async () => {
     prisma.user.findFirst.mockResolvedValue({
       id: 1,

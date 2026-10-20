@@ -387,6 +387,28 @@ export class AuthService {
   }
 
   /**
+   * Availability checks used by the registration form (public, pre-auth).
+   * Only answers whether the value is taken; never returns user data.
+   * Matching is case-insensitive so `User@Mail.com` cannot duplicate
+   * an existing `user@mail.com` account at registration time.
+   */
+  async checkEmailExists(email: string): Promise<{ exists: boolean }> {
+    const user = await this.prisma.user.findFirst({
+      where: { email: { equals: email.trim(), mode: 'insensitive' } },
+      select: { id: true },
+    });
+    return { exists: user !== null };
+  }
+
+  async checkNicknameExists(nickname: string): Promise<{ exists: boolean }> {
+    const user = await this.prisma.user.findFirst({
+      where: { nickname: { equals: nickname.trim(), mode: 'insensitive' } },
+      select: { id: true },
+    });
+    return { exists: user !== null };
+  }
+
+  /**
    * Register a new user with email verification required
    */
   async register(registerDto: RegisterDto) {

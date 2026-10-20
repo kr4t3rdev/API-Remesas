@@ -14,6 +14,8 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { SetPrimaryCurrencyDto } from './dto/set-primary-currency.dto';
+import { CheckEmailDto } from './dto/check-email.dto';
+import { CheckNicknameDto } from './dto/check-nickname.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -26,6 +28,24 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Credenciales inválidas' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Get('check-email')
+  @ApiOperation({ summary: 'Comprobar si un email ya está registrado' })
+  @ApiQuery({ name: 'email', required: true, example: 'usuario@email.com' })
+  @ApiResponse({ status: 200, description: 'Disponibilidad del email' })
+  @ApiResponse({ status: 400, description: 'Email inválido o ausente' })
+  async checkEmail(@Query() query: CheckEmailDto) {
+    return this.authService.checkEmailExists(query.email);
+  }
+
+  @Get('check-nickname')
+  @ApiOperation({ summary: 'Comprobar si un nickname ya está en uso' })
+  @ApiQuery({ name: 'nickname', required: true, example: 'Juanito' })
+  @ApiResponse({ status: 200, description: 'Disponibilidad del nickname' })
+  @ApiResponse({ status: 400, description: 'Nickname inválido o ausente' })
+  async checkNickname(@Query() query: CheckNicknameDto) {
+    return this.authService.checkNicknameExists(query.nickname);
   }
 
   @Post('register')
