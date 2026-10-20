@@ -9,6 +9,7 @@ async function main() {
   // Crear monedas (compartidas entre todos los usuarios)
   const currencies = [
     { code: 'USD', name: 'Dólar Estadounidense', symbol: '$' },
+    { code: 'ZLL', name: 'Zelle (Dólar)', symbol: '$' },
     { code: 'EUR', name: 'Euro', symbol: '€' },
     { code: 'MEX', name: 'Peso Mexicano', symbol: 'MX$' },
     { code: 'CAD', name: 'Dólar Canadiense', symbol: 'C$' },
@@ -178,6 +179,7 @@ async function main() {
   });
 
   for (const currency of otherCurrencies) {
+    const baseRate = currency.code === 'USD' ? 200 : currency.code === 'ZLL' ? 208 : 150;
     await prisma.exchangeRate.upsert({
       where: {
         userId_currencyId: {
@@ -186,14 +188,14 @@ async function main() {
         },
       },
       update: {
-        referenceRate: currency.code === 'USD' ? 200 : 150,
+        referenceRate: baseRate,
         buyMargin: 0.05,
         sellMargin: 0.05,
       },
       create: {
         userId: admin.id,
         currencyId: currency.id,
-        referenceRate: currency.code === 'USD' ? 200 : 150,
+        referenceRate: baseRate,
         buyMargin: 0.05,
         sellMargin: 0.05,
       },
