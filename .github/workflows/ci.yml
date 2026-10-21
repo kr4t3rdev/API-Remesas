@@ -18,23 +18,70 @@ jobs:
     name: Install, build & test
     runs-on: ubuntu-latest
     env:
+      # Prisma only needs a syntactically valid URL to generate/validate in CI.
       DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
       JWT_SECRET: <redacted>
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
+
       - name: Install dependencies
         run: npm ci
+
       - name: Prisma generate & validate
         run: |
           npx prisma generate
           npx prisma validate
+
       - name: Build (NestJS / TypeScript)
         run: npm run build
+
       - name: Test
         run: npm test -- --ci
+
+  contract:
+    name: Contract (OpenAPI)
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      JWT_SECRET: <redacted>
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prisma generate
+        run: npx prisma generate
+
+      - name: Export contract (no database)
+        run: npm run openapi:export
+
+      - name: Contract drift check (committed openapi.json must match the code)
+        run: git diff --exit-code -- openapi.json
+
+      - name: Lint contract (Spectral)
+        run: npm run openapi:lint
+
+      - name: Breaking-change check vs base branch (oasdiff)
+        if: github.event_name == 'pull_request'
+        uses: oasdiff/oasdiff-action/breaking@main
+        with:
+          base: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.base_ref }}/openapi.json
+          revision: openapi.json
+          fail-on-diff: true
