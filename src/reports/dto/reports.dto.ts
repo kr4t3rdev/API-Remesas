@@ -7,6 +7,7 @@ import {
   Min,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 export const YYYY_MM_DD_FORMAT = 'YYYY-MM-DD';
 const DATE_FORMAT_HINT = 'YYYY-MM-DD (e.g. 2026-01-31)';
@@ -119,6 +120,7 @@ export class GetAuditSummaryDto {
 }
 
 export class GetCurrencyReportByIdParamDto {
+  @ApiProperty({ type: 'integer', minimum: 1, example: 1 })
   @IsInt()
   @Min(1)
   @Transform(({ value }) =>

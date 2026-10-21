@@ -1,0 +1,18 @@
+# Spectral ruleset for the Cashflow OpenAPI contract (openapi.json).
+# Baseline: the recommended OAS ruleset, tightened where the native
+# clients (Swift/Kotlin/TypeScript SDKs) depend on contract stability.
+extends: spectral:oas
+rules:
+  # Every operation needs a stable operationId: generated SDK method
+  # names derive from it. Missing or duplicated ids break clients.
+  operation-operationId: error
+  # Every operation must be grouped by tag (one tag per Nest controller).
+  operation-tags: error
+  # Responses must be documented so SDKs can type them.
+  operation-success-response: error
+  # Keep summaries on operations: they feed SDK doc comments.
+  operation-singular-tag: off
+  info-contact: off
+  info-license: off
+  oas3-schema: error
+  oas3-unused-component: warn

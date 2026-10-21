@@ -18,7 +18,10 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "prisma:seed": "ts-node prisma/seed.ts"
+    "prisma:seed": "ts-node prisma/seed.ts",
+    "openapi:export": "ts-node -r tsconfig-paths/register scripts/export-openapi.ts",
+    "openapi:lint": "npx --yes @stoplight/spectral-cli@6 lint openapi.json",
+    "openapi:check": "npm run openapi:export && git diff --exit-code -- openapi.json"
   },
   "keywords": [
     "nestjs",

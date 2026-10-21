@@ -14,7 +14,7 @@ export class UpdateExpenseItemDto {
   @Min(0.01, { message: 'El monto debe ser mayor a cero' })
   amount?: number;
 
-  @ApiPropertyOptional({ example: 'Inmuebles', description: 'Null para eliminar categoría' })
+  @ApiPropertyOptional({ type: 'string', nullable: true, example: 'Inmuebles', description: 'Null para eliminar categoría' })
   @IsOptional()
   @IsString()
   category?: string | null;

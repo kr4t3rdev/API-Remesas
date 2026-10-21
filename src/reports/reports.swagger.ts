@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger';
 
 export class DailyExpenseByCategoryDto {
   @ApiProperty({ example: 5 })
@@ -21,6 +21,7 @@ export class DailyReportTransactionDto {
   totalVentas!: number;
 }
 
+@ApiExtraModels(DailyExpenseByCategoryDto)
 export class DailyReportExpenseDto {
   @ApiProperty()
   total!: number;
@@ -35,7 +36,7 @@ export class DailyReportExpenseDto {
   unconvertedCount!: number;
   @ApiProperty({
     type: 'object',
-    additionalProperties: { $ref: '#/components/schemas/DailyExpenseByCategoryDto' },
+    additionalProperties: { $ref: getSchemaPath(DailyExpenseByCategoryDto) },
   })
   byCategory!: Record<string, DailyExpenseByCategoryDto>;
 }
@@ -101,6 +102,7 @@ export class PeriodReportPeriodDto {
   endDate!: string;
 }
 
+@ApiExtraModels(DailyExpenseByCategoryDto)
 export class PeriodReportDto {
   @ApiProperty({ type: PeriodReportPeriodDto })
   period!: PeriodReportPeriodDto;
@@ -112,7 +114,7 @@ export class PeriodReportDto {
   transactionsByCurrency!: Record<string, { compras: number; ventas: number; count: number }>;
   @ApiProperty({
     type: 'object',
-    additionalProperties: { $ref: '#/components/schemas/DailyExpenseByCategoryDto' },
+    additionalProperties: { $ref: getSchemaPath(DailyExpenseByCategoryDto) },
   })
   expensesByCategory!: Record<string, DailyExpenseByCategoryDto>;
 }
@@ -170,6 +172,7 @@ export class CurrencyReportDto {
   transactions!: any[];
 }
 
+@ApiExtraModels(DailyExpenseByCategoryDto)
 export class ExpensesReportDto {
   @ApiProperty()
   total!: number;
@@ -181,7 +184,7 @@ export class ExpensesReportDto {
   unconvertedCount!: number;
   @ApiProperty({
     type: 'object',
-    additionalProperties: { $ref: '#/components/schemas/DailyExpenseByCategoryDto' },
+    additionalProperties: { $ref: getSchemaPath(DailyExpenseByCategoryDto) },
   })
   byCategory!: Record<string, DailyExpenseByCategoryDto>;
   @ApiProperty({ type: 'object', additionalProperties: true })
