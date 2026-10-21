@@ -47,7 +47,7 @@ export class ReportsService {
         message: 'endDate must be on or after startDate',
       });
     }
-    end.setHours(23, 59, 59, 999);
+    end.setUTCHours(23, 59, 59, 999);
     return { start, end };
   }
 
@@ -138,9 +138,9 @@ export class ReportsService {
   async getDailyReport(userId: number, date?: string): Promise<DailyReportDto> {
     const targetDate = date ? this.parseDate(date, 'date') : new Date();
     const startOfDay = new Date(targetDate);
-    startOfDay.setHours(0, 0, 0, 0);
+    startOfDay.setUTCHours(0, 0, 0, 0);
     const endOfDay = new Date(targetDate);
-    endOfDay.setHours(23, 59, 59, 999);
+    endOfDay.setUTCHours(23, 59, 59, 999);
 
     const transactions = await this.prisma.transaction.findMany({
       where: {
@@ -686,9 +686,9 @@ export class ReportsService {
 
   private async getDailyBreakdown(userId: number, start: Date, end: Date) {
     const startDay = new Date(start);
-    startDay.setHours(0, 0, 0, 0);
+    startDay.setUTCHours(0, 0, 0, 0);
     const endDay = new Date(end);
-    endDay.setHours(23, 59, 59, 999);
+    endDay.setUTCHours(23, 59, 59, 999);
 
     // Un solo aggregate por tabla: agrupamos por fecha (truncada a día) y
     // sumamos monto y marginProfit. Prisma no soporta date_trunc directo,
@@ -732,7 +732,7 @@ export class ReportsService {
         expensesUnconverted: 0,
         marginProfit: 0,
       });
-      cursor.setDate(cursor.getDate() + 1);
+      cursor.setUTCDate(cursor.getUTCDate() + 1);
     }
 
     for (const tx of transactions) {

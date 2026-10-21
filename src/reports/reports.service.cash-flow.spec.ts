@@ -75,7 +75,7 @@ describe('ReportsService report periods and cash flow', () => {
     const expense = {
       amount: new Decimal(10),
       currencyId: 2,
-      date: new Date('2026-07-09T12:00:00.000Z'),
+      date: new Date('2026-07-10T12:00:00.000Z'),
       currency: { code: 'USD' },
     };
     const prisma = {
@@ -113,7 +113,7 @@ describe('ReportsService report periods and cash flow', () => {
     const expense = {
       amount: new Decimal(10),
       currencyId: 2,
-      date: new Date('2026-07-08T12:00:00.000Z'),
+      date: new Date('2026-07-09T12:00:00.000Z'),
       currency: { code: 'USD' },
     };
     const findFirst = jest.fn().mockResolvedValue({ rate: new Decimal(270) });
