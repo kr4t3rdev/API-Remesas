@@ -1,0 +1,6142 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "operationId": "auth_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Login exitoso con estado de acceso del usuario"
+          },
+          "401": {
+            "description": "Credenciales inválidas"
+          }
+        },
+        "summary": "Iniciar sesión",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/check-email": {
+      "get": {
+        "operationId": "auth_checkEmail",
+        "parameters": [
+          {
+            "name": "email",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "usuario@email.com",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Disponibilidad del email"
+          },
+          "400": {
+            "description": "Email inválido o ausente"
+          }
+        },
+        "summary": "Comprobar si un email ya está registrado",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/check-nickname": {
+      "get": {
+        "operationId": "auth_checkNickname",
+        "parameters": [
+          {
+            "name": "nickname",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "Juanito",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Disponibilidad del nickname"
+          },
+          "400": {
+            "description": "Nickname inválido o ausente"
+          }
+        },
+        "summary": "Comprobar si un nickname ya está en uso",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "operationId": "auth_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Registro exitoso. Email de verificación enviado."
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "409": {
+            "description": "El correo electrónico ya está registrado"
+          }
+        },
+        "summary": "Registrarse",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/forgot-password": {
+      "post": {
+        "operationId": "auth_forgotPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Solicitud procesada"
+          }
+        },
+        "summary": "Solicitar restablecimiento de contraseña",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "operationId": "auth_resetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contraseña restablecida correctamente"
+          },
+          "400": {
+            "description": "Token inválido o expirado"
+          }
+        },
+        "summary": "Restablecer contraseña con token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/verify-email": {
+      "post": {
+        "operationId": "auth_verifyEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email verificado correctamente"
+          },
+          "400": {
+            "description": "Token inválido, ya verificado o expirado"
+          }
+        },
+        "summary": "Verificar email",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/resend-verification": {
+      "post": {
+        "operationId": "auth_resendVerification",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendVerificationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email de verificación re-enviado"
+          },
+          "400": {
+            "description": "Error en la solicitud"
+          },
+          "403": {
+            "description": "Cooldown activo, esperar antes de re-enviar"
+          }
+        },
+        "summary": "Re-enviar email de verificación",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "operationId": "auth_getCurrentUser",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Usuario encontrado con estado de acceso"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener usuario actual",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/change-password": {
+      "post": {
+        "operationId": "auth_changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contraseña actualizada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cambiar contraseña",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/me/primary-currency": {
+      "patch": {
+        "operationId": "auth_setPrimaryCurrency",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPrimaryCurrencyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Moneda principal actualizada"
+          },
+          "404": {
+            "description": "Moneda no encontrada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Establecer moneda principal",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/users": {
+      "post": {
+        "operationId": "auth_createUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario creado"
+          },
+          "403": {
+            "description": "No autorizado"
+          },
+          "409": {
+            "description": "Email ya registrado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crear nuevo usuario (Solo Admin)",
+        "tags": [
+          "Auth"
+        ]
+      },
+      "get": {
+        "operationId": "auth_getAllUsers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios"
+          },
+          "403": {
+            "description": "No autorizado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar todos los usuarios (Solo Admin)",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/users/{id}": {
+      "delete": {
+        "operationId": "auth_deleteUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario eliminado"
+          },
+          "403": {
+            "description": "No autorizado"
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Eliminar usuario (Solo Admin)",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/users/{id}/activate": {
+      "patch": {
+        "operationId": "auth_activateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuario actualizado"
+          },
+          "403": {
+            "description": "No autorizado"
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Activar/Desactivar usuario (Solo Admin)",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/notifications": {
+      "get": {
+        "operationId": "notifications_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar notificaciones del usuario autenticado",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/notifications/unread-count": {
+      "get": {
+        "operationId": "notifications_unreadCount",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener cantidad de notificaciones no leídas",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/notifications/read-all": {
+      "patch": {
+        "operationId": "notifications_markAllAsRead",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Marcar todas las notificaciones como leídas",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/notifications/register-push-token": {
+      "post": {
+        "operationId": "notifications_registerPushToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterPushTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Registrar un push token para notificaciones push",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/notifications/push-token": {
+      "delete": {
+        "operationId": "notifications_unregisterPushToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnregisterPushTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Eliminar el push token registrado por este user",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/notifications/{id}/read": {
+      "patch": {
+        "operationId": "notifications_markAsRead",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Marcar una notificación como leída",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/currencies": {
+      "get": {
+        "operationId": "currencies_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de monedas"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar todas las monedas",
+        "tags": [
+          "Currencies"
+        ]
+      },
+      "post": {
+        "operationId": "currencies_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCurrencyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Moneda creada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crear nueva moneda",
+        "tags": [
+          "Currencies"
+        ]
+      }
+    },
+    "/api/currencies/with-primary": {
+      "get": {
+        "operationId": "currencies_findAllWithPrimary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de monedas con primary currency"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar monedas con información de moneda principal del usuario",
+        "tags": [
+          "Currencies"
+        ]
+      }
+    },
+    "/api/currencies/{id}": {
+      "get": {
+        "operationId": "currencies_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Moneda encontrada"
+          },
+          "404": {
+            "description": "Moneda no encontrada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener moneda por ID",
+        "tags": [
+          "Currencies"
+        ]
+      },
+      "patch": {
+        "operationId": "currencies_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCurrencyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Moneda actualizada"
+          },
+          "404": {
+            "description": "Moneda no encontrada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Actualizar moneda",
+        "tags": [
+          "Currencies"
+        ]
+      },
+      "delete": {
+        "operationId": "currencies_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Moneda eliminada"
+          },
+          "400": {
+            "description": "La moneda es principal de usuarios"
+          },
+          "404": {
+            "description": "Moneda no encontrada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Eliminar moneda",
+        "tags": [
+          "Currencies"
+        ]
+      }
+    },
+    "/api/exchange-rates": {
+      "get": {
+        "operationId": "exchange_rates_findCurrent",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de tasas actuales"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener tasas actuales",
+        "tags": [
+          "Exchange Rates"
+        ]
+      }
+    },
+    "/api/exchange-rates/all": {
+      "get": {
+        "operationId": "exchange_rates_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de todas las tasas"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener todas las tasas (incluyendo inactivas)",
+        "tags": [
+          "Exchange Rates"
+        ]
+      }
+    },
+    "/api/exchange-rates/history": {
+      "get": {
+        "operationId": "exchange_rates_getHistory",
+        "parameters": [
+          {
+            "name": "currencyId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historial de tasas"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Historial de tasas",
+        "tags": [
+          "Exchange Rates"
+        ]
+      }
+    },
+    "/api/exchange-rates/{currencyId}": {
+      "get": {
+        "operationId": "exchange_rates_findByCurrency",
+        "parameters": [
+          {
+            "name": "currencyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historial de tasas de la moneda"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Historial de tasas por moneda",
+        "tags": [
+          "Exchange Rates"
+        ]
+      },
+      "put": {
+        "operationId": "exchange_rates_update",
+        "parameters": [
+          {
+            "name": "currencyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExchangeRateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tasa actualizada"
+          },
+          "404": {
+            "description": "Moneda no encontrada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Actualizar tasa de cambio",
+        "tags": [
+          "Exchange Rates"
+        ]
+      },
+      "delete": {
+        "operationId": "exchange_rates_remove",
+        "parameters": [
+          {
+            "name": "currencyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tasa eliminada"
+          },
+          "400": {
+            "description": "No se puede eliminar la tasa porque tiene transacciones asociadas"
+          },
+          "404": {
+            "description": "Tasa no encontrada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Eliminar tasa de cambio",
+        "tags": [
+          "Exchange Rates"
+        ]
+      }
+    },
+    "/api/transactions": {
+      "post": {
+        "operationId": "transactions_create",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "required": true,
+            "in": "header",
+            "description": "Unique key for safely retrying the transaction request",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTransactionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Transacción creada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crear transacción (compra/venta)",
+        "tags": [
+          "Transactions"
+        ]
+      },
+      "get": {
+        "operationId": "transactions_findAll",
+        "parameters": [
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "COMPRA",
+                "VENTA"
+              ]
+            }
+          },
+          {
+            "name": "operationKind",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "TRANSFER",
+                "REMITTANCE"
+              ]
+            }
+          },
+          {
+            "name": "currencyId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de transacciones"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar transacciones",
+        "tags": [
+          "Transactions"
+        ]
+      }
+    },
+    "/api/transactions/{id}": {
+      "get": {
+        "operationId": "transactions_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transacción encontrada"
+          },
+          "404": {
+            "description": "Transacción no encontrada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener transacción por ID",
+        "tags": [
+          "Transactions"
+        ]
+      }
+    },
+    "/api/fx-operations/transfers": {
+      "post": {
+        "operationId": "fx_operations_createTransfer",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "required": true,
+            "in": "header",
+            "description": "Unique key for safely retrying the FX transfer request",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFxTransferDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "FX Operations"
+        ]
+      }
+    },
+    "/api/fx-operations/positions/open": {
+      "post": {
+        "operationId": "fx_operations_openPosition",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenCurrencyPositionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "FX Operations"
+        ]
+      }
+    },
+    "/api/cash-balances": {
+      "get": {
+        "operationId": "cash_balances_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de saldos"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener saldos de caja por moneda",
+        "tags": [
+          "Cash Balances"
+        ]
+      }
+    },
+    "/api/cash-balances/{currencyId}": {
+      "get": {
+        "operationId": "cash_balances_findByCurrency",
+        "parameters": [
+          {
+            "name": "currencyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Saldo de la moneda"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener saldo de una moneda específica",
+        "tags": [
+          "Cash Balances"
+        ]
+      }
+    },
+    "/api/cash-audits": {
+      "post": {
+        "operationId": "cash_audits_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCashAuditDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Arqueo registrado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Registrar arqueo de caja",
+        "tags": [
+          "Cash Audits"
+        ]
+      },
+      "get": {
+        "operationId": "cash_audits_findAll",
+        "parameters": [
+          {
+            "name": "currencyId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de arqueos"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar arqueos",
+        "tags": [
+          "Cash Audits"
+        ]
+      }
+    },
+    "/api/cash-audits/{id}": {
+      "get": {
+        "operationId": "cash_audits_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Arqueo encontrado"
+          },
+          "404": {
+            "description": "Arqueo no encontrado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener arqueo por ID",
+        "tags": [
+          "Cash Audits"
+        ]
+      }
+    },
+    "/api/cash-adjustments": {
+      "post": {
+        "operationId": "cash_adjustments_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCashAdjustmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ajuste creado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crear ajuste de caja",
+        "tags": [
+          "Cash Adjustments"
+        ]
+      },
+      "get": {
+        "operationId": "cash_adjustments_findAll",
+        "parameters": [
+          {
+            "name": "currencyId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de ajustes"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar ajustes",
+        "tags": [
+          "Cash Adjustments"
+        ]
+      }
+    },
+    "/api/bank-accounts": {
+      "post": {
+        "operationId": "bank_accounts_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBankAccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cuenta creada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crear cuenta bancaria",
+        "tags": [
+          "Bank Accounts"
+        ]
+      },
+      "get": {
+        "operationId": "bank_accounts_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de cuentas"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar cuentas bancarias",
+        "tags": [
+          "Bank Accounts"
+        ]
+      }
+    },
+    "/api/bank-accounts/{id}": {
+      "get": {
+        "operationId": "bank_accounts_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cuenta encontrada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener cuenta por ID",
+        "tags": [
+          "Bank Accounts"
+        ]
+      },
+      "patch": {
+        "operationId": "bank_accounts_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBankAccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cuenta actualizada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Actualizar cuenta bancaria",
+        "tags": [
+          "Bank Accounts"
+        ]
+      },
+      "delete": {
+        "operationId": "bank_accounts_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cuenta desactivada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Desactivar cuenta bancaria",
+        "tags": [
+          "Bank Accounts"
+        ]
+      }
+    },
+    "/api/bank-accounts/{id}/balance": {
+      "get": {
+        "operationId": "bank_accounts_getBalance",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Saldo de la cuenta"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener saldo de cuenta",
+        "tags": [
+          "Bank Accounts"
+        ]
+      }
+    },
+    "/api/bank-accounts/{id}/transactions": {
+      "get": {
+        "operationId": "bank_accounts_getTransactions",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Movimientos de la cuenta"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener movimientos de cuenta",
+        "tags": [
+          "Bank Accounts"
+        ]
+      }
+    },
+    "/api/expenses": {
+      "post": {
+        "operationId": "expenses_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExpenseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Gasto creado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crear gasto",
+        "tags": [
+          "Expenses"
+        ]
+      },
+      "get": {
+        "operationId": "expenses_findAll",
+        "parameters": [
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "renta",
+                "servicios",
+                "salario",
+                "insumos",
+                "otros"
+              ]
+            }
+          },
+          {
+            "name": "currencyId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de gastos"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar gastos",
+        "tags": [
+          "Expenses"
+        ]
+      }
+    },
+    "/api/expenses/{id}": {
+      "get": {
+        "operationId": "expenses_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gasto encontrado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener gasto por ID",
+        "tags": [
+          "Expenses"
+        ]
+      },
+      "patch": {
+        "operationId": "expenses_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExpenseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Gasto actualizado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Actualizar gasto",
+        "tags": [
+          "Expenses"
+        ]
+      },
+      "delete": {
+        "operationId": "expenses_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gasto eliminado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Eliminar gasto",
+        "tags": [
+          "Expenses"
+        ]
+      }
+    },
+    "/api/objectives": {
+      "post": {
+        "operationId": "objectives_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateObjectiveDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Objetivo creado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crear objetivo",
+        "tags": [
+          "Objectives"
+        ]
+      },
+      "get": {
+        "operationId": "objectives_findAll",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de objetivos"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar objetivos",
+        "tags": [
+          "Objectives"
+        ]
+      }
+    },
+    "/api/objectives/{id}": {
+      "get": {
+        "operationId": "objectives_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Objetivo encontrado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener objetivo por ID",
+        "tags": [
+          "Objectives"
+        ]
+      },
+      "patch": {
+        "operationId": "objectives_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateObjectiveDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Objetivo actualizado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Actualizar objetivo",
+        "tags": [
+          "Objectives"
+        ]
+      },
+      "delete": {
+        "operationId": "objectives_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Objetivo eliminado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Eliminar objetivo",
+        "tags": [
+          "Objectives"
+        ]
+      }
+    },
+    "/api/objectives/{id}/progress": {
+      "get": {
+        "operationId": "objectives_getProgress",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Progreso del objetivo"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener progreso del objetivo",
+        "tags": [
+          "Objectives"
+        ]
+      }
+    },
+    "/api/objectives/{id}/status": {
+      "patch": {
+        "operationId": "objectives_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Estado actualizado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cambiar estado del objetivo",
+        "tags": [
+          "Objectives"
+        ]
+      }
+    },
+    "/api/reports/daily": {
+      "get": {
+        "operationId": "reports_getDailyReport",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DailyReportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Resumen del día",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/reports/period": {
+      "get": {
+        "operationId": "reports_getPeriodReport",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeriodReportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reporte por período",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/reports/profit": {
+      "get": {
+        "operationId": "reports_getProfitReport",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfitReportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reporte de ganancias",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/reports/currency/{id}": {
+      "get": {
+        "operationId": "reports_getCurrencyReport",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "minimum": 1,
+              "example": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyReportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reporte por moneda",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/reports/fx-performance": {
+      "get": {
+        "operationId": "reports_getFxPerformanceReport",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FxPerformanceReportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Rendimiento de operaciones FX",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/reports/expenses": {
+      "get": {
+        "operationId": "reports_getExpensesReport",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpensesReportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reporte de gastos",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/reports/accounts": {
+      "get": {
+        "operationId": "reports_getAccountsReport",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountsReportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Estado de cuentas bancarias",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/reports/objectives": {
+      "get": {
+        "operationId": "reports_getObjectivesReport",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectivesReportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Avance de objetivos",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/reports/cash-flow": {
+      "get": {
+        "operationId": "reports_getCashFlowReport",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashFlowReportDtoSwagger"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Flujo de efectivo",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/reports/audit-summary": {
+      "get": {
+        "operationId": "reports_getAuditSummary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditSummaryReportDtoSwagger"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Resumen de arqueos",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/rate-history": {
+      "post": {
+        "operationId": "rate_history_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRateHistoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tasa registrada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Registrar tasa en el historial",
+        "tags": [
+          "Rate History"
+        ]
+      },
+      "get": {
+        "operationId": "rate_history_findAll",
+        "parameters": [
+          {
+            "name": "currencyId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historial de tasas"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener historial de tasas",
+        "tags": [
+          "Rate History"
+        ]
+      },
+      "delete": {
+        "operationId": "rate_history_resetHistory",
+        "parameters": [
+          {
+            "name": "currencyId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historial reseteado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Resetear historial de tasas",
+        "tags": [
+          "Rate History"
+        ]
+      }
+    },
+    "/api/rate-history/manual": {
+      "get": {
+        "operationId": "rate_history_getManualEntries",
+        "parameters": [
+          {
+            "name": "currencyId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tasas manuales"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener tasas registradas manualmente",
+        "tags": [
+          "Rate History"
+        ]
+      }
+    },
+    "/api/rate-history/pair/{fromId}/{toId}": {
+      "get": {
+        "operationId": "rate_history_findByPair",
+        "parameters": [
+          {
+            "name": "fromId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "toId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Historial del par"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Historial de tasas por par de monedas",
+        "tags": [
+          "Rate History"
+        ]
+      }
+    },
+    "/api/rate-history/stats/{fromId}/{toId}": {
+      "get": {
+        "operationId": "rate_history_getStats",
+        "parameters": [
+          {
+            "name": "fromId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "toId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estadísticas"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Estadísticas de tasas por par",
+        "tags": [
+          "Rate History"
+        ]
+      }
+    },
+    "/api/rate-history/latest/{fromId}/{toId}": {
+      "get": {
+        "operationId": "rate_history_getLatestRate",
+        "parameters": [
+          {
+            "name": "fromId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "toId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Última tasa"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener última tasa de un par",
+        "tags": [
+          "Rate History"
+        ]
+      }
+    },
+    "/api/plans": {
+      "get": {
+        "operationId": "plans_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar planes",
+        "tags": [
+          "Plans"
+        ]
+      },
+      "post": {
+        "operationId": "plans_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Plan creado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crear plan",
+        "tags": [
+          "Plans"
+        ]
+      }
+    },
+    "/api/plans/{id}": {
+      "get": {
+        "operationId": "plans_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener plan por ID",
+        "tags": [
+          "Plans"
+        ]
+      },
+      "patch": {
+        "operationId": "plans_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Actualizar plan",
+        "tags": [
+          "Plans"
+        ]
+      },
+      "delete": {
+        "operationId": "plans_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Plan eliminado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Eliminar plan",
+        "tags": [
+          "Plans"
+        ]
+      }
+    },
+    "/api/subscriptions/licenses": {
+      "get": {
+        "operationId": "subscriptions_listLicenses",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar licencias",
+        "tags": [
+          "Subscriptions"
+        ]
+      },
+      "post": {
+        "operationId": "subscriptions_assignLicense",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignLicenseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Asignar licencia a usuario",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/api/subscriptions/licenses/{id}": {
+      "get": {
+        "operationId": "subscriptions_getLicense",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener detalle de licencia",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/api/subscriptions/licenses/{id}/renew": {
+      "patch": {
+        "operationId": "subscriptions_renewLicense",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenewLicenseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Renovar licencia",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/api/subscriptions/licenses/{id}/suspend": {
+      "patch": {
+        "operationId": "subscriptions_suspendLicense",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuspendLicenseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Suspender licencia",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/api/subscriptions/licenses/{id}/reactivate": {
+      "patch": {
+        "operationId": "subscriptions_reactivateLicense",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuspendLicenseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reactivar licencia",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/api/subscriptions/payments": {
+      "post": {
+        "operationId": "subscriptions_registerPayment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterPaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Registrar pago de suscripción (USD -> CUP)",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/api/admin/kpis": {
+      "get": {
+        "operationId": "admin_getKpis",
+        "parameters": [
+          {
+            "name": "dateFrom",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateTo",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "planId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "KPIs de administración",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/api/admin/reports/platform-series": {
+      "get": {
+        "operationId": "admin_getPlatformSeries",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Series temporales de plataforma (billing, newUsers, churn por mes)",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/api/admin/profile/stats": {
+      "get": {
+        "operationId": "admin_getProfileStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Estadísticas del perfil administrativo",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/api/admin/users": {
+      "get": {
+        "operationId": "admin_getUsers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listado operativo de usuarios",
+        "tags": [
+          "Admin"
+        ]
+      },
+      "post": {
+        "operationId": "admin_createUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAdminUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crear usuario desde consola admin (CRUD extendido en una sola captura)",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/api/admin/users/blocked": {
+      "get": {
+        "operationId": "admin_getBlockedUsers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Usuarios bloqueados o baneados",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/api/admin/users/{id}": {
+      "get": {
+        "operationId": "admin_getUserDetail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Detalle operativo de un usuario",
+        "tags": [
+          "Admin"
+        ]
+      },
+      "patch": {
+        "operationId": "admin_updateUserBasic",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Actualizar datos base (CRUD) de usuario",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/api/admin/users/{id}/actions": {
+      "post": {
+        "operationId": "admin_applyUserControlAction",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminUserActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Aplicar control operativo de usuario (no-CRUD)",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/api/admin/licenses/expiring": {
+      "get": {
+        "operationId": "admin_getExpiringLicenses",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Licencias por vencer",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/api/admin/metrics/services": {
+      "get": {
+        "operationId": "admin_getServiceMetrics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Métricas de servicios activos y expirados",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/api/admin/audit-logs": {
+      "get": {
+        "operationId": "admin_getAuditLogs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Bitácora de auditoría admin",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/api/upload/avatar": {
+      "post": {
+        "operationId": "upload_uploadAvatar",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Upload"
+        ]
+      }
+    },
+    "/api/upload/avatar/{filename}": {
+      "get": {
+        "operationId": "upload_getAvatar",
+        "parameters": [
+          {
+            "name": "filename",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Upload"
+        ]
+      }
+    },
+    "/api/worker-payments": {
+      "post": {
+        "operationId": "worker_payments_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Trabajador creado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crear trabajador",
+        "tags": [
+          "Worker Payments"
+        ]
+      },
+      "get": {
+        "operationId": "worker_payments_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de trabajadores"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar trabajadores",
+        "tags": [
+          "Worker Payments"
+        ]
+      }
+    },
+    "/api/worker-payments/{id}": {
+      "get": {
+        "operationId": "worker_payments_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trabajador encontrado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener trabajador por ID con transacciones",
+        "tags": [
+          "Worker Payments"
+        ]
+      },
+      "put": {
+        "operationId": "worker_payments_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Trabajador actualizado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Actualizar trabajador",
+        "tags": [
+          "Worker Payments"
+        ]
+      },
+      "delete": {
+        "operationId": "worker_payments_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trabajador eliminado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Eliminar trabajador",
+        "tags": [
+          "Worker Payments"
+        ]
+      }
+    },
+    "/api/worker-payments/{id}/transaction": {
+      "post": {
+        "operationId": "worker_payments_createTransaction",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTransactionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Transacción registrada"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Registrar transacción del trabajador",
+        "tags": [
+          "Worker Payments"
+        ]
+      }
+    },
+    "/api/worker-payments/{id}/balance": {
+      "post": {
+        "operationId": "worker_payments_addBalance",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddBalanceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Saldo agregado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Agregar saldo al trabajador",
+        "tags": [
+          "Worker Payments"
+        ]
+      }
+    },
+    "/api/worker-payments/{id}/deposit": {
+      "post": {
+        "operationId": "worker_payments_deposit",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepositDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Depósito realizado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Depositar saldo del trabajador a caja/cuenta",
+        "tags": [
+          "Worker Payments"
+        ]
+      }
+    },
+    "/api/expense-items": {
+      "post": {
+        "operationId": "expense_items_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExpenseItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Elemento creado exitosamente"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crear elemento de gasto",
+        "tags": [
+          "Expense Items"
+        ]
+      },
+      "get": {
+        "operationId": "expense_items_findAll",
+        "parameters": [
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Filtrar por categoría",
+            "schema": {
+              "example": "Inmuebles",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Fecha de inicio (ISO)",
+            "schema": {
+              "example": "2026-03-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Fecha de fin (ISO)",
+            "schema": {
+              "example": "2026-03-31",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de elementos"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar elementos de gasto",
+        "tags": [
+          "Expense Items"
+        ]
+      }
+    },
+    "/api/expense-items/categories": {
+      "get": {
+        "operationId": "expense_items_getCategories",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de categorías"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener categorías usadas",
+        "tags": [
+          "Expense Items"
+        ]
+      }
+    },
+    "/api/expense-items/reports/{period}": {
+      "get": {
+        "operationId": "expense_items_getReport",
+        "parameters": [
+          {
+            "name": "period",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "enum": [
+                "month",
+                "quarter",
+                "semester",
+                "year",
+                "all",
+                "single"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reporte generado"
+          },
+          "400": {
+            "description": "Parámetros inválidos"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Generar reporte de gastos",
+        "tags": [
+          "Expense Items"
+        ]
+      }
+    },
+    "/api/expense-items/{id}": {
+      "get": {
+        "operationId": "expense_items_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Elemento encontrado"
+          },
+          "404": {
+            "description": "Elemento no encontrado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener elemento por ID",
+        "tags": [
+          "Expense Items"
+        ]
+      },
+      "patch": {
+        "operationId": "expense_items_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExpenseItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Elemento actualizado"
+          },
+          "404": {
+            "description": "Elemento no encontrado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Actualizar elemento de gasto",
+        "tags": [
+          "Expense Items"
+        ]
+      },
+      "delete": {
+        "operationId": "expense_items_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Elemento eliminado"
+          },
+          "404": {
+            "description": "Elemento no encontrado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Eliminar elemento de gasto",
+        "tags": [
+          "Expense Items"
+        ]
+      }
+    },
+    "/api/cash/overview": {
+      "get": {
+        "operationId": "cash_getOverview",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Resumen de caja por moneda"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener resumen operativo de caja",
+        "tags": [
+          "Cash"
+        ]
+      }
+    },
+    "/api/cash/policies": {
+      "get": {
+        "operationId": "cash_getPolicies",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener políticas de caja por moneda",
+        "tags": [
+          "Cash"
+        ]
+      }
+    },
+    "/api/cash/policies/{currencyId}": {
+      "put": {
+        "operationId": "cash_updatePolicy",
+        "parameters": [
+          {
+            "name": "currencyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCashPolicyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Actualizar política de caja por moneda",
+        "tags": [
+          "Cash"
+        ]
+      }
+    },
+    "/api/cash/auditors": {
+      "get": {
+        "operationId": "cash_getAuditors",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener usuarios disponibles como auditores",
+        "tags": [
+          "Cash"
+        ]
+      }
+    },
+    "/api/cash/closings": {
+      "get": {
+        "operationId": "cash_getClosings",
+        "parameters": [
+          {
+            "name": "currencyId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de cierres diarios"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar cierres diarios de caja",
+        "tags": [
+          "Cash"
+        ]
+      },
+      "post": {
+        "operationId": "cash_createClosing",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCashClosingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cierre diario creado o ya existente de forma idempotente"
+          },
+          "409": {
+            "description": "Ya existe un cierre con datos diferentes"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crear cierre diario de caja",
+        "tags": [
+          "Cash"
+        ]
+      }
+    },
+    "/api/cash/closings/{id}": {
+      "get": {
+        "operationId": "cash_getClosing",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cierre diario encontrado"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obtener cierre diario",
+        "tags": [
+          "Cash"
+        ]
+      }
+    },
+    "/api/cash/valuation": {
+      "get": {
+        "operationId": "cash_getValuation",
+        "parameters": [
+          {
+            "name": "currencyId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Valorar caja global en una moneda destino",
+        "tags": [
+          "Cash"
+        ]
+      }
+    },
+    "/api/remittances/events": {
+      "post": {
+        "operationId": "remittances_ingest",
+        "parameters": [
+          {
+            "name": "x-provider-token",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemittanceEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Remittances"
+        ]
+      }
+    },
+    "/api/remittances": {
+      "get": {
+        "operationId": "remittances_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Remittances"
+        ]
+      }
+    },
+    "/api/remittances/reconciliation": {
+      "get": {
+        "operationId": "remittances_reconcile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Remittances"
+        ]
+      }
+    },
+    "/api/remittances/{id}/retry": {
+      "post": {
+        "operationId": "remittances_retry",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemittanceEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Remittances"
+        ]
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "health_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Health"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Casa de Cambio API",
+    "description": "Sistema de gestión para casa de cambio",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "admin@cambios.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "admin123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "usuario@email.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123"
+          },
+          "name": {
+            "type": "string",
+            "example": "Juan Pérez"
+          },
+          "nickname": {
+            "type": "string",
+            "example": "Juanito"
+          }
+        },
+        "required": [
+          "email",
+          "password",
+          "name"
+        ]
+      },
+      "ForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "usuario@email.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "abc123-def456-ghi789"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "Password123"
+          }
+        },
+        "required": [
+          "token",
+          "newPassword"
+        ]
+      },
+      "VerifyEmailDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "abc123-def456-ghi789"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "ResendVerificationDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "usuario@email.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "example": "admin123"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "newPassword123"
+          }
+        },
+        "required": [
+          "newPassword"
+        ]
+      },
+      "SetPrimaryCurrencyDto": {
+        "type": "object",
+        "properties": {
+          "primaryCurrencyId": {
+            "type": "number",
+            "example": 1,
+            "description": "ID de la moneda principal"
+          }
+        },
+        "required": [
+          "primaryCurrencyId"
+        ]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "nuevo@cambios.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          },
+          "name": {
+            "type": "string",
+            "example": "Juan Pérez"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "USER"
+            ],
+            "example": "USER"
+          }
+        },
+        "required": [
+          "email",
+          "password",
+          "name",
+          "role"
+        ]
+      },
+      "ActivateUserDto": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "RegisterPushTokenDto": {
+        "type": "object",
+        "properties": {
+          "pushToken": {
+            "type": "string",
+            "description": "Expo push token"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "android",
+              "ios"
+            ]
+          }
+        },
+        "required": [
+          "pushToken",
+          "platform"
+        ]
+      },
+      "UnregisterPushTokenDto": {
+        "type": "object",
+        "properties": {
+          "pushToken": {
+            "type": "string",
+            "description": "Expo push token to remove",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "pushToken"
+        ]
+      },
+      "CreateCurrencyDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "USD"
+          },
+          "name": {
+            "type": "string",
+            "example": "Dólar Estadounidense"
+          },
+          "symbol": {
+            "type": "string",
+            "example": "$"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "default": true
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "symbol",
+          "isActive"
+        ]
+      },
+      "UpdateCurrencyDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "USD"
+          },
+          "name": {
+            "type": "string",
+            "example": "Dólar Estadounidense"
+          },
+          "symbol": {
+            "type": "string",
+            "example": "$"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "default": true
+          }
+        }
+      },
+      "UpdateExchangeRateDto": {
+        "type": "object",
+        "properties": {
+          "referenceRate": {
+            "type": "number",
+            "example": 200
+          },
+          "buyMargin": {
+            "type": "number",
+            "example": 0.05
+          },
+          "sellMargin": {
+            "type": "number",
+            "example": 0.05
+          }
+        },
+        "required": [
+          "referenceRate",
+          "buyMargin",
+          "sellMargin"
+        ]
+      },
+      "CreateTransactionDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Cantidad de la transacción"
+          },
+          "profit": {
+            "type": "number",
+            "description": "Ganancia generada por la transacción"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripción de la transacción"
+          },
+          "destinationType": {
+            "type": "string",
+            "description": "Tipo de destino: CASH o BANK_ACCOUNT"
+          },
+          "destinationId": {
+            "type": "number",
+            "description": "ID del destino (bankAccountId si destinationType es BANK_ACCOUNT)"
+          },
+          "currencyId": {
+            "type": "number",
+            "description": "ID de la moneda"
+          }
+        },
+        "required": [
+          "amount",
+          "profit",
+          "currencyId"
+        ]
+      },
+      "CreateFxTransferDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "COMPRA",
+              "VENTA"
+            ]
+          },
+          "currencyId": {
+            "type": "number"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "rate": {
+            "type": "number"
+          },
+          "operationKind": {
+            "type": "string",
+            "enum": [
+              "TRANSFER",
+              "REMITTANCE"
+            ],
+            "default": "TRANSFER"
+          },
+          "persistRate": {
+            "type": "boolean",
+            "default": false,
+            "description": "Persist this effective rate as the active rate for this transaction side"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "CASH",
+              "BANK_ACCOUNT"
+            ],
+            "default": "CASH"
+          },
+          "sourceBankAccountId": {
+            "type": "number",
+            "description": "Bank account used as source when sourceType is BANK_ACCOUNT"
+          },
+          "destinationType": {
+            "type": "string",
+            "enum": [
+              "CASH",
+              "BANK_ACCOUNT"
+            ],
+            "default": "CASH"
+          },
+          "destinationBankAccountId": {
+            "type": "number",
+            "description": "Bank account receiving funds when destinationType is BANK_ACCOUNT"
+          },
+          "workerId": {
+            "type": "number",
+            "description": "Worker receiving profit from this FX operation"
+          },
+          "workerProfit": {
+            "type": "number",
+            "description": "Profit credited to the worker balance in workerCurrencyId"
+          },
+          "workerCurrencyId": {
+            "type": "number",
+            "description": "Currency of the worker profit"
+          }
+        },
+        "required": [
+          "type",
+          "currencyId",
+          "amount",
+          "rate"
+        ]
+      },
+      "OpenCurrencyPositionDto": {
+        "type": "object",
+        "properties": {
+          "currencyId": {
+            "type": "number",
+            "description": "Currency whose existing cash balance is being opened"
+          },
+          "openingCost": {
+            "type": "number",
+            "description": "Historical weighted average cost per unit"
+          }
+        },
+        "required": [
+          "currencyId",
+          "openingCost"
+        ]
+      },
+      "CreateCashAuditDto": {
+        "type": "object",
+        "properties": {
+          "currencyId": {
+            "type": "number",
+            "example": 1
+          },
+          "actualBalance": {
+            "type": "number",
+            "example": 5000
+          },
+          "notes": {
+            "type": "string",
+            "example": "Nota del arqueo"
+          }
+        },
+        "required": [
+          "currencyId",
+          "actualBalance"
+        ]
+      },
+      "CreateCashAdjustmentDto": {
+        "type": "object",
+        "properties": {
+          "currencyId": {
+            "type": "number",
+            "example": 1
+          },
+          "amount": {
+            "type": "number",
+            "example": 100
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "INGRESO",
+              "EGRESO"
+            ],
+            "example": "INGRESO"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Depósito inicial"
+          }
+        },
+        "required": [
+          "currencyId",
+          "amount",
+          "type",
+          "reason"
+        ]
+      },
+      "CreateBankAccountDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Cuenta Principal"
+          },
+          "bankName": {
+            "type": "string",
+            "example": "Banco Popular"
+          },
+          "currencyId": {
+            "type": "number",
+            "example": 1
+          },
+          "accountNumber": {
+            "type": "string",
+            "example": "1234567890"
+          },
+          "initialBalance": {
+            "type": "number",
+            "example": 1000
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "default": true
+          }
+        },
+        "required": [
+          "name",
+          "bankName",
+          "currencyId",
+          "accountNumber",
+          "isActive"
+        ]
+      },
+      "UpdateBankAccountDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Cuenta Principal"
+          },
+          "bankName": {
+            "type": "string",
+            "example": "Banco Popular"
+          },
+          "currencyId": {
+            "type": "number",
+            "example": 1
+          },
+          "accountNumber": {
+            "type": "string",
+            "example": "1234567890"
+          },
+          "initialBalance": {
+            "type": "number",
+            "example": 1000
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "default": true
+          }
+        }
+      },
+      "CreateExpenseDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "example": "Renta del local"
+          },
+          "amount": {
+            "type": "number",
+            "example": 5000
+          },
+          "currencyId": {
+            "type": "number",
+            "example": 1
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "CASH",
+              "BANK_ACCOUNT"
+            ]
+          },
+          "sourceBankAccountId": {
+            "type": "number",
+            "description": "Required when sourceType is BANK_ACCOUNT"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "renta",
+              "servicios",
+              "salario",
+              "insumos",
+              "otros"
+            ],
+            "example": "renta"
+          },
+          "date": {
+            "type": "string",
+            "example": "2024-01-15"
+          },
+          "notes": {
+            "type": "string",
+            "example": "Nota opcional"
+          }
+        },
+        "required": [
+          "description",
+          "amount",
+          "currencyId",
+          "sourceType",
+          "category",
+          "date"
+        ]
+      },
+      "UpdateExpenseDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "example": "Renta del local"
+          },
+          "amount": {
+            "type": "number",
+            "example": 5000
+          },
+          "currencyId": {
+            "type": "number",
+            "example": 1
+          },
+          "sourceType": {
+            "type": "string",
+            "enum": [
+              "CASH",
+              "BANK_ACCOUNT"
+            ]
+          },
+          "sourceBankAccountId": {
+            "type": "number",
+            "description": "Required when sourceType is BANK_ACCOUNT"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "renta",
+              "servicios",
+              "salario",
+              "insumos",
+              "otros"
+            ],
+            "example": "renta"
+          },
+          "date": {
+            "type": "string",
+            "example": "2024-01-15"
+          },
+          "notes": {
+            "type": "string",
+            "example": "Nota opcional"
+          }
+        }
+      },
+      "CreateObjectiveDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Meta de ventas Q1"
+          },
+          "description": {
+            "type": "string",
+            "example": "Alcanzar $50,000 en ventas"
+          },
+          "targetAmount": {
+            "type": "number",
+            "example": 50000
+          },
+          "currencyId": {
+            "type": "number",
+            "example": 1
+          },
+          "bankAccountId": {
+            "type": "number",
+            "example": 1
+          }
+        },
+        "required": [
+          "name",
+          "targetAmount",
+          "currencyId"
+        ]
+      },
+      "UpdateObjectiveDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Meta de ventas Q1"
+          },
+          "description": {
+            "type": "string",
+            "example": "Alcanzar $50,000 en ventas"
+          },
+          "targetAmount": {
+            "type": "number",
+            "example": 50000
+          },
+          "currencyId": {
+            "type": "number",
+            "example": 1
+          },
+          "bankAccountId": {
+            "type": "number",
+            "example": 1
+          }
+        }
+      },
+      "UpdateStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVO",
+              "COMPLETADO",
+              "PAUSADO"
+            ],
+            "example": "ACTIVO"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "DailyReportTransactionDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "compras": {
+            "type": "number"
+          },
+          "ventas": {
+            "type": "number"
+          },
+          "totalCompras": {
+            "type": "number"
+          },
+          "totalVentas": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "total",
+          "compras",
+          "ventas",
+          "totalCompras",
+          "totalVentas"
+        ]
+      },
+      "DailyExpenseByCategoryDto": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number",
+            "example": 5
+          },
+          "total": {
+            "type": "number",
+            "example": 125.5
+          }
+        },
+        "required": [
+          "count",
+          "total"
+        ]
+      },
+      "DailyReportExpenseDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "totalAmount": {
+            "type": "number",
+            "description": "Suma cruda mezclando currencies"
+          },
+          "totalAmountInCup": {
+            "type": "object",
+            "nullable": true,
+            "description": "Suma convertida a CUP cuando hay tasa vigente"
+          },
+          "unconvertedCount": {
+            "type": "number"
+          },
+          "byCategory": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/DailyExpenseByCategoryDto"
+            }
+          }
+        },
+        "required": [
+          "total",
+          "totalAmount",
+          "totalAmountInCup",
+          "unconvertedCount",
+          "byCategory"
+        ]
+      },
+      "DailyReportProfitDto": {
+        "type": "object",
+        "properties": {
+          "margin": {
+            "type": "number",
+            "description": "% de retorno sobre ventas (0-100)"
+          },
+          "marginProfit": {
+            "type": "number",
+            "description": "Suma de Transaction.marginProfit"
+          },
+          "net": {
+            "type": "object",
+            "nullable": true,
+            "description": "Realized FX margin minus CUP-converted expenses; null when conversion is incomplete"
+          }
+        },
+        "required": [
+          "margin",
+          "marginProfit",
+          "net"
+        ]
+      },
+      "DailyReportDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-07-22"
+          },
+          "transactions": {
+            "$ref": "#/components/schemas/DailyReportTransactionDto"
+          },
+          "expenses": {
+            "$ref": "#/components/schemas/DailyReportExpenseDto"
+          },
+          "profit": {
+            "$ref": "#/components/schemas/DailyReportProfitDto"
+          }
+        },
+        "required": [
+          "date",
+          "transactions",
+          "expenses",
+          "profit"
+        ]
+      },
+      "PeriodReportPeriodDto": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string"
+          },
+          "endDate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "startDate",
+          "endDate"
+        ]
+      },
+      "PeriodReportSummaryDto": {
+        "type": "object",
+        "properties": {
+          "totalTransactions": {
+            "type": "number"
+          },
+          "totalExpensesCount": {
+            "type": "number"
+          },
+          "totalExpensesAmount": {
+            "type": "number"
+          },
+          "totalExpensesInCup": {
+            "type": "number",
+            "nullable": true
+          },
+          "unconvertedExpensesCount": {
+            "type": "number"
+          },
+          "marginProfit": {
+            "type": "number"
+          },
+          "netProfit": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "totalTransactions",
+          "totalExpensesCount",
+          "totalExpensesAmount",
+          "totalExpensesInCup",
+          "unconvertedExpensesCount",
+          "marginProfit",
+          "netProfit"
+        ]
+      },
+      "DailyBreakdownItemDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "transactions": {
+            "type": "number",
+            "description": "Cantidad de transacciones del día"
+          },
+          "transactionsTotalCup": {
+            "type": "number"
+          },
+          "expenses": {
+            "type": "number"
+          },
+          "expensesTotalCup": {
+            "type": "number"
+          },
+          "expensesUnconverted": {
+            "type": "number"
+          },
+          "marginProfit": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "transactions",
+          "transactionsTotalCup",
+          "expenses",
+          "expensesTotalCup",
+          "expensesUnconverted",
+          "marginProfit"
+        ]
+      },
+      "PeriodReportDto": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "$ref": "#/components/schemas/PeriodReportPeriodDto"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/PeriodReportSummaryDto"
+          },
+          "dailyBreakdown": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DailyBreakdownItemDto"
+            }
+          },
+          "transactionsByCurrency": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "expensesByCategory": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/DailyExpenseByCategoryDto"
+            }
+          }
+        },
+        "required": [
+          "period",
+          "summary",
+          "dailyBreakdown",
+          "transactionsByCurrency",
+          "expensesByCategory"
+        ]
+      },
+      "ProfitReportTransactionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "COMPRA",
+              "VENTA"
+            ]
+          },
+          "currency": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "rate": {
+            "type": "number"
+          },
+          "totalCup": {
+            "type": "number"
+          },
+          "marginProfit": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "currency",
+          "amount",
+          "rate",
+          "totalCup",
+          "marginProfit",
+          "createdAt"
+        ]
+      },
+      "ProfitReportDto": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "$ref": "#/components/schemas/PeriodReportPeriodDto"
+          },
+          "totalMarginProfit": {
+            "type": "number"
+          },
+          "totalCompras": {
+            "type": "number"
+          },
+          "totalVentas": {
+            "type": "number"
+          },
+          "netFlow": {
+            "type": "number"
+          },
+          "byCurrency": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProfitReportTransactionDto"
+            }
+          }
+        },
+        "required": [
+          "period",
+          "totalMarginProfit",
+          "totalCompras",
+          "totalVentas",
+          "netFlow",
+          "byCurrency",
+          "transactions"
+        ]
+      },
+      "CurrencyReportDto": {
+        "type": "object",
+        "properties": {
+          "currencyId": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "currentBalance": {
+            "type": "number"
+          },
+          "totalTransactions": {
+            "type": "number"
+          },
+          "totalCompras": {
+            "type": "number"
+          },
+          "totalVentas": {
+            "type": "number"
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        },
+        "required": [
+          "currencyId",
+          "currency",
+          "currentBalance",
+          "totalTransactions",
+          "totalCompras",
+          "totalVentas",
+          "transactions"
+        ]
+      },
+      "FxPerformanceMovementDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "rate": {
+            "type": "number"
+          },
+          "costoPromedio": {
+            "type": "number"
+          },
+          "rendimiento": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "currency",
+          "amount",
+          "rate",
+          "costoPromedio",
+          "rendimiento",
+          "createdAt"
+        ]
+      },
+      "FxPerformancePositionDto": {
+        "type": "object",
+        "properties": {
+          "currencyId": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "saldo": {
+            "type": "number"
+          },
+          "costoPromedio": {
+            "type": "number",
+            "nullable": true
+          },
+          "reviewStatus": {
+            "type": "string",
+            "enum": [
+              "UNREVIEWED",
+              "REVIEWED"
+            ]
+          },
+          "reviewedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "availableForSale": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "currencyId",
+          "currency",
+          "saldo",
+          "costoPromedio",
+          "reviewStatus",
+          "reviewedAt",
+          "availableForSale"
+        ]
+      },
+      "FxPerformanceReportDto": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "$ref": "#/components/schemas/PeriodReportPeriodDto"
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalRendimiento": {
+            "type": "number"
+          },
+          "movements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FxPerformanceMovementDto"
+            }
+          },
+          "positions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FxPerformancePositionDto"
+            }
+          }
+        },
+        "required": [
+          "period",
+          "currency",
+          "totalRendimiento",
+          "movements",
+          "positions"
+        ]
+      },
+      "ExpensesReportDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "totalAmount": {
+            "type": "number"
+          },
+          "totalAmountInCup": {
+            "type": "number",
+            "nullable": true
+          },
+          "unconvertedCount": {
+            "type": "number"
+          },
+          "byCategory": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/DailyExpenseByCategoryDto"
+            }
+          },
+          "byCurrency": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "expenses": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        },
+        "required": [
+          "total",
+          "totalAmount",
+          "totalAmountInCup",
+          "unconvertedCount",
+          "byCategory",
+          "byCurrency",
+          "expenses"
+        ]
+      },
+      "AccountReportItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "userId": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "balance": {
+            "type": "number"
+          },
+          "currencyId": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "transactionCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "name",
+          "balance",
+          "currencyId",
+          "isActive",
+          "transactionCount"
+        ]
+      },
+      "AccountsReportDto": {
+        "type": "object",
+        "properties": {
+          "totalAccounts": {
+            "type": "number"
+          },
+          "totalBalance": {
+            "type": "number"
+          },
+          "accounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountReportItemDto"
+            }
+          }
+        },
+        "required": [
+          "totalAccounts",
+          "totalBalance",
+          "accounts"
+        ]
+      },
+      "ObjectiveReportItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "targetAmount": {
+            "type": "number"
+          },
+          "currentAmount": {
+            "type": "number"
+          },
+          "percentage": {
+            "type": "number"
+          },
+          "remaining": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "targetAmount",
+          "currentAmount",
+          "percentage",
+          "remaining"
+        ]
+      },
+      "ObjectivesReportDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "activos": {
+            "type": "number"
+          },
+          "completados": {
+            "type": "number"
+          },
+          "pausados": {
+            "type": "number"
+          },
+          "objectives": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObjectiveReportItemDto"
+            }
+          }
+        },
+        "required": [
+          "total",
+          "activos",
+          "completados",
+          "pausados",
+          "objectives"
+        ]
+      },
+      "CashFlowReportDtoSwagger": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "$ref": "#/components/schemas/PeriodReportPeriodDto"
+          },
+          "currencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "period",
+          "currencies"
+        ]
+      },
+      "AuditSummaryReportDtoSwagger": {
+        "type": "object",
+        "properties": {
+          "totalAudits": {
+            "type": "number"
+          },
+          "withDiscrepancies": {
+            "type": "number"
+          },
+          "totalDiscrepancy": {
+            "type": "number"
+          },
+          "audits": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        },
+        "required": [
+          "totalAudits",
+          "withDiscrepancies",
+          "totalDiscrepancy",
+          "audits"
+        ]
+      },
+      "CreateRateHistoryDto": {
+        "type": "object",
+        "properties": {
+          "currencyFromId": {
+            "type": "number",
+            "example": 1
+          },
+          "currencyToId": {
+            "type": "number",
+            "example": 2
+          },
+          "rate": {
+            "type": "number",
+            "example": 200.5
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "MANUAL",
+              "SYSTEM"
+            ],
+            "example": "MANUAL"
+          },
+          "referenceType": {
+            "type": "string",
+            "example": "transaction"
+          },
+          "referenceId": {
+            "type": "number",
+            "example": 1
+          }
+        },
+        "required": [
+          "currencyFromId",
+          "currencyToId",
+          "rate",
+          "source"
+        ]
+      },
+      "CreatePlanDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Plan Estándar"
+          },
+          "description": {
+            "type": "string",
+            "example": "Plan base con licencia por usuario"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "default": true
+          },
+          "monthlyUsd": {
+            "type": "number",
+            "example": 25
+          },
+          "semiannualUsd": {
+            "type": "number",
+            "example": 85.5
+          },
+          "annualUsd": {
+            "type": "number",
+            "example": 162
+          }
+        },
+        "required": [
+          "name",
+          "monthlyUsd"
+        ]
+      },
+      "UpdatePlanDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Plan Estándar"
+          },
+          "description": {
+            "type": "string",
+            "example": "Plan base con licencia por usuario"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "default": true
+          },
+          "monthlyUsd": {
+            "type": "number",
+            "example": 25
+          },
+          "semiannualUsd": {
+            "type": "number",
+            "example": 85.5
+          },
+          "annualUsd": {
+            "type": "number",
+            "example": 162
+          }
+        }
+      },
+      "AssignLicenseDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "number",
+            "example": 1
+          },
+          "planId": {
+            "type": "number",
+            "example": 1
+          },
+          "cycle": {
+            "type": "string",
+            "enum": [
+              "MONTHLY",
+              "SEMIANNUAL",
+              "ANNUAL"
+            ],
+            "example": "MONTHLY"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "TRIAL",
+              "ACTIVE",
+              "GRACE",
+              "EXPIRED",
+              "SUSPENDED",
+              "CANCELLED"
+            ],
+            "example": "ACTIVE"
+          },
+          "expiresAt": {
+            "type": "string",
+            "example": "2026-03-01T00:00:00.000Z"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Asignación manual admin"
+          }
+        },
+        "required": [
+          "userId",
+          "planId",
+          "cycle"
+        ]
+      },
+      "RenewLicenseDto": {
+        "type": "object",
+        "properties": {
+          "cycle": {
+            "type": "string",
+            "enum": [
+              "MONTHLY",
+              "SEMIANNUAL",
+              "ANNUAL"
+            ],
+            "example": "MONTHLY"
+          },
+          "planId": {
+            "type": "number",
+            "example": 1
+          }
+        },
+        "required": [
+          "cycle",
+          "planId"
+        ]
+      },
+      "SuspendLicenseDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "example": "Pago vencido"
+          }
+        }
+      },
+      "RegisterPaymentDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "number",
+            "example": 1
+          },
+          "userLicenseId": {
+            "type": "number",
+            "example": 1
+          },
+          "planId": {
+            "type": "number",
+            "example": 1
+          },
+          "cycle": {
+            "type": "string",
+            "enum": [
+              "MONTHLY",
+              "SEMIANNUAL",
+              "ANNUAL"
+            ],
+            "example": "MONTHLY"
+          },
+          "amountUsd": {
+            "type": "number",
+            "example": 15
+          },
+          "exchangeRateUsed": {
+            "type": "number",
+            "example": 350
+          },
+          "bankAccountId": {
+            "type": "number",
+            "example": 1
+          },
+          "paidAt": {
+            "type": "string",
+            "example": "2026-03-05T12:00:00.000Z"
+          },
+          "notes": {
+            "type": "string",
+            "example": "Cobro mensual licencia"
+          }
+        },
+        "required": [
+          "userId",
+          "planId",
+          "cycle",
+          "amountUsd",
+          "exchangeRateUsed"
+        ]
+      },
+      "CreateAdminUserProfileDto": {
+        "type": "object",
+        "properties": {
+          "lastName": {
+            "type": "string",
+            "example": "Pérez"
+          },
+          "documentId": {
+            "type": "string",
+            "example": "ID-9988"
+          },
+          "department": {
+            "type": "string",
+            "example": "Operaciones"
+          },
+          "position": {
+            "type": "string",
+            "example": "Analista Senior"
+          }
+        }
+      },
+      "CreateAdminUserContactDto": {
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string",
+            "example": "+53 555 12 34"
+          },
+          "alternateEmail": {
+            "type": "string",
+            "example": "alt@empresa.com"
+          },
+          "address": {
+            "type": "string",
+            "example": "Calle 100 #23"
+          }
+        }
+      },
+      "CreateAdminUserAccessDto": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          },
+          "forcePasswordChangeOnFirstLogin": {
+            "type": "boolean",
+            "example": true
+          },
+          "sendInviteEmail": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "CreateAdminUserSecurityDto": {
+        "type": "object",
+        "properties": {
+          "riskLevel": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH"
+            ],
+            "example": "MEDIUM"
+          },
+          "notes": {
+            "type": "string",
+            "example": "Requiere acceso a panel de soporte"
+          }
+        }
+      },
+      "CreateAdminUserPreferencesDto": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string",
+            "example": "es-CU"
+          },
+          "timezone": {
+            "type": "string",
+            "example": "America/Havana"
+          }
+        }
+      },
+      "CreateAdminUserLicenseSetupDto": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "number",
+            "example": 3
+          },
+          "cycle": {
+            "type": "string",
+            "enum": [
+              "MONTHLY",
+              "SEMIANNUAL",
+              "ANNUAL"
+            ],
+            "example": "MONTHLY"
+          },
+          "startImmediately": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "CreateAdminUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Nuevo Usuario"
+          },
+          "email": {
+            "type": "string",
+            "example": "nuevo@cambios.com"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "USER"
+            ],
+            "example": "USER"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/CreateAdminUserProfileDto"
+          },
+          "contact": {
+            "$ref": "#/components/schemas/CreateAdminUserContactDto"
+          },
+          "access": {
+            "$ref": "#/components/schemas/CreateAdminUserAccessDto"
+          },
+          "security": {
+            "$ref": "#/components/schemas/CreateAdminUserSecurityDto"
+          },
+          "preferences": {
+            "$ref": "#/components/schemas/CreateAdminUserPreferencesDto"
+          },
+          "licenseSetup": {
+            "$ref": "#/components/schemas/CreateAdminUserLicenseSetupDto"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "role"
+        ]
+      },
+      "UpdateAdminUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Nombre actualizado"
+          },
+          "email": {
+            "type": "string",
+            "example": "correo@dominio.com"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "AdminUserActionPayloadDto": {
+        "type": "object",
+        "properties": {
+          "newRole": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "USER"
+            ],
+            "example": "USER"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "Password123"
+          },
+          "blockUntil": {
+            "type": "string",
+            "example": "2026-03-10T12:00:00.000Z"
+          },
+          "extendDays": {
+            "type": "number",
+            "example": 30
+          },
+          "licenseId": {
+            "type": "number",
+            "example": 10
+          }
+        }
+      },
+      "AdminUserActionDto": {
+        "type": "object",
+        "properties": {
+          "actionType": {
+            "type": "string",
+            "enum": [
+              "TEMP_BLOCK",
+              "UNBLOCK",
+              "SUSPEND_ACCOUNT",
+              "REACTIVATE_ACCOUNT",
+              "FORCE_PASSWORD_RESET",
+              "RESET_PASSWORD",
+              "REVOKE_ALL_SESSIONS",
+              "CHANGE_ROLE",
+              "SUSPEND_LICENSE",
+              "EXTEND_LICENSE"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "example": "Actividad sospechosa detectada"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/AdminUserActionPayloadDto"
+          }
+        },
+        "required": [
+          "actionType",
+          "reason"
+        ]
+      },
+      "CreateWorkerDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre del trabajador"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Teléfono del trabajador"
+          },
+          "photoUrl": {
+            "type": "string",
+            "description": "URL de la foto del trabajador"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateWorkerDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre del trabajador"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Teléfono del trabajador"
+          },
+          "photoUrl": {
+            "type": "string",
+            "description": "URL de la foto del trabajador"
+          }
+        }
+      },
+      "AddBalanceDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Monto a entregar al trabajador"
+          },
+          "sourceType": {
+            "type": "string",
+            "description": "Tipo de origen: CASH o BANK_ACCOUNT"
+          },
+          "sourceId": {
+            "type": "number",
+            "description": "ID del origen (bankAccountId si sourceType es BANK_ACCOUNT)"
+          },
+          "currencyId": {
+            "type": "number",
+            "description": "ID de la moneda"
+          }
+        },
+        "required": [
+          "amount",
+          "currencyId"
+        ]
+      },
+      "DepositDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Monto a depositar"
+          },
+          "destinationType": {
+            "type": "string",
+            "description": "Tipo de destino: CASH o BANK_ACCOUNT"
+          },
+          "destinationId": {
+            "type": "number",
+            "description": "ID del destino (bankAccountId si destinationType es BANK_ACCOUNT)"
+          },
+          "currencyId": {
+            "type": "number",
+            "description": "ID de la moneda"
+          }
+        },
+        "required": [
+          "amount",
+          "currencyId"
+        ]
+      },
+      "CreateExpenseItemDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Arrendamientos de Inmuebles",
+            "description": "Nombre del gasto"
+          },
+          "amount": {
+            "type": "number",
+            "example": 5000,
+            "description": "Monto del gasto"
+          },
+          "category": {
+            "type": "string",
+            "example": "Inmuebles",
+            "description": "Categoría opcional"
+          }
+        },
+        "required": [
+          "name",
+          "amount"
+        ]
+      },
+      "UpdateExpenseItemDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Mantenimiento de Inmuebles"
+          },
+          "amount": {
+            "type": "number",
+            "example": 3500
+          },
+          "category": {
+            "type": "string",
+            "nullable": true,
+            "example": "Inmuebles",
+            "description": "Null para eliminar categoría"
+          }
+        }
+      },
+      "UpdateCashPolicyDto": {
+        "type": "object",
+        "properties": {
+          "safetyBuffer": {
+            "type": "number",
+            "example": 1000
+          },
+          "insuranceLimit": {
+            "type": "number",
+            "example": 5000
+          }
+        },
+        "required": [
+          "safetyBuffer",
+          "insuranceLimit"
+        ]
+      },
+      "CreateCashClosingDto": {
+        "type": "object",
+        "properties": {
+          "currencyId": {
+            "type": "number",
+            "example": 1
+          },
+          "businessDate": {
+            "type": "string",
+            "example": "2026-07-11",
+            "format": "date"
+          },
+          "actualBalance": {
+            "type": "number",
+            "example": 1500.5
+          },
+          "notes": {
+            "type": "string",
+            "example": "Cierre sin diferencias"
+          }
+        },
+        "required": [
+          "currencyId",
+          "businessDate",
+          "actualBalance"
+        ]
+      },
+      "RemittanceEventDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "number",
+            "deprecated": true,
+            "description": "Ignored. Tenant identity is resolved from provider credentials."
+          },
+          "provider": {
+            "type": "string"
+          },
+          "sourceId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "COMPLETED",
+              "FAILED"
+            ]
+          },
+          "foreignCurrencyId": {
+            "type": "number"
+          },
+          "foreignAmount": {
+            "type": "number"
+          },
+          "localCurrencyId": {
+            "type": "number"
+          },
+          "localAmount": {
+            "type": "number"
+          },
+          "rate": {
+            "type": "number"
+          },
+          "idempotencyKey": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "sourceId",
+          "status",
+          "foreignCurrencyId",
+          "foreignAmount",
+          "localCurrencyId",
+          "localAmount",
+          "rate"
+        ]
+      }
+    }
+  }
+}
