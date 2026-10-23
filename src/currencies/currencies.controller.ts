@@ -18,6 +18,8 @@ import {
 import { CurrenciesService } from './currencies.service';
 import { CreateCurrencyDto } from './dto/create-currency.dto';
 import { UpdateCurrencyDto } from './dto/update-currency.dto';
+import { CurrenciesWithPrimaryResponseDto, CurrencyResponseDto } from './currencies.swagger';
+import { MessageResponseDto } from '../auth/auth.swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
@@ -30,21 +32,21 @@ export class CurrenciesController {
 
   @Get()
   @ApiOperation({ summary: 'Listar todas las monedas' })
-  @ApiResponse({ status: 200, description: 'Lista de monedas' })
+  @ApiResponse({ status: 200, type: [CurrencyResponseDto], description: 'Lista de monedas' })
   findAll() {
     return this.currenciesService.findAll();
   }
 
   @Get('with-primary')
   @ApiOperation({ summary: 'Listar monedas con información de moneda principal del usuario' })
-  @ApiResponse({ status: 200, description: 'Lista de monedas con primary currency' })
+  @ApiResponse({ status: 200, type: CurrenciesWithPrimaryResponseDto, description: 'Lista de monedas con primary currency' })
   findAllWithPrimary(@CurrentUser('id') userId: number) {
     return this.currenciesService.findAllWithPrimary(userId);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener moneda por ID' })
-  @ApiResponse({ status: 200, description: 'Moneda encontrada' })
+  @ApiResponse({ status: 200, type: CurrencyResponseDto, description: 'Moneda encontrada' })
   @ApiResponse({ status: 404, description: 'Moneda no encontrada' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.currenciesService.findOne(id);
@@ -52,14 +54,14 @@ export class CurrenciesController {
 
   @Post()
   @ApiOperation({ summary: 'Crear nueva moneda' })
-  @ApiResponse({ status: 201, description: 'Moneda creada' })
+  @ApiResponse({ status: 201, type: CurrencyResponseDto, description: 'Moneda creada' })
   create(@Body() createCurrencyDto: CreateCurrencyDto) {
     return this.currenciesService.create(createCurrencyDto);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar moneda' })
-  @ApiResponse({ status: 200, description: 'Moneda actualizada' })
+  @ApiResponse({ status: 200, type: CurrencyResponseDto, description: 'Moneda actualizada' })
   @ApiResponse({ status: 404, description: 'Moneda no encontrada' })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -70,7 +72,7 @@ export class CurrenciesController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar moneda' })
-  @ApiResponse({ status: 200, description: 'Moneda eliminada' })
+  @ApiResponse({ status: 200, type: MessageResponseDto, description: 'Moneda eliminada' })
   @ApiResponse({ status: 404, description: 'Moneda no encontrada' })
   @ApiResponse({ status: 400, description: 'La moneda es principal de usuarios' })
   remove(@Param('id', ParseIntPipe) id: number) {
