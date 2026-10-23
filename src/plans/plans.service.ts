@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import type { Plan } from '@prisma/client';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
@@ -8,34 +7,19 @@ import { UpdatePlanDto } from './dto/update-plan.dto';
 export class PlansService {
   constructor(private readonly prisma: PrismaService) {}
 
-  /**
-   * Money convention of the API contract: prices are JSON numbers.
-   * Prisma Decimal columns serialize as strings, so convert at the
-   * boundary (same pattern as bank-accounts/cash-balances balances).
-   */
-  private toResponse(plan: Plan) {
-    return {
-      ...plan,
-      monthlyUsd: plan.monthlyUsd.toNumber(),
-      semiannualUsd: plan.semiannualUsd.toNumber(),
-      annualUsd: plan.annualUsd.toNumber(),
-    };
-  }
-
-  async findAll() {
-    const plans = await this.prisma.plan.findMany({ orderBy: { createdAt: 'desc' } });
-    return plans.map((plan) => this.toResponse(plan));
+  findAll() {
+    return this.prisma.plan.findMany({ orderBy: { createdAt: 'desc' } });
   }
 
   async findOne(id: number) {
     const plan = await this.prisma.plan.findUnique({ where: { id } });
     if (!plan) throw new NotFoundException('Plan no encontrado');
-    return this.toResponse(plan);
+    return plan;
   }
 
-  async create(dto: CreatePlanDto) {
+  create(dto: CreatePlanDto) {
     const monthlyUsd = dto.monthlyUsd;
-    const plan = await this.prisma.plan.create({
+    return this.prisma.plan.create({
       data: {
         name: dto.name,
         description: dto.description,
@@ -45,7 +29,6 @@ export class PlansService {
         annualUsd: dto.annualUsd ?? Number((monthlyUsd * 12).toFixed(2)),
       },
     });
-    return this.toResponse(plan);
   }
 
   async update(id: number, dto: UpdatePlanDto) {
@@ -57,8 +40,7 @@ export class PlansService {
       if (typeof data.annualUsd !== 'number') data.annualUsd = Number((data.monthlyUsd * 12).toFixed(2));
     }
 
-    const plan = await this.prisma.plan.update({ where: { id }, data });
-    return this.toResponse(plan);
+    return this.prisma.plan.update({ where: { id }, data });
   }
 
   async delete(id: number) {
@@ -70,7 +52,6 @@ export class PlansService {
     if (existingLicenses) {
       throw new BadRequestException('No se puede eliminar un plan con licencias existentes.');
     }
-    const plan = await this.prisma.plan.delete({ where: { id } });
-    return this.toResponse(plan);
+    return this.prisma.plan.delete({ where: { id } });
   }
 }

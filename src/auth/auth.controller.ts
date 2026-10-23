@@ -16,17 +16,6 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { SetPrimaryCurrencyDto } from './dto/set-primary-currency.dto';
 import { CheckEmailDto } from './dto/check-email.dto';
 import { CheckNicknameDto } from './dto/check-nickname.dto';
-import {
-  ActivateUserResponseDto,
-  AuthUserDto,
-  CreatedUserResponseDto,
-  ExistsResponseDto,
-  LoginResponseDto,
-  MessageResponseDto,
-  PrimaryCurrencyUserDto,
-  RegisterResponseDto,
-  UserListItemDto,
-} from './auth.swagger';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -35,7 +24,7 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({ summary: 'Iniciar sesión' })
-  @ApiResponse({ status: 201, type: LoginResponseDto, description: 'Login exitoso con estado de acceso del usuario' })
+  @ApiResponse({ status: 201, description: 'Login exitoso con estado de acceso del usuario' })
   @ApiResponse({ status: 401, description: 'Credenciales inválidas' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
@@ -44,7 +33,7 @@ export class AuthController {
   @Get('check-email')
   @ApiOperation({ summary: 'Comprobar si un email ya está registrado' })
   @ApiQuery({ name: 'email', required: true, example: 'usuario@email.com' })
-  @ApiResponse({ status: 200, type: ExistsResponseDto, description: 'Disponibilidad del email' })
+  @ApiResponse({ status: 200, description: 'Disponibilidad del email' })
   @ApiResponse({ status: 400, description: 'Email inválido o ausente' })
   async checkEmail(@Query() query: CheckEmailDto) {
     return this.authService.checkEmailExists(query.email);
@@ -53,7 +42,7 @@ export class AuthController {
   @Get('check-nickname')
   @ApiOperation({ summary: 'Comprobar si un nickname ya está en uso' })
   @ApiQuery({ name: 'nickname', required: true, example: 'Juanito' })
-  @ApiResponse({ status: 200, type: ExistsResponseDto, description: 'Disponibilidad del nickname' })
+  @ApiResponse({ status: 200, description: 'Disponibilidad del nickname' })
   @ApiResponse({ status: 400, description: 'Nickname inválido o ausente' })
   async checkNickname(@Query() query: CheckNicknameDto) {
     return this.authService.checkNicknameExists(query.nickname);
@@ -61,7 +50,7 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'Registrarse' })
-  @ApiResponse({ status: 201, type: RegisterResponseDto, description: 'Registro exitoso. Email de verificación enviado.' })
+  @ApiResponse({ status: 201, description: 'Registro exitoso. Email de verificación enviado.' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @ApiResponse({ status: 409, description: 'El correo electrónico ya está registrado' })
   async register(@Body() registerDto: RegisterDto) {
@@ -70,14 +59,14 @@ export class AuthController {
 
   @Post('forgot-password')
   @ApiOperation({ summary: 'Solicitar restablecimiento de contraseña' })
-  @ApiResponse({ status: 200, type: MessageResponseDto, description: 'Solicitud procesada' })
+  @ApiResponse({ status: 200, description: 'Solicitud procesada' })
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return this.authService.forgotPassword(forgotPasswordDto);
   }
 
   @Post('reset-password')
   @ApiOperation({ summary: 'Restablecer contraseña con token' })
-  @ApiResponse({ status: 200, type: MessageResponseDto, description: 'Contraseña restablecida correctamente' })
+  @ApiResponse({ status: 200, description: 'Contraseña restablecida correctamente' })
   @ApiResponse({ status: 400, description: 'Token inválido o expirado' })
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto);
@@ -85,7 +74,7 @@ export class AuthController {
 
   @Post('verify-email')
   @ApiOperation({ summary: 'Verificar email' })
-  @ApiResponse({ status: 200, type: MessageResponseDto, description: 'Email verificado correctamente' })
+  @ApiResponse({ status: 200, description: 'Email verificado correctamente' })
   @ApiResponse({ status: 400, description: 'Token inválido, ya verificado o expirado' })
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
     return this.authService.verifyEmail(verifyEmailDto.token);
@@ -93,7 +82,7 @@ export class AuthController {
 
   @Post('resend-verification')
   @ApiOperation({ summary: 'Re-enviar email de verificación' })
-  @ApiResponse({ status: 200, type: MessageResponseDto, description: 'Email de verificación re-enviado' })
+  @ApiResponse({ status: 200, description: 'Email de verificación re-enviado' })
   @ApiResponse({ status: 400, description: 'Error en la solicitud' })
   @ApiResponse({ status: 403, description: 'Cooldown activo, esperar antes de re-enviar' })
   async resendVerification(@Body() resendVerificationDto: ResendVerificationDto) {
@@ -104,7 +93,7 @@ export class AuthController {
   @Get('me')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener usuario actual' })
-  @ApiResponse({ status: 200, type: AuthUserDto, description: 'Usuario encontrado con estado de acceso' })
+  @ApiResponse({ status: 200, description: 'Usuario encontrado con estado de acceso' })
   async getCurrentUser(@Request() req: any) {
     return this.authService.getCurrentUser(req.user.id);
   }
@@ -113,7 +102,7 @@ export class AuthController {
   @Post('change-password')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Cambiar contraseña' })
-  @ApiResponse({ status: 200, type: MessageResponseDto, description: 'Contraseña actualizada' })
+  @ApiResponse({ status: 200, description: 'Contraseña actualizada' })
   async changePassword(
     @Request() req: any,
     @Body() changePasswordDto: ChangePasswordDto,
@@ -125,7 +114,7 @@ export class AuthController {
   @Patch('me/primary-currency')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Establecer moneda principal' })
-  @ApiResponse({ status: 200, type: PrimaryCurrencyUserDto, description: 'Moneda principal actualizada' })
+  @ApiResponse({ status: 200, description: 'Moneda principal actualizada' })
   @ApiResponse({ status: 404, description: 'Moneda no encontrada' })
   async setPrimaryCurrency(
     @Request() req: any,
@@ -140,7 +129,7 @@ export class AuthController {
   @Post('users')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Crear nuevo usuario (Solo Admin)' })
-  @ApiResponse({ status: 201, type: CreatedUserResponseDto, description: 'Usuario creado' })
+  @ApiResponse({ status: 201, description: 'Usuario creado' })
   @ApiResponse({ status: 403, description: 'No autorizado' })
   @ApiResponse({ status: 409, description: 'Email ya registrado' })
   async createUser(@Body() createUserDto: CreateUserDto) {
@@ -152,7 +141,7 @@ export class AuthController {
   @Get('users')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Listar todos los usuarios (Solo Admin)' })
-  @ApiResponse({ status: 200, type: [UserListItemDto], description: 'Lista de usuarios' })
+  @ApiResponse({ status: 200, description: 'Lista de usuarios' })
   @ApiResponse({ status: 403, description: 'No autorizado' })
   async getAllUsers() {
     return this.authService.getAllUsers();
@@ -163,7 +152,7 @@ export class AuthController {
   @Delete('users/:id')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Eliminar usuario (Solo Admin)' })
-  @ApiResponse({ status: 200, type: MessageResponseDto, description: 'Usuario eliminado' })
+  @ApiResponse({ status: 200, description: 'Usuario eliminado' })
   @ApiResponse({ status: 403, description: 'No autorizado' })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
   async deleteUser(@Param('id', ParseIntPipe) id: number) {
@@ -175,7 +164,7 @@ export class AuthController {
   @Patch('users/:id/activate')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Activar/Desactivar usuario (Solo Admin)' })
-  @ApiResponse({ status: 200, type: ActivateUserResponseDto, description: 'Usuario actualizado' })
+  @ApiResponse({ status: 200, description: 'Usuario actualizado' })
   @ApiResponse({ status: 403, description: 'No autorizado' })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
   async activateUser(
