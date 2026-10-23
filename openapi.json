@@ -17,14 +17,7 @@
         },
         "responses": {
           "201": {
-            "description": "Login exitoso con estado de acceso del usuario",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponseDto"
-                }
-              }
-            }
+            "description": "Login exitoso con estado de acceso del usuario"
           },
           "401": {
             "description": "Credenciales inválidas"
@@ -52,14 +45,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Disponibilidad del email",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExistsResponseDto"
-                }
-              }
-            }
+            "description": "Disponibilidad del email"
           },
           "400": {
             "description": "Email inválido o ausente"
@@ -87,14 +73,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Disponibilidad del nickname",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExistsResponseDto"
-                }
-              }
-            }
+            "description": "Disponibilidad del nickname"
           },
           "400": {
             "description": "Nickname inválido o ausente"
@@ -122,14 +101,7 @@
         },
         "responses": {
           "201": {
-            "description": "Registro exitoso. Email de verificación enviado.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RegisterResponseDto"
-                }
-              }
-            }
+            "description": "Registro exitoso. Email de verificación enviado."
           },
           "400": {
             "description": "Datos inválidos"
@@ -160,14 +132,7 @@
         },
         "responses": {
           "200": {
-            "description": "Solicitud procesada",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageResponseDto"
-                }
-              }
-            }
+            "description": "Solicitud procesada"
           }
         },
         "summary": "Solicitar restablecimiento de contraseña",
@@ -192,14 +157,7 @@
         },
         "responses": {
           "200": {
-            "description": "Contraseña restablecida correctamente",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageResponseDto"
-                }
-              }
-            }
+            "description": "Contraseña restablecida correctamente"
           },
           "400": {
             "description": "Token inválido o expirado"
@@ -227,14 +185,7 @@
         },
         "responses": {
           "200": {
-            "description": "Email verificado correctamente",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageResponseDto"
-                }
-              }
-            }
+            "description": "Email verificado correctamente"
           },
           "400": {
             "description": "Token inválido, ya verificado o expirado"
@@ -262,14 +213,7 @@
         },
         "responses": {
           "200": {
-            "description": "Email de verificación re-enviado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageResponseDto"
-                }
-              }
-            }
+            "description": "Email de verificación re-enviado"
           },
           "400": {
             "description": "Error en la solicitud"
@@ -290,14 +234,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Usuario encontrado con estado de acceso",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthUserDto"
-                }
-              }
-            }
+            "description": "Usuario encontrado con estado de acceso"
           }
         },
         "security": [
@@ -327,14 +264,7 @@
         },
         "responses": {
           "200": {
-            "description": "Contraseña actualizada",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageResponseDto"
-                }
-              }
-            }
+            "description": "Contraseña actualizada"
           }
         },
         "security": [
@@ -364,14 +294,7 @@
         },
         "responses": {
           "200": {
-            "description": "Moneda principal actualizada",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PrimaryCurrencyUserDto"
-                }
-              }
-            }
+            "description": "Moneda principal actualizada"
           },
           "404": {
             "description": "Moneda no encontrada"
@@ -404,14 +327,7 @@
         },
         "responses": {
           "201": {
-            "description": "Usuario creado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreatedUserResponseDto"
-                }
-              }
-            }
+            "description": "Usuario creado"
           },
           "403": {
             "description": "No autorizado"
@@ -435,17 +351,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Lista de usuarios",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserListItemDto"
-                  }
-                }
-              }
-            }
+            "description": "Lista de usuarios"
           },
           "403": {
             "description": "No autorizado"
@@ -477,14 +383,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Usuario eliminado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageResponseDto"
-                }
-              }
-            }
+            "description": "Usuario eliminado"
           },
           "403": {
             "description": "No autorizado"
@@ -529,14 +428,7 @@
         },
         "responses": {
           "200": {
-            "description": "Usuario actualizado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ActivateUserResponseDto"
-                }
-              }
-            }
+            "description": "Usuario actualizado"
           },
           "403": {
             "description": "No autorizado"
@@ -711,17 +603,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Lista de monedas",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CurrencyResponseDto"
-                  }
-                }
-              }
-            }
+            "description": "Lista de monedas"
           }
         },
         "security": [
@@ -749,14 +631,7 @@
         },
         "responses": {
           "201": {
-            "description": "Moneda creada",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CurrencyResponseDto"
-                }
-              }
-            }
+            "description": "Moneda creada"
           }
         },
         "security": [
@@ -776,14 +651,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Lista de monedas con primary currency",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CurrenciesWithPrimaryResponseDto"
-                }
-              }
-            }
+            "description": "Lista de monedas con primary currency"
           }
         },
         "security": [
@@ -812,14 +680,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Moneda encontrada",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CurrencyResponseDto"
-                }
-              }
-            }
+            "description": "Moneda encontrada"
           },
           "404": {
             "description": "Moneda no encontrada"
@@ -859,14 +720,7 @@
         },
         "responses": {
           "200": {
-            "description": "Moneda actualizada",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CurrencyResponseDto"
-                }
-              }
-            }
+            "description": "Moneda actualizada"
           },
           "404": {
             "description": "Moneda no encontrada"
@@ -896,14 +750,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Moneda eliminada",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageResponseDto"
-                }
-              }
-            }
+            "description": "Moneda eliminada"
           },
           "400": {
             "description": "La moneda es principal de usuarios"
@@ -2634,17 +2481,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Lista de planes",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PlanResponseDto"
-                  }
-                }
-              }
-            }
+            "description": ""
           }
         },
         "security": [
@@ -2672,14 +2509,7 @@
         },
         "responses": {
           "201": {
-            "description": "Plan creado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlanResponseDto"
-                }
-              }
-            }
+            "description": "Plan creado"
           }
         },
         "security": [
@@ -2708,17 +2538,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Plan encontrado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlanResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Plan no encontrado"
+            "description": ""
           }
         },
         "security": [
@@ -2755,17 +2575,7 @@
         },
         "responses": {
           "200": {
-            "description": "Plan actualizado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlanResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Plan no encontrado"
+            "description": ""
           }
         },
         "security": [
@@ -2792,14 +2602,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Plan eliminado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlanResponseDto"
-                }
-              }
-            }
+            "description": "Plan eliminado"
           }
         },
         "security": [
@@ -4286,96 +4089,6 @@
           "password"
         ]
       },
-      "AuthUserDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "example": 1
-          },
-          "email": {
-            "type": "string",
-            "example": "admin@cambios.com"
-          },
-          "name": {
-            "type": "string",
-            "example": "Admin"
-          },
-          "role": {
-            "type": "string",
-            "enum": [
-              "ADMIN",
-              "USER"
-            ]
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "failedLoginAttempts": {
-            "type": "number",
-            "example": 0
-          },
-          "blockedUntil": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "isBanned": {
-            "type": "boolean"
-          },
-          "bannedUntil": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "mustChangePassword": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "id",
-          "email",
-          "name",
-          "role",
-          "isActive",
-          "failedLoginAttempts",
-          "blockedUntil",
-          "isBanned",
-          "bannedUntil",
-          "mustChangePassword"
-        ]
-      },
-      "LoginResponseDto": {
-        "type": "object",
-        "properties": {
-          "access_token": {
-            "type": "string",
-            "description": "JWT de acceso"
-          },
-          "mustChangePassword": {
-            "type": "boolean"
-          },
-          "user": {
-            "$ref": "#/components/schemas/AuthUserDto"
-          }
-        },
-        "required": [
-          "access_token",
-          "mustChangePassword",
-          "user"
-        ]
-      },
-      "ExistsResponseDto": {
-        "type": "object",
-        "properties": {
-          "exists": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "exists"
-        ]
-      },
       "RegisterDto": {
         "type": "object",
         "properties": {
@@ -4402,22 +4115,6 @@
           "name"
         ]
       },
-      "RegisterResponseDto": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "example": "nuevo@cambios.com"
-          }
-        },
-        "required": [
-          "message",
-          "email"
-        ]
-      },
       "ForgotPasswordDto": {
         "type": "object",
         "properties": {
@@ -4428,17 +4125,6 @@
         },
         "required": [
           "email"
-        ]
-      },
-      "MessageResponseDto": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "message"
         ]
       },
       "ResetPasswordDto": {
@@ -4511,40 +4197,6 @@
           "primaryCurrencyId"
         ]
       },
-      "PrimaryCurrencyUserDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "example": 1
-          },
-          "email": {
-            "type": "string",
-            "example": "admin@cambios.com"
-          },
-          "name": {
-            "type": "string",
-            "example": "Admin"
-          },
-          "role": {
-            "type": "string",
-            "enum": [
-              "ADMIN",
-              "USER"
-            ]
-          },
-          "primaryCurrencyId": {
-            "type": "integer"
-          }
-        },
-        "required": [
-          "id",
-          "email",
-          "name",
-          "role",
-          "primaryCurrencyId"
-        ]
-      },
       "CreateUserDto": {
         "type": "object",
         "properties": {
@@ -4576,110 +4228,6 @@
           "role"
         ]
       },
-      "CreatedUserResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "example": 1
-          },
-          "email": {
-            "type": "string",
-            "example": "nuevo@cambios.com"
-          },
-          "name": {
-            "type": "string",
-            "example": "Nuevo Usuario"
-          },
-          "role": {
-            "type": "string",
-            "enum": [
-              "ADMIN",
-              "USER"
-            ]
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "failedLoginAttempts": {
-            "type": "number",
-            "example": 0
-          },
-          "blockedUntil": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "isBanned": {
-            "type": "boolean"
-          },
-          "bannedUntil": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "email",
-          "name",
-          "role",
-          "isActive",
-          "failedLoginAttempts",
-          "blockedUntil",
-          "isBanned",
-          "bannedUntil",
-          "createdAt"
-        ]
-      },
-      "UserListItemDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "example": 1
-          },
-          "email": {
-            "type": "string",
-            "example": "admin@cambios.com"
-          },
-          "name": {
-            "type": "string",
-            "example": "Admin"
-          },
-          "nickname": {
-            "type": "string",
-            "nullable": true
-          },
-          "role": {
-            "type": "string",
-            "enum": [
-              "ADMIN",
-              "USER"
-            ]
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "email",
-          "name",
-          "nickname",
-          "role",
-          "isActive",
-          "createdAt"
-        ]
-      },
       "ActivateUserDto": {
         "type": "object",
         "properties": {
@@ -4688,65 +4236,6 @@
             "example": true
           }
         }
-      },
-      "ActivatedUserDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "example": 1
-          },
-          "email": {
-            "type": "string",
-            "example": "admin@cambios.com"
-          },
-          "name": {
-            "type": "string",
-            "example": "Admin"
-          },
-          "nickname": {
-            "type": "string",
-            "nullable": true
-          },
-          "role": {
-            "type": "string",
-            "enum": [
-              "ADMIN",
-              "USER"
-            ]
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "email",
-          "name",
-          "nickname",
-          "role",
-          "isActive",
-          "createdAt"
-        ]
-      },
-      "ActivateUserResponseDto": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string"
-          },
-          "user": {
-            "$ref": "#/components/schemas/ActivatedUserDto"
-          }
-        },
-        "required": [
-          "message",
-          "user"
-        ]
       },
       "RegisterPushTokenDto": {
         "type": "object",
@@ -4779,66 +4268,6 @@
         },
         "required": [
           "pushToken"
-        ]
-      },
-      "CurrencyResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "example": 1
-          },
-          "code": {
-            "type": "string",
-            "example": "USD"
-          },
-          "name": {
-            "type": "string",
-            "example": "Dólar estadounidense"
-          },
-          "symbol": {
-            "type": "string",
-            "example": "$"
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "code",
-          "name",
-          "symbol",
-          "isActive",
-          "createdAt",
-          "updatedAt"
-        ]
-      },
-      "CurrenciesWithPrimaryResponseDto": {
-        "type": "object",
-        "properties": {
-          "currencies": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CurrencyResponseDto"
-            }
-          },
-          "primaryCurrencyId": {
-            "type": "integer",
-            "nullable": true
-          }
-        },
-        "required": [
-          "currencies",
-          "primaryCurrencyId"
         ]
       },
       "CreateCurrencyDto": {
@@ -6056,57 +5485,6 @@
           "currencyToId",
           "rate",
           "source"
-        ]
-      },
-      "PlanResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number",
-            "example": 1
-          },
-          "name": {
-            "type": "string",
-            "example": "Básico"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "monthlyUsd": {
-            "type": "number",
-            "example": 15
-          },
-          "semiannualUsd": {
-            "type": "number",
-            "example": 85.5
-          },
-          "annualUsd": {
-            "type": "number",
-            "example": 162
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "description",
-          "isActive",
-          "monthlyUsd",
-          "semiannualUsd",
-          "annualUsd",
-          "createdAt",
-          "updatedAt"
         ]
       },
       "CreatePlanDto": {
