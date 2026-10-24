@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Install, build & test
+    runs-on: ubuntu-latest
+    env:
+      # Prisma only needs a syntactically valid URL to generate/validate in CI.
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      JWT_SECRET: <redacted>
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prisma generate & validate
+        run: |
+          npx prisma generate
+          npx prisma validate
+
+      - name: Build (NestJS / TypeScript)
+        run: npm run build
+
+      - name: Test
+        run: npm test -- --ci
+
+  contract:
+    name: Contract (OpenAPI)
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      JWT_SECRET: <redacted>
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prisma generate
+        run: npx prisma generate
+
+      # `git diff --exit-code` reports no difference for an untracked file, so
+      # without this guard the drift check below would pass vacuously if
+      # openapi.json were ever removed from version control.
+      - name: Verify the contract is tracked by git
+        run: |
+          if ! git ls-files --error-unmatch openapi.json >/dev/null 2>&1; then
+            echo "::error::openapi.json is not tracked by git. The drift check would pass vacuously, and clients would have no published contract."
+            exit 1
+          fi
+
+      - name: Export contract (no database)
+        run: npm run openapi:export
+
+      - name: Contract drift check (committed openapi.json must match the code)
+        run: npm run openapi:check:diff
+
+      - name: Lint contract (Spectral)
+        run: npm run openapi:lint
+
+      # TypeScript SDK: generate from the contract, prove it did not drift
+      # from the committed types, and prove the result actually compiles.
+      - name: Generate TypeScript SDK
+        run: npm run sdk:ts:generate
+
+      - name: TypeScript SDK drift check
+        run: git diff --exit-code -- sdks/typescript/schema.d.ts
+
+      - name: TypeScript SDK typecheck
+        run: npm run sdk:ts:check
+
+      - name: Breaking-change check vs base branch (oasdiff)
+        if: github.event_name == 'pull_request'
+        uses: oasdiff/oasdiff-action/breaking@main
+        with:
+          base: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.base_ref }}/openapi.json
+          revision: openapi.json
+          fail-on-diff: true
