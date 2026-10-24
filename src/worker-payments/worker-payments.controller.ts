@@ -60,7 +60,7 @@ export class WorkerPaymentsController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Actualizar trabajador' })
-  @ApiResponse({ status: 200, description: 'Trabajador actualizado' })
+  @ApiResponse({ status: 200, description: 'Trabajador actualizado', type: WorkerDto })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateWorkerDto,
@@ -71,7 +71,7 @@ export class WorkerPaymentsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar trabajador' })
-  @ApiResponse({ status: 200, description: 'Trabajador eliminado' })
+  @ApiResponse({ status: 200, description: 'Trabajador eliminado', type: WorkerDto })
   remove(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: number) {
     return this.workerPaymentsService.remove(id, userId);
   }
@@ -89,7 +89,7 @@ export class WorkerPaymentsController {
 
   @Post(':id/balance')
   @ApiOperation({ summary: 'Agregar saldo al trabajador' })
-  @ApiResponse({ status: 201, description: 'Saldo agregado' })
+  @ApiResponse({ status: 201, description: 'Saldo agregado', type: WorkerMutationResultDto })
   addBalance(
     @Param('id', ParseIntPipe) id: number,
     @Body() addDto: AddBalanceDto,
@@ -100,7 +100,7 @@ export class WorkerPaymentsController {
 
   @Post(':id/deposit')
   @ApiOperation({ summary: 'Depositar saldo del trabajador a caja/cuenta' })
-  @ApiResponse({ status: 201, description: 'Depósito realizado' })
+  @ApiResponse({ status: 201, description: 'Depósito realizado', type: WorkerMutationResultDto })
   deposit(
     @Param('id', ParseIntPipe) id: number,
     @Body() depositDto: DepositDto,

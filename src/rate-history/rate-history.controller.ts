@@ -98,7 +98,7 @@ export class RateHistoryController {
 
   @Get('latest/:fromId/:toId')
   @ApiOperation({ summary: 'Obtener última tasa de un par' })
-  @ApiResponse({ status: 200, description: 'Última tasa (decimal-string, null si no hay registro)' })
+  @ApiResponse({ status: 200, description: 'Última tasa (decimal-string, null si no hay registro)', schema: { type: 'string', nullable: true } })
   getLatestRate(
     @CurrentUser('id') userId: number,
     @Param('fromId', ParseIntPipe) fromId: number,

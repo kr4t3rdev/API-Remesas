@@ -3728,6 +3728,22 @@ export interface components {
              */
             category?: string;
         };
+        ExpenseItemDto: {
+            /** @example 10 */
+            id: number;
+            /** @example 7 */
+            userId: number;
+            /** @example Alquiler oficina */
+            name: string;
+            /** @description Decimal como string */
+            amount: string;
+            /** @example renta */
+            category: Record<string, never> | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
         ExpenseItemReportItemDto: {
             /** @example 10 */
             id: number;
@@ -6020,7 +6036,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": string | null;
+                };
             };
         };
     };
@@ -6680,7 +6698,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["WorkerDto"];
+                };
             };
         };
     };
@@ -6700,7 +6720,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["WorkerDto"];
+                };
             };
         };
     };
@@ -6750,7 +6772,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["WorkerMutationResultDto"];
+                };
             };
         };
     };
@@ -6774,7 +6798,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["WorkerMutationResultDto"];
+                };
             };
         };
     };
@@ -6799,7 +6825,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ExpenseItemDto"][];
+                };
             };
         };
     };
@@ -6821,7 +6849,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ExpenseItemDto"];
+                };
             };
             /** @description Datos inválidos */
             400: {
@@ -6846,7 +6876,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": string[];
+                };
             };
         };
     };
@@ -6897,7 +6929,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ExpenseItemDto"];
+                };
             };
             /** @description Elemento no encontrado */
             404: {
@@ -6924,7 +6958,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ExpenseItemDto"];
+                };
             };
             /** @description Elemento no encontrado */
             404: {
@@ -6955,7 +6991,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ExpenseItemDto"];
+                };
             };
             /** @description Elemento no encontrado */
             404: {

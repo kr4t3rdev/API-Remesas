@@ -34,7 +34,7 @@ export class ExpenseItemsController {
 
   @Post()
   @ApiOperation({ summary: 'Crear elemento de gasto' })
-  @ApiResponse({ status: 201, description: 'Elemento creado exitosamente' })
+  @ApiResponse({ status: 201, description: 'Elemento creado exitosamente', type: ExpenseItemDto })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   create(@Body() createDto: CreateExpenseItemDto, @CurrentUser('id') userId: number) {
     return this.expenseItemsService.create(createDto, userId);
@@ -42,14 +42,14 @@ export class ExpenseItemsController {
 
   @Get()
   @ApiOperation({ summary: 'Listar elementos de gasto' })
-  @ApiResponse({ status: 200, description: 'Lista de elementos' })
+  @ApiResponse({ status: 200, description: 'Lista de elementos', type: ExpenseItemDto, isArray: true })
   findAll(@Query() query: QueryExpenseItemDto, @CurrentUser('id') userId: number) {
     return this.expenseItemsService.findAll(query, userId);
   }
 
   @Get('categories')
   @ApiOperation({ summary: 'Obtener categorías usadas' })
-  @ApiResponse({ status: 200, description: 'Lista de categorías' })
+  @ApiResponse({ status: 200, description: 'Lista de categorías', type: String, isArray: true })
   getCategories(@CurrentUser('id') userId: number) {
     return this.expenseItemsService.getCategories(userId);
   }
@@ -70,7 +70,7 @@ export class ExpenseItemsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener elemento por ID' })
-  @ApiResponse({ status: 200, description: 'Elemento encontrado' })
+  @ApiResponse({ status: 200, description: 'Elemento encontrado', type: ExpenseItemDto })
   @ApiResponse({ status: 404, description: 'Elemento no encontrado' })
   findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: number) {
     return this.expenseItemsService.findOne(id, userId);
@@ -78,7 +78,7 @@ export class ExpenseItemsController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar elemento de gasto' })
-  @ApiResponse({ status: 200, description: 'Elemento actualizado' })
+  @ApiResponse({ status: 200, description: 'Elemento actualizado', type: ExpenseItemDto })
   @ApiResponse({ status: 404, description: 'Elemento no encontrado' })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -90,7 +90,7 @@ export class ExpenseItemsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar elemento de gasto' })
-  @ApiResponse({ status: 200, description: 'Elemento eliminado' })
+  @ApiResponse({ status: 200, description: 'Elemento eliminado', type: ExpenseItemDto })
   @ApiResponse({ status: 404, description: 'Elemento no encontrado' })
   remove(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: number) {
     return this.expenseItemsService.remove(id, userId);

@@ -2993,7 +2993,15 @@
         ],
         "responses": {
           "200": {
-            "description": "Última tasa (decimal-string, null si no hay registro)"
+            "description": "Última tasa (decimal-string, null si no hay registro)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "nullable": true
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4077,7 +4085,14 @@
         },
         "responses": {
           "200": {
-            "description": "Trabajador actualizado"
+            "description": "Trabajador actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4104,7 +4119,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Trabajador eliminado"
+            "description": "Trabajador eliminado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4189,7 +4211,14 @@
         },
         "responses": {
           "201": {
-            "description": "Saldo agregado"
+            "description": "Saldo agregado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerMutationResultDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4228,7 +4257,14 @@
         },
         "responses": {
           "201": {
-            "description": "Depósito realizado"
+            "description": "Depósito realizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerMutationResultDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4258,7 +4294,14 @@
         },
         "responses": {
           "201": {
-            "description": "Elemento creado exitosamente"
+            "description": "Elemento creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpenseItemDto"
+                }
+              }
+            }
           },
           "400": {
             "description": "Datos inválidos"
@@ -4310,7 +4353,17 @@
         ],
         "responses": {
           "200": {
-            "description": "Lista de elementos"
+            "description": "Lista de elementos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExpenseItemDto"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4330,7 +4383,17 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Lista de categorías"
+            "description": "Lista de categorías",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4414,7 +4477,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Elemento encontrado"
+            "description": "Elemento encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpenseItemDto"
+                }
+              }
+            }
           },
           "404": {
             "description": "Elemento no encontrado"
@@ -4454,7 +4524,14 @@
         },
         "responses": {
           "200": {
-            "description": "Elemento actualizado"
+            "description": "Elemento actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpenseItemDto"
+                }
+              }
+            }
           },
           "404": {
             "description": "Elemento no encontrado"
@@ -4484,7 +4561,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Elemento eliminado"
+            "description": "Elemento eliminado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpenseItemDto"
+                }
+              }
+            }
           },
           "404": {
             "description": "Elemento no encontrado"
@@ -9883,6 +9967,49 @@
         "required": [
           "name",
           "amount"
+        ]
+      },
+      "ExpenseItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 10
+          },
+          "userId": {
+            "type": "number",
+            "example": 7
+          },
+          "name": {
+            "type": "string",
+            "example": "Alquiler oficina"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Decimal como string"
+          },
+          "category": {
+            "type": "object",
+            "example": "renta",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "name",
+          "amount",
+          "category",
+          "createdAt",
+          "updatedAt"
         ]
       },
       "ExpenseItemReportItemDto": {
