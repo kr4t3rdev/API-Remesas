@@ -204,7 +204,7 @@ export class AdminUserActionResultDto {
   @ApiProperty({ type: AdminUserDto, nullable: true, description: 'Usuario actualizado (acciones sobre la cuenta)' })
   user?: AdminUserDto | null;
 
-  @ApiProperty({ example: true, nullable: true, description: 'Acciones de contraseña' })
+  @ApiProperty({ example: true, nullable: true, type: Boolean, description: 'Acciones de contraseña' })
   success?: boolean | null;
 
   @ApiProperty({ nullable: true })
@@ -216,7 +216,7 @@ export class AdminUserActionResultDto {
   @ApiProperty({ nullable: true, description: 'Solo RESET_PASSWORD: contraseña temporal generada' })
   newPassword?: string | null;
 
-  @ApiProperty({ example: false, nullable: true, description: 'Solo REVOKE_ALL_SESSIONS' })
+  @ApiProperty({ example: false, nullable: true, type: Boolean, description: 'Solo REVOKE_ALL_SESSIONS' })
   revoked?: boolean | null;
 
   @ApiProperty({ nullable: true, description: 'Solo REVOKE_ALL_SESSIONS' })
@@ -276,13 +276,13 @@ export class AdminAuditLogDto {
   @ApiProperty({ example: 1 })
   actorUserId!: number;
 
-  @ApiProperty({ example: 2, nullable: true })
+  @ApiProperty({ example: 2, nullable: true, type: Number })
   targetUserId!: number | null;
 
   @ApiProperty({ example: 'USER_CREATE' })
   action!: string;
 
-  @ApiProperty({ example: 'Alta de usuario desde consola admin', nullable: true })
+  @ApiProperty({ example: 'Alta de usuario desde consola admin', nullable: true, type: String })
   reason!: string | null;
 
   @ApiProperty({ nullable: true })

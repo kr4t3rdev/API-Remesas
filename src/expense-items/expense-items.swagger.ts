@@ -19,7 +19,7 @@ export class ExpenseItemDto {
   @ApiProperty({ type: String, description: 'Decimal como string' })
   amount!: string;
 
-  @ApiProperty({ example: 'renta', nullable: true })
+  @ApiProperty({ example: 'renta', nullable: true, type: String })
   category!: string | null;
 
   @ApiProperty({ format: 'date-time' })

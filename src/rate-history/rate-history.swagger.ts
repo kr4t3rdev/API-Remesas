@@ -26,10 +26,10 @@ export class RateHistoryEntryDto {
   @ApiProperty({ enum: ['MANUAL', 'SYSTEM'] })
   source!: string;
 
-  @ApiProperty({ example: 'exchange_rate', nullable: true })
+  @ApiProperty({ example: 'exchange_rate', nullable: true, type: String })
   referenceType!: string | null;
 
-  @ApiProperty({ example: 10, nullable: true })
+  @ApiProperty({ example: 10, nullable: true, type: Number })
   referenceId!: number | null;
 
   @ApiProperty({ type: CurrencyDto, nullable: true, description: 'Presente en listados; create no incluye' })

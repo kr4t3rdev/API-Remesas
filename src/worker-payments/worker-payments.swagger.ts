@@ -73,7 +73,7 @@ export class WorkerDto {
   @ApiProperty({ example: 'Carlos' })
   name!: string;
 
-  @ApiProperty({ example: '+53 5xxx xxxx', nullable: true })
+  @ApiProperty({ example: '+53 5xxx xxxx', nullable: true, type: String })
   phone!: string | null;
 
   @ApiProperty({ nullable: true })

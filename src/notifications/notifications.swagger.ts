@@ -11,7 +11,7 @@ export class NotificationDto {
   @ApiProperty({ example: 12 })
   id!: number;
 
-  @ApiProperty({ example: 7, nullable: true, description: 'Null en notificaciones globales de admin' })
+  @ApiProperty({ example: 7, nullable: true, type: Number, description: 'Null en notificaciones globales de admin' })
   userId!: number | null;
 
   @ApiProperty({ example: 'USER_TEMP_BLOCKED', description: 'Tipo de notificación del enum NotificationType' })

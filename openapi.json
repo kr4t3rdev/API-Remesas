@@ -5518,7 +5518,7 @@
             "example": "Juan Pérez"
           },
           "nickname": {
-            "type": "object",
+            "type": "string",
             "example": "Juanito",
             "nullable": true
           },
@@ -5583,7 +5583,7 @@
             "example": 12
           },
           "userId": {
-            "type": "object",
+            "type": "number",
             "example": 7,
             "nullable": true,
             "description": "Null en notificaciones globales de admin"
@@ -6801,7 +6801,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "object",
+            "type": "number",
             "example": 1,
             "nullable": true,
             "description": "Null en la pierna CUP"
@@ -7063,7 +7063,7 @@
             "example": "CASH"
           },
           "sourceBankAccountId": {
-            "type": "object",
+            "type": "number",
             "example": 1,
             "nullable": true
           },
@@ -7223,7 +7223,7 @@
             "example": "Meta de ahorro Q1"
           },
           "description": {
-            "type": "object",
+            "type": "string",
             "example": "Acumular USD para operativa",
             "nullable": true
           },
@@ -7240,7 +7240,7 @@
             "example": 2
           },
           "bankAccountId": {
-            "type": "object",
+            "type": "number",
             "example": 3,
             "nullable": true
           },
@@ -7301,7 +7301,7 @@
             "example": "Meta de ahorro Q1"
           },
           "description": {
-            "type": "object",
+            "type": "string",
             "example": "Acumular USD para operativa",
             "nullable": true
           },
@@ -7318,7 +7318,7 @@
             "example": 2
           },
           "bankAccountId": {
-            "type": "object",
+            "type": "number",
             "example": 3,
             "nullable": true
           },
@@ -8196,12 +8196,12 @@
             ]
           },
           "referenceType": {
-            "type": "object",
+            "type": "string",
             "example": "exchange_rate",
             "nullable": true
           },
           "referenceId": {
-            "type": "object",
+            "type": "number",
             "example": 10,
             "nullable": true
           },
@@ -8326,7 +8326,7 @@
             "example": "Plan Mensual"
           },
           "description": {
-            "type": "object",
+            "type": "string",
             "example": "Suscripción mensual",
             "nullable": true
           },
@@ -8668,7 +8668,7 @@
             "example": 2
           },
           "userLicenseId": {
-            "type": "object",
+            "type": "number",
             "example": 5,
             "nullable": true
           },
@@ -9408,7 +9408,7 @@
             ]
           },
           "success": {
-            "type": "object",
+            "type": "boolean",
             "example": true,
             "nullable": true,
             "description": "Acciones de contraseña"
@@ -9427,7 +9427,7 @@
             "description": "Solo RESET_PASSWORD: contraseña temporal generada"
           },
           "revoked": {
-            "type": "object",
+            "type": "boolean",
             "example": false,
             "nullable": true,
             "description": "Solo REVOKE_ALL_SESSIONS"
@@ -9562,7 +9562,7 @@
             "example": 1
           },
           "targetUserId": {
-            "type": "object",
+            "type": "number",
             "example": 2,
             "nullable": true
           },
@@ -9571,7 +9571,7 @@
             "example": "USER_CREATE"
           },
           "reason": {
-            "type": "object",
+            "type": "string",
             "example": "Alta de usuario desde consola admin",
             "nullable": true
           },
@@ -9798,7 +9798,7 @@
             "example": "Carlos"
           },
           "phone": {
-            "type": "object",
+            "type": "string",
             "example": "+53 5xxx xxxx",
             "nullable": true
           },
@@ -9989,7 +9989,7 @@
             "description": "Decimal como string"
           },
           "category": {
-            "type": "object",
+            "type": "string",
             "example": "renta",
             "nullable": true
           },
@@ -10032,7 +10032,7 @@
             "description": "Decimal como string"
           },
           "category": {
-            "type": "object",
+            "type": "string",
             "example": "renta",
             "nullable": true
           },

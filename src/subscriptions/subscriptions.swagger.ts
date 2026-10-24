@@ -59,7 +59,7 @@ export class SubscriptionPaymentDto {
   @ApiProperty({ example: 2 })
   userId!: number;
 
-  @ApiProperty({ example: 5, nullable: true })
+  @ApiProperty({ example: 5, nullable: true, type: Number })
   userLicenseId!: number | null;
 
   @ApiProperty({ example: 1 })

@@ -52,7 +52,7 @@ export class BankAccountBalanceDto {
 }
 
 export class BankTransferCurrencyDto {
-  @ApiProperty({ example: 1, nullable: true, description: 'Null en la pierna CUP' })
+  @ApiProperty({ example: 1, nullable: true, type: Number, description: 'Null en la pierna CUP' })
   id!: number | null;
 
   @ApiProperty({ example: 'CUP' })

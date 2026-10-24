@@ -17,7 +17,7 @@ export class ObjectiveDto {
   @ApiProperty({ example: 'Meta de ahorro Q1' })
   name!: string;
 
-  @ApiProperty({ example: 'Acumular USD para operativa', nullable: true })
+  @ApiProperty({ example: 'Acumular USD para operativa', nullable: true, type: String })
   description!: string | null;
 
   @ApiProperty({ type: String, description: 'Decimal como string' })
@@ -29,7 +29,7 @@ export class ObjectiveDto {
   @ApiProperty({ example: 2 })
   currencyId!: number;
 
-  @ApiProperty({ example: 3, nullable: true })
+  @ApiProperty({ example: 3, nullable: true, type: Number })
   bankAccountId!: number | null;
 
   @ApiProperty({ enum: ['ACTIVO', 'COMPLETADO', 'PAUSADO'] })

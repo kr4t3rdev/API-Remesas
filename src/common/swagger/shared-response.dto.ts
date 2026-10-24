@@ -33,7 +33,7 @@ export class ExpenseDto {
   @ApiProperty({ example: 'CASH' })
   sourceType!: string;
 
-  @ApiProperty({ example: 1, nullable: true })
+  @ApiProperty({ example: 1, nullable: true, type: Number })
   sourceBankAccountId!: number | null;
 
   @ApiProperty({ type: CurrencyDto })
@@ -70,7 +70,7 @@ export class PlanDto {
   @ApiProperty({ example: 'Plan Mensual' })
   name!: string;
 
-  @ApiProperty({ example: 'Suscripción mensual', nullable: true })
+  @ApiProperty({ example: 'Suscripción mensual', nullable: true, type: String })
   description!: string | null;
 
   @ApiProperty({ example: true })

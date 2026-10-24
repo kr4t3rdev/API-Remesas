@@ -1967,7 +1967,7 @@ export interface components {
             /** @example Juan Pérez */
             name: string;
             /** @example Juanito */
-            nickname: Record<string, never> | null;
+            nickname: string | null;
             /**
              * @example USER
              * @enum {string}
@@ -1997,7 +1997,7 @@ export interface components {
              * @description Null en notificaciones globales de admin
              * @example 7
              */
-            userId: Record<string, never> | null;
+            userId: number | null;
             /**
              * @description Tipo de notificación del enum NotificationType
              * @example USER_TEMP_BLOCKED
@@ -2550,7 +2550,7 @@ export interface components {
              * @description Null en la pierna CUP
              * @example 1
              */
-            id: Record<string, never> | null;
+            id: number | null;
             /** @example CUP */
             code: string;
             /** @example Peso cubano */
@@ -2653,7 +2653,7 @@ export interface components {
             /** @example CASH */
             sourceType: string;
             /** @example 1 */
-            sourceBankAccountId: Record<string, never> | null;
+            sourceBankAccountId: number | null;
             currency: components["schemas"]["CurrencyDto"];
             /** @description Cuenta de origen cuando es BANK_ACCOUNT */
             sourceBankAccount: Record<string, never> | null;
@@ -2715,7 +2715,7 @@ export interface components {
             /** @example Meta de ahorro Q1 */
             name: string;
             /** @example Acumular USD para operativa */
-            description: Record<string, never> | null;
+            description: string | null;
             /** @description Decimal como string */
             targetAmount: string;
             /** @description Decimal como string */
@@ -2723,7 +2723,7 @@ export interface components {
             /** @example 2 */
             currencyId: number;
             /** @example 3 */
-            bankAccountId: Record<string, never> | null;
+            bankAccountId: number | null;
             /** @enum {string} */
             status: "ACTIVO" | "COMPLETADO" | "PAUSADO";
             currency: components["schemas"]["CurrencyDto"];
@@ -2742,7 +2742,7 @@ export interface components {
             /** @example Meta de ahorro Q1 */
             name: string;
             /** @example Acumular USD para operativa */
-            description: Record<string, never> | null;
+            description: string | null;
             /** @description Decimal como string */
             targetAmount: string;
             /** @description Decimal como string */
@@ -2750,7 +2750,7 @@ export interface components {
             /** @example 2 */
             currencyId: number;
             /** @example 3 */
-            bankAccountId: Record<string, never> | null;
+            bankAccountId: number | null;
             /** @enum {string} */
             status: "ACTIVO" | "COMPLETADO" | "PAUSADO";
             currency: components["schemas"]["CurrencyDto"];
@@ -3037,9 +3037,9 @@ export interface components {
             /** @enum {string} */
             source: "MANUAL" | "SYSTEM";
             /** @example exchange_rate */
-            referenceType: Record<string, never> | null;
+            referenceType: string | null;
             /** @example 10 */
-            referenceId: Record<string, never> | null;
+            referenceId: number | null;
             /** @description Presente en listados; create no incluye */
             currencyFrom: components["schemas"]["CurrencyDto"] | null;
             /** @description Presente en listados; create no incluye */
@@ -3082,7 +3082,7 @@ export interface components {
             /** @example Plan Mensual */
             name: string;
             /** @example Suscripción mensual */
-            description: Record<string, never> | null;
+            description: string | null;
             /** @example true */
             isActive: boolean;
             /** @description Decimal como string */
@@ -3224,7 +3224,7 @@ export interface components {
             /** @example 2 */
             userId: number;
             /** @example 5 */
-            userLicenseId: Record<string, never> | null;
+            userLicenseId: number | null;
             /** @example 1 */
             planId: number;
             /** @enum {string} */
@@ -3516,7 +3516,7 @@ export interface components {
              * @description Acciones de contraseña
              * @example true
              */
-            success: Record<string, never> | null;
+            success: boolean | null;
             userId: Record<string, never> | null;
             action: Record<string, never> | null;
             /** @description Solo RESET_PASSWORD: contraseña temporal generada */
@@ -3525,7 +3525,7 @@ export interface components {
              * @description Solo REVOKE_ALL_SESSIONS
              * @example false
              */
-            revoked: Record<string, never> | null;
+            revoked: boolean | null;
             /** @description Solo REVOKE_ALL_SESSIONS */
             strategy: Record<string, never> | null;
             /** @description Acciones sobre licencias */
@@ -3577,11 +3577,11 @@ export interface components {
             /** @example 1 */
             actorUserId: number;
             /** @example 2 */
-            targetUserId: Record<string, never> | null;
+            targetUserId: number | null;
             /** @example USER_CREATE */
             action: string;
             /** @example Alta de usuario desde consola admin */
-            reason: Record<string, never> | null;
+            reason: string | null;
             metadata: Record<string, never> | null;
             previousValue: Record<string, never> | null;
             newValue: Record<string, never> | null;
@@ -3660,7 +3660,7 @@ export interface components {
             /** @example Carlos */
             name: string;
             /** @example +53 5xxx xxxx */
-            phone: Record<string, never> | null;
+            phone: string | null;
             photoUrl: Record<string, never> | null;
             /** @example CAR */
             initials: string;
@@ -3738,7 +3738,7 @@ export interface components {
             /** @description Decimal como string */
             amount: string;
             /** @example renta */
-            category: Record<string, never> | null;
+            category: string | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -3754,7 +3754,7 @@ export interface components {
             /** @description Decimal como string */
             amount: string;
             /** @example renta */
-            category: Record<string, never> | null;
+            category: string | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */

@@ -95,7 +95,7 @@ export class AdminUserListItemDto {
   @ApiProperty({ example: 'Juan Pérez' })
   name!: string;
 
-  @ApiProperty({ example: 'Juanito', nullable: true })
+  @ApiProperty({ example: 'Juanito', nullable: true, type: String })
   nickname!: string | null;
 
   @ApiProperty({ enum: ['ADMIN', 'USER'], example: 'USER' })
