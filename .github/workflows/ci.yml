@@ -69,16 +69,38 @@ jobs:
       - name: Prisma generate
         run: npx prisma generate
 
-      - name: Export contract (no database)
+      
+      # `git diff --exit-code` reports no difference for an untracked file, so
+# without this guard the drift check below would pass vacuously if
+                  # openapi.json were ever removed from version control.
+                  - name: Verify the contract is tracked by git
+                    run: |
+                        if ! git ls-files --error-unmatch openapi.json >/dev/null 2>&1; then
+                              echo "::error::openapi.json is not tracked by git. The drift check would pass vacuously, and clients would have no published contract."
+                                    exit 1
+                                        fi
+                                        
+                                        - name: Export contract (no database)
         run: npm run openapi:export
 
       - name: Contract drift check (committed openapi.json must match the code)
-        run: git diff --exit-code -- openapi.json
+        run: npm run openapi:check:diff
 
       - name: Lint contract (Spectral)
         run: npm run openapi:lint
 
-      - name: Breaking-change check vs base branch (oasdiff)
+      # TypeScript SDK: generate from the contract, prove it did not drift
+      # from the committed types, and prove the result actually compiles.
+      - name: Generate TypeScript SDK
+        
+        run: npm run sdk:ts:generate
+        - name: TypeScript SDK drift check
+          
+          run: git diff --exit-code -- sdks/typescript/schema.d.ts
+          - name: TypeScript SDK typecheck
+            run: npm run sdk:ts:check
+            
+            - name: Breaking-change check vs base branch (oasdiff)
         if: github.event_name == 'pull_request'
         uses: oasdiff/oasdiff-action/breaking@main
         with:
