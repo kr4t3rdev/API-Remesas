@@ -77,27 +77,27 @@ describe('CashService', () => {
 
     expect(result.primaryCurrency?.code).toBe('CUP');
     expect(result.currencies).toHaveLength(2);
-    expect(result.balances[0].balance).toBe(1500.5);
+    expect(result.balances[0].balance).toBe('1500.5');
     expect(result.recentMovements).toEqual([
       expect.objectContaining({
         id: 'transaction:20',
         kind: 'TRANSACTION',
         direction: 'IN',
-        totalBase: 2400,
+        totalBase: '2400',
         operationKind: 'REMITTANCE',
       }),
       expect.objectContaining({
         id: 'adjustment:30',
         kind: 'ADJUSTMENT',
         direction: 'IN',
-        amount: 100,
+        amount: '100',
       }),
     ]);
     expect(result.latestAudits[0]).toEqual(
       expect.objectContaining({
-        expectedBalance: 1400,
-        actualBalance: 1500,
-        difference: 100,
+        expectedBalance: '1400',
+        actualBalance: '1500',
+        difference: '100',
         auditorName: undefined,
       }),
     );
@@ -120,7 +120,7 @@ describe('CashService', () => {
 
     const result = await new CashService(prisma as unknown as PrismaService).getOverview(7);
     expect(result.recentMovements).toEqual([expect.objectContaining({
-      id: 'transaction:21', kind: 'TRANSACTION', direction: 'OUT', amount: 10, cashAmount: 2400,
+      id: 'transaction:21', kind: 'TRANSACTION', direction: 'OUT', amount: '10', cashAmount: '2400',
       sourceType: 'CASH', destinationType: 'BANK_ACCOUNT', destinationBankAccountId: 4,
     })]);
   });
@@ -135,7 +135,7 @@ describe('CashService', () => {
     };
     const result = await new CashService(prisma as unknown as PrismaService).getOverview(7);
     expect(transactionFindMany).toHaveBeenCalledWith(expect.objectContaining({ where: { userId: 7, OR: [{ sourceType: 'CASH' }, { destinationType: 'CASH' }] } }));
-    expect(result.recentMovements[0]).toEqual(expect.objectContaining({ direction: 'IN', cashAmount: 2400 }));
+    expect(result.recentMovements[0]).toEqual(expect.objectContaining({ direction: 'IN', cashAmount: '2400' }));
   });
 
   it('includes cash-sourced expenses in cash history', async () => {
@@ -145,7 +145,7 @@ describe('CashService', () => {
       cashAdjustment: { findMany: jest.fn().mockResolvedValue([]) }, cashAudit: { findMany: jest.fn().mockResolvedValue([]) },
     };
     const result = await new CashService(prisma as unknown as PrismaService).getOverview(7);
-    expect(result.recentMovements[0]).toEqual(expect.objectContaining({ id: 'expense:9', kind: 'EXPENSE', direction: 'OUT', amount: 100 }));
+    expect(result.recentMovements[0]).toEqual(expect.objectContaining({ id: 'expense:9', kind: 'EXPENSE', direction: 'OUT', amount: '100' }));
     expect(prisma.expense.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { userId: 7, sourceType: 'CASH' } }));
   });
 
@@ -172,8 +172,8 @@ describe('CashService', () => {
     expect(prisma.cashPolicy.upsert).toHaveBeenCalledWith(expect.objectContaining({
       where: { userId_currencyId: { userId: 7, currencyId: 2 } },
     }));
-    expect(result.safetyBuffer).toBe(10.5);
-    expect(result.insuranceLimit).toBe(1000);
+    expect(result.safetyBuffer).toBe('10.5');
+    expect(result.insuranceLimit).toBe('1000');
   });
 
   it('scopes available auditors to the authenticated user', async () => {
@@ -214,7 +214,7 @@ describe('CashService', () => {
     });
 
     expect(transaction).toHaveBeenCalled();
-    expect(result.difference).toBe(-10.5);
+    expect(result.difference).toBe('-10.5');
   });
 
   it('returns the existing closing only when the payload is identical', async () => {
@@ -284,9 +284,9 @@ describe('CashService', () => {
 
     const result = await new CashService(prisma as unknown as PrismaService).getValuation(7, 2);
 
-    expect(result.total).toBe(5);
+    expect(result.total).toBe('5');
     expect(result.missingRates).toEqual(['EUR']);
-    expect(result.breakdown[0]).toEqual(expect.objectContaining({ currencyCode: 'CUP', convertedAmount: 5 }));
+    expect(result.breakdown[0]).toEqual(expect.objectContaining({ currencyCode: 'CUP', convertedAmount: '5' }));
     expect(result.breakdown[1]).toEqual(expect.objectContaining({ currencyCode: 'EUR', convertedAmount: null }));
   });
 });

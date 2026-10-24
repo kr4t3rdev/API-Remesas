@@ -17,6 +17,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { RateHistoryService } from './rate-history.service';
+import { RateHistoryEntryDto, RateHistoryResetDto, RateHistoryStatsDto } from './rate-history.swagger';
 import { CreateRateHistoryDto } from './dto/create-rate-history.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -30,7 +31,7 @@ export class RateHistoryController {
 
   @Post()
   @ApiOperation({ summary: 'Registrar tasa en el historial' })
-  @ApiResponse({ status: 201, description: 'Tasa registrada' })
+  @ApiResponse({ status: 201, description: 'Tasa registrada', type: RateHistoryEntryDto })
   create(
     @CurrentUser('id') userId: number,
     @Body() createDto: CreateRateHistoryDto,
@@ -41,7 +42,7 @@ export class RateHistoryController {
   @Get()
   @ApiOperation({ summary: 'Obtener historial de tasas' })
   @ApiQuery({ name: 'currencyId', required: false, type: Number })
-  @ApiResponse({ status: 200, description: 'Historial de tasas' })
+  @ApiResponse({ status: 200, description: 'Historial de tasas', type: RateHistoryEntryDto, isArray: true })
   findAll(
     @CurrentUser('id') userId: number,
     @Query('currencyId') currencyId?: number,
@@ -55,7 +56,7 @@ export class RateHistoryController {
   @Get('manual')
   @ApiOperation({ summary: 'Obtener tasas registradas manualmente' })
   @ApiQuery({ name: 'currencyId', required: false, type: Number })
-  @ApiResponse({ status: 200, description: 'Tasas manuales' })
+  @ApiResponse({ status: 200, description: 'Tasas manuales', type: RateHistoryEntryDto, isArray: true })
   getManualEntries(
     @CurrentUser('id') userId: number,
     @Query('currencyId') currencyId?: number,
@@ -68,7 +69,7 @@ export class RateHistoryController {
 
   @Get('pair/:fromId/:toId')
   @ApiOperation({ summary: 'Historial de tasas por par de monedas' })
-  @ApiResponse({ status: 200, description: 'Historial del par' })
+  @ApiResponse({ status: 200, description: 'Historial del par', type: RateHistoryEntryDto, isArray: true })
   findByPair(
     @CurrentUser('id') userId: number,
     @Param('fromId', ParseIntPipe) fromId: number,
@@ -80,7 +81,7 @@ export class RateHistoryController {
   @Get('stats/:fromId/:toId')
   @ApiOperation({ summary: 'Estadísticas de tasas por par' })
   @ApiQuery({ name: 'days', required: false, type: Number })
-  @ApiResponse({ status: 200, description: 'Estadísticas' })
+  @ApiResponse({ status: 200, description: 'Estadísticas del par', type: RateHistoryStatsDto })
   getStats(
     @CurrentUser('id') userId: number,
     @Param('fromId', ParseIntPipe) fromId: number,
@@ -97,7 +98,7 @@ export class RateHistoryController {
 
   @Get('latest/:fromId/:toId')
   @ApiOperation({ summary: 'Obtener última tasa de un par' })
-  @ApiResponse({ status: 200, description: 'Última tasa' })
+  @ApiResponse({ status: 200, description: 'Última tasa (decimal-string, null si no hay registro)' })
   getLatestRate(
     @CurrentUser('id') userId: number,
     @Param('fromId', ParseIntPipe) fromId: number,
@@ -109,7 +110,7 @@ export class RateHistoryController {
   @Delete()
   @ApiOperation({ summary: 'Resetear historial de tasas' })
   @ApiQuery({ name: 'currencyId', required: false, type: Number })
-  @ApiResponse({ status: 200, description: 'Historial reseteado' })
+  @ApiResponse({ status: 200, description: 'Historial reseteado', type: RateHistoryResetDto })
   resetHistory(
     @CurrentUser('id') userId: number,
     @Query('currencyId') currencyId?: number,

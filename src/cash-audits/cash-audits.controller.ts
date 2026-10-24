@@ -19,6 +19,7 @@ import { CashAuditsService } from './cash-audits.service';
 import { CreateCashAuditDto } from './dto/create-cash-audit.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { CashAuditDto } from '../cash/cash.swagger';
 
 @ApiTags('Cash Audits')
 @ApiBearerAuth()
@@ -29,7 +30,7 @@ export class CashAuditsController {
 
   @Post()
   @ApiOperation({ summary: 'Registrar arqueo de caja' })
-  @ApiResponse({ status: 201, description: 'Arqueo registrado' })
+  @ApiResponse({ status: 201, description: 'Arqueo registrado', type: CashAuditDto })
   create(@CurrentUser('id') userId: number, @Body() createDto: CreateCashAuditDto) {
     return this.cashAuditsService.create(userId, createDto);
   }
@@ -37,14 +38,14 @@ export class CashAuditsController {
   @Get()
   @ApiOperation({ summary: 'Listar arqueos' })
   @ApiQuery({ name: 'currencyId', required: false, type: Number })
-  @ApiResponse({ status: 200, description: 'Lista de arqueos' })
+  @ApiResponse({ status: 200, description: 'Lista de arqueos', type: CashAuditDto, isArray: true })
   findAll(@CurrentUser('id') userId: number, @Query('currencyId') currencyId?: number) {
     return this.cashAuditsService.findAll(userId, currencyId ? Number(currencyId) : undefined);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener arqueo por ID' })
-  @ApiResponse({ status: 200, description: 'Arqueo encontrado' })
+  @ApiResponse({ status: 200, description: 'Arqueo encontrado', type: CashAuditDto })
   @ApiResponse({ status: 404, description: 'Arqueo no encontrado' })
   findOne(@CurrentUser('id') userId: number, @Param('id', ParseIntPipe) id: number) {
     return this.cashAuditsService.findOne(userId, id);

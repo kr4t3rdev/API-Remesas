@@ -8,9 +8,9 @@ import { PrismaService } from '../database/prisma/prisma.service';
 import { Decimal } from '@prisma/client/runtime/library';
 import { UpdateCashPolicyDto } from './dto/update-cash-policy.dto';
 import { CreateCashClosingDto } from './dto/create-cash-closing.dto';
+import { toDecimalString } from '../common/utils/decimal-serialization';
 
 const toDecimal = (value: unknown) => new Decimal(String(value ?? 0));
-const toNumber = (value: unknown) => Number(value ?? 0);
 
 @Injectable()
 export class CashService {
@@ -45,14 +45,14 @@ export class CashService {
         operationKind: transaction.operationKind,
         direction: transaction.sourceType === 'CASH' ? ('OUT' as const) : ('IN' as const),
         title: transaction.type === 'VENTA' ? 'Venta de moneda' : 'Compra de moneda',
-        description: `${toNumber(transaction.amount)} ${transaction.currency.code}`,
-        amount: toNumber(transaction.amount),
+        description: `${toDecimalString(transaction.amount)} ${transaction.currency.code}`,
+        amount: toDecimalString(transaction.amount),
         cashAmount: transaction.sourceType === 'CASH' && transaction.type === 'COMPRA'
-          ? toNumber(transaction.totalCup)
+          ? toDecimalString(transaction.totalCup)
           : transaction.destinationType === 'CASH' && transaction.type === 'VENTA'
-            ? toNumber(transaction.totalCup)
-            : toNumber(transaction.amount),
-        totalBase: toNumber(transaction.totalCup),
+            ? toDecimalString(transaction.totalCup)
+            : toDecimalString(transaction.amount),
+        totalBase: toDecimalString(transaction.totalCup),
         sourceType: transaction.sourceType,
         destinationType: transaction.destinationType,
         sourceBankAccountId: transaction.sourceBankAccountId,
@@ -67,7 +67,7 @@ export class CashService {
         direction: adjustment.type === 'INGRESO' ? ('IN' as const) : ('OUT' as const),
         title: adjustment.type === 'INGRESO' ? 'Ingreso manual' : 'Egreso manual',
         description: adjustment.reason,
-        amount: toNumber(adjustment.amount),
+        amount: toDecimalString(adjustment.amount),
         totalBase: null,
         currency: adjustment.currency,
         createdAt: adjustment.createdAt,
@@ -79,8 +79,8 @@ export class CashService {
         direction: 'OUT' as const,
         title: expense.description,
         description: expense.category,
-        amount: toNumber(expense.amount),
-        cashAmount: toNumber(expense.amount),
+        amount: toDecimalString(expense.amount),
+        cashAmount: toDecimalString(expense.amount),
         totalBase: null,
         currency: expense.currency,
         createdAt: expense.createdAt,
@@ -96,14 +96,14 @@ export class CashService {
       asOf: new Date().toISOString(),
       primaryCurrency: user?.primaryCurrency ?? null,
       currencies,
-      balances: balances.map((balance) => ({ ...balance, balance: toNumber(balance.balance) })),
+      balances: balances.map((balance) => ({ ...balance, balance: toDecimalString(balance.balance) })),
       recentMovements,
       latestAudits: latestAudits.map((audit) => ({
         ...audit,
         auditorName: audit.user?.name,
-        expectedBalance: toNumber(audit.expectedBalance),
-        actualBalance: toNumber(audit.actualBalance),
-        difference: toNumber(audit.difference),
+        expectedBalance: toDecimalString(audit.expectedBalance),
+        actualBalance: toDecimalString(audit.actualBalance),
+        difference: toDecimalString(audit.difference),
       })),
     };
   }
@@ -118,8 +118,8 @@ export class CashService {
       const policy = policyByCurrency.get(currency.id);
       return {
         currency,
-        safetyBuffer: toNumber(policy?.safetyBuffer),
-        insuranceLimit: toNumber(policy?.insuranceLimit),
+        safetyBuffer: toDecimalString(policy?.safetyBuffer),
+        insuranceLimit: toDecimalString(policy?.insuranceLimit),
       };
     });
   }
@@ -134,7 +134,7 @@ export class CashService {
       create: { userId, currencyId, safetyBuffer: toDecimal(dto.safetyBuffer), insuranceLimit: toDecimal(dto.insuranceLimit) },
       include: { currency: true },
     });
-    return { ...policy, safetyBuffer: toNumber(policy.safetyBuffer), insuranceLimit: toNumber(policy.insuranceLimit) };
+    return { ...policy, safetyBuffer: toDecimalString(policy.safetyBuffer), insuranceLimit: toDecimalString(policy.insuranceLimit) };
   }
 
   async getAuditors(userId: number) {
@@ -229,17 +229,17 @@ export class CashService {
         if (!targetRate) missingRates.add(targetCurrency.code);
       }
       if (convertedAmount) total = total.plus(convertedAmount);
-      return { currencyId: balance.currencyId, currencyCode: balance.currency.code, amount: toNumber(balance.balance), convertedAmount: convertedAmount ? toNumber(convertedAmount) : null };
+      return { currencyId: balance.currencyId, currencyCode: balance.currency.code, amount: toDecimalString(balance.balance), convertedAmount: convertedAmount ? toDecimalString(convertedAmount) : null };
     });
-    return { total: toNumber(total), targetCurrency, breakdown, missingRates: [...missingRates].sort() };
+    return { total: toDecimalString(total), targetCurrency, breakdown, missingRates: [...missingRates].sort() };
   }
 
   private serializeClosing(closing: any) {
     return {
       ...closing,
-      expectedBalance: toNumber(closing.expectedBalance),
-      actualBalance: toNumber(closing.actualBalance),
-      difference: toNumber(closing.difference),
+      expectedBalance: toDecimalString(closing.expectedBalance),
+      actualBalance: toDecimalString(closing.actualBalance),
+      difference: toDecimalString(closing.difference),
     };
   }
 }

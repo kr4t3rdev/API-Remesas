@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
+import { Decimal } from 'decimal.js';
+import { toDecimalString } from '../common/utils/decimal-serialization';
 import { CreateRateHistoryDto, RateSource } from './dto/create-rate-history.dto';
-import { Decimal } from '@prisma/client/runtime/library';
+
+const dec = (value: unknown): Decimal => new Decimal(String(value ?? 0));
 
 @Injectable()
 export class RateHistoryService {
@@ -64,7 +67,7 @@ export class RateHistoryService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return rate ? Number(rate.rate) : null;
+    return rate ? toDecimalString(rate.rate) : null;
   }
 
   async getManualEntries(userId: number, currencyId?: number) {
@@ -106,24 +109,24 @@ export class RateHistoryService {
       return null;
     }
 
-    const rateValues = rates.map(r => Number(r.rate));
-    const sum = rateValues.reduce((a, b) => a + b, 0);
-    const avg = sum / rateValues.length;
-    const min = Math.min(...rateValues);
-    const max = Math.max(...rateValues);
+    const rateValues = rates.map(r => dec(r.rate));
+    const sum = rateValues.reduce((a, b) => a.plus(b), new Decimal(0));
+    const avg = sum.div(rateValues.length);
+    const min = Decimal.min(...rateValues);
+    const max = Decimal.max(...rateValues);
     const latest = rateValues[rateValues.length - 1];
     const previous = rateValues.length > 1 ? rateValues[rateValues.length - 2] : latest;
-    const change = latest - previous;
-    const changePercent = previous !== 0 ? ((change / previous) * 100) : 0;
+    const change = latest.minus(previous);
+    const changePercent = previous.gt(0) ? change.div(previous).mul(100) : new Decimal(0);
 
     return {
-      average: avg,
-      min,
-      max,
-      latest,
-      previous,
-      change,
-      changePercent,
+      average: toDecimalString(avg),
+      min: toDecimalString(min),
+      max: toDecimalString(max),
+      latest: toDecimalString(latest),
+      previous: toDecimalString(previous),
+      change: toDecimalString(change),
+      changePercent: Number(changePercent.toDecimalPlaces(2)),
       count: rates.length,
       manualCount: rates.filter(r => r.source === 'MANUAL').length,
     };

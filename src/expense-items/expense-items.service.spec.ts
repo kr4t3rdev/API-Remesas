@@ -222,8 +222,8 @@ describe('ExpenseItemsService', () => {
       const result = await service.getReport('month', 1, '2026-03');
 
       expect(result.count).toBe(2);
-      expect(result.total).toBe(3000);
-      expect(result.average).toBe(1500);
+      expect(result.total).toBe('3000');
+      expect(result.average).toBe('1500');
     });
 
     it('debería generar reporte trimestral', async () => {

@@ -4,29 +4,29 @@ export class DailyExpenseByCategoryDto {
   @ApiProperty({ example: 5 })
   count!: number;
 
-  @ApiProperty({ example: 125.5 })
-  total!: number;
+  @ApiProperty({ example: '125.5', description: 'Suma de gastos de la categoría (decimal como string)' })
+  total!: string;
 }
 
 export class DailyReportTransactionDto {
-  @ApiProperty()
+  @ApiProperty({ description: 'Cantidad de transacciones del día' })
   total!: number;
   @ApiProperty()
   compras!: number;
   @ApiProperty()
   ventas!: number;
-  @ApiProperty()
-  totalCompras!: number;
-  @ApiProperty()
-  totalVentas!: number;
+  @ApiProperty({ description: 'Total CUP de compras (decimal como string)' })
+  totalCompras!: string;
+  @ApiProperty({ description: 'Total CUP de ventas (decimal como string)' })
+  totalVentas!: string;
 }
 
 @ApiExtraModels(DailyExpenseByCategoryDto)
 export class DailyReportExpenseDto {
-  @ApiProperty()
+  @ApiProperty({ description: 'Cantidad de gastos del día' })
   total!: number;
-  @ApiProperty({ description: 'Suma cruda mezclando currencies' })
-  totalAmount!: number;
+  @ApiProperty({ description: 'Suma cruda mezclando currencies (decimal como string)' })
+  totalAmount!: string;
   @ApiProperty({
     nullable: true,
     description: 'Suma convertida a CUP cuando hay tasa vigente',
@@ -44,10 +44,10 @@ export class DailyReportExpenseDto {
 export class DailyReportProfitDto {
   @ApiProperty({ description: '% de retorno sobre ventas (0-100)' })
   margin!: number;
-  @ApiProperty({ description: 'Suma de Transaction.marginProfit' })
-  marginProfit!: number;
-  @ApiProperty({ nullable: true, description: 'Realized FX margin minus CUP-converted expenses; null when conversion is incomplete' })
-  net!: number | null;
+  @ApiProperty({ description: 'Suma de Transaction.marginProfit (decimal como string)' })
+  marginProfit!: string;
+  @ApiProperty({ nullable: true, description: 'Realized FX margin minus CUP-converted expenses; null when conversion is incomplete (decimal como string)' })
+  net!: string | null;
 }
 
 export class DailyReportDto {
@@ -66,16 +66,16 @@ export class DailyBreakdownItemDto {
   date!: string;
   @ApiProperty({ description: 'Cantidad de transacciones del día' })
   transactions!: number;
-  @ApiProperty()
-  transactionsTotalCup!: number;
+  @ApiProperty({ description: 'Total CUP de transacciones del día (decimal como string)' })
+  transactionsTotalCup!: string;
   @ApiProperty()
   expenses!: number;
-  @ApiProperty()
-  expensesTotalCup!: number;
+  @ApiProperty({ description: 'Total CUP de gastos del día (decimal como string)' })
+  expensesTotalCup!: string;
   @ApiProperty()
   expensesUnconverted!: number;
-  @ApiProperty()
-  marginProfit!: number;
+  @ApiProperty({ description: 'Decimal como string' })
+  marginProfit!: string;
 }
 
 export class PeriodReportSummaryDto {
@@ -84,15 +84,15 @@ export class PeriodReportSummaryDto {
   @ApiProperty()
   totalExpensesCount!: number;
   @ApiProperty()
-  totalExpensesAmount!: number;
-  @ApiProperty({ type: Number, nullable: true })
-  totalExpensesInCup!: number | null;
+  totalExpensesAmount!: string;
+  @ApiProperty({ type: String, nullable: true })
+  totalExpensesInCup!: string | null;
   @ApiProperty()
   unconvertedExpensesCount!: number;
-  @ApiProperty()
-  marginProfit!: number;
-  @ApiProperty({ nullable: true })
-  netProfit!: number | null;
+  @ApiProperty({ description: 'Decimal como string' })
+  marginProfit!: string;
+  @ApiProperty({ type: String, nullable: true })
+  netProfit!: string | null;
 }
 
 export class PeriodReportPeriodDto {
@@ -111,7 +111,7 @@ export class PeriodReportDto {
   @ApiProperty({ type: [DailyBreakdownItemDto] })
   dailyBreakdown!: DailyBreakdownItemDto[];
   @ApiProperty({ type: 'object', additionalProperties: true })
-  transactionsByCurrency!: Record<string, { compras: number; ventas: number; count: number }>;
+  transactionsByCurrency!: Record<string, { compras: string; ventas: string; count: number }>;
   @ApiProperty({
     type: 'object',
     additionalProperties: { $ref: getSchemaPath(DailyExpenseByCategoryDto) },
@@ -126,14 +126,14 @@ export class ProfitReportTransactionDto {
   type!: 'COMPRA' | 'VENTA';
   @ApiProperty()
   currency!: string;
-  @ApiProperty()
-  amount!: number;
-  @ApiProperty()
-  rate!: number;
-  @ApiProperty()
-  totalCup!: number;
-  @ApiProperty()
-  marginProfit!: number;
+  @ApiProperty({ description: 'Decimal como string' })
+  amount!: string;
+  @ApiProperty({ description: 'Decimal como string' })
+  rate!: string;
+  @ApiProperty({ description: 'Decimal como string' })
+  totalCup!: string;
+  @ApiProperty({ description: 'Decimal como string' })
+  marginProfit!: string;
   @ApiProperty()
   createdAt!: string;
 }
@@ -142,15 +142,15 @@ export class ProfitReportDto {
   @ApiProperty({ type: PeriodReportPeriodDto })
   period!: PeriodReportPeriodDto;
   @ApiProperty()
-  totalMarginProfit!: number;
-  @ApiProperty()
-  totalCompras!: number;
-  @ApiProperty()
-  totalVentas!: number;
-  @ApiProperty()
-  netFlow!: number;
+  totalMarginProfit!: string;
+  @ApiProperty({ description: 'Decimal como string' })
+  totalCompras!: string;
+  @ApiProperty({ description: 'Decimal como string' })
+  totalVentas!: string;
+  @ApiProperty({ description: 'Decimal como string' })
+  netFlow!: string;
   @ApiProperty({ type: 'object', additionalProperties: true })
-  byCurrency!: Record<string, { marginProfit: number; count: number }>;
+  byCurrency!: Record<string, { marginProfit: string; count: number }>;
   @ApiProperty({ type: [ProfitReportTransactionDto] })
   transactions!: ProfitReportTransactionDto[];
 }
@@ -176,10 +176,10 @@ export class CurrencyReportDto {
 export class ExpensesReportDto {
   @ApiProperty()
   total!: number;
-  @ApiProperty()
-  totalAmount!: number;
-  @ApiProperty({ type: Number, nullable: true })
-  totalAmountInCup!: number | null;
+  @ApiProperty({ description: 'Decimal como string' })
+  totalAmount!: string;
+  @ApiProperty({ type: String, nullable: true })
+  totalAmountInCup!: string | null;
   @ApiProperty()
   unconvertedCount!: number;
   @ApiProperty({
@@ -188,7 +188,7 @@ export class ExpensesReportDto {
   })
   byCategory!: Record<string, DailyExpenseByCategoryDto>;
   @ApiProperty({ type: 'object', additionalProperties: true })
-  byCurrency!: Record<string, { total: number; count: number }>;
+  byCurrency!: Record<string, { total: string; count: number }>;
   @ApiProperty({ type: 'array', items: { type: 'object', additionalProperties: true } })
   expenses!: any[];
 }
@@ -200,8 +200,8 @@ export class AccountReportItemDto {
   userId!: number;
   @ApiProperty()
   name!: string;
-  @ApiProperty()
-  balance!: number;
+  @ApiProperty({ description: 'Decimal como string' })
+  balance!: string;
   @ApiProperty()
   currencyId!: number;
   @ApiProperty()
@@ -213,8 +213,8 @@ export class AccountReportItemDto {
 export class AccountsReportDto {
   @ApiProperty()
   totalAccounts!: number;
-  @ApiProperty()
-  totalBalance!: number;
+  @ApiProperty({ description: 'Decimal como string (mezcla currencies, igual que antes)' })
+  totalBalance!: string;
   @ApiProperty({ type: [AccountReportItemDto] })
   accounts!: AccountReportItemDto[];
 }
@@ -222,14 +222,14 @@ export class AccountsReportDto {
 export class ObjectiveReportItemDto {
   @ApiProperty()
   id!: number;
-  @ApiProperty()
-  targetAmount!: number;
-  @ApiProperty()
-  currentAmount!: number;
+  @ApiProperty({ description: 'Decimal como string' })
+  targetAmount!: string;
+  @ApiProperty({ description: 'Decimal como string' })
+  currentAmount!: string;
   @ApiProperty()
   percentage!: number;
-  @ApiProperty()
-  remaining!: number;
+  @ApiProperty({ description: 'Decimal como string' })
+  remaining!: string;
 }
 
 export class ObjectivesReportDto {
@@ -251,9 +251,9 @@ export class CashFlowReportDtoSwagger {
   @ApiProperty()
   currencies!: Array<{
     currency: { code: string; symbol: string };
-    inflows: { transactions: number; adjustments: number; total: number };
-    outflows: { transactions: number; expenses: number; adjustments: number; total: number };
-    balance: number;
+    inflows: { transactions: string; adjustments: string; total: string };
+    outflows: { transactions: string; expenses: string; adjustments: string; total: string };
+    balance: string;
   }>;
 }
 
@@ -262,8 +262,8 @@ export class AuditSummaryReportDtoSwagger {
   totalAudits!: number;
   @ApiProperty()
   withDiscrepancies!: number;
-  @ApiProperty()
-  totalDiscrepancy!: number;
+  @ApiProperty({ description: 'Decimal como string' })
+  totalDiscrepancy!: string;
   @ApiProperty({ type: 'array', items: { type: 'object', additionalProperties: true } })
   audits!: any[];
 }
@@ -273,14 +273,14 @@ export class FxPerformanceMovementDto {
   id!: number;
   @ApiProperty()
   currency!: string;
-  @ApiProperty()
-  amount!: number;
-  @ApiProperty()
-  rate!: number;
-  @ApiProperty()
-  costoPromedio!: number;
-  @ApiProperty()
-  rendimiento!: number;
+  @ApiProperty({ description: 'Decimal como string' })
+  amount!: string;
+  @ApiProperty({ description: 'Decimal como string' })
+  rate!: string;
+  @ApiProperty({ description: 'Decimal como string' })
+  costoPromedio!: string;
+  @ApiProperty({ description: 'Decimal como string' })
+  rendimiento!: string;
   @ApiProperty()
   createdAt!: string;
 }
@@ -291,9 +291,9 @@ export class FxPerformancePositionDto {
   @ApiProperty()
   currency!: string;
   @ApiProperty()
-  saldo!: number;
-  @ApiProperty({ type: Number, nullable: true })
-  costoPromedio!: number | null;
+  saldo!: string;
+  @ApiProperty({ type: String, nullable: true })
+  costoPromedio!: string | null;
   @ApiProperty({ enum: ['UNREVIEWED', 'REVIEWED'] })
   reviewStatus!: 'UNREVIEWED' | 'REVIEWED';
   @ApiProperty({ type: String, format: 'date-time', nullable: true })
@@ -308,7 +308,7 @@ export class FxPerformanceReportDto {
   @ApiProperty({ type: String, nullable: true })
   currency!: string | null;
   @ApiProperty()
-  totalRendimiento!: number;
+  totalRendimiento!: string;
   @ApiProperty({ type: [FxPerformanceMovementDto] })
   movements!: FxPerformanceMovementDto[];
   @ApiProperty({ type: [FxPerformancePositionDto] })

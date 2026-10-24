@@ -17,6 +17,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { ExpensesService } from './expenses.service';
+import { ExpenseDto, ExpenseListDto } from '../common/swagger/shared-response.dto';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { QueryExpenseDto } from './dto/query-expense.dto';
@@ -32,28 +33,28 @@ export class ExpensesController {
 
   @Post()
   @ApiOperation({ summary: 'Crear gasto' })
-  @ApiResponse({ status: 201, description: 'Gasto creado' })
+  @ApiResponse({ status: 201, description: 'Gasto creado', type: ExpenseDto })
   create(@Body() createDto: CreateExpenseDto, @CurrentUser('id') userId: number) {
     return this.expensesService.create(createDto, userId);
   }
 
   @Get()
   @ApiOperation({ summary: 'Listar gastos' })
-  @ApiResponse({ status: 200, description: 'Lista de gastos' })
+  @ApiResponse({ status: 200, description: 'Lista paginada de gastos', type: ExpenseListDto })
   findAll(@Query() query: QueryExpenseDto, @CurrentUser('id') userId: number) {
     return this.expensesService.findAll(query, userId);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener gasto por ID' })
-  @ApiResponse({ status: 200, description: 'Gasto encontrado' })
+  @ApiResponse({ status: 200, description: 'Gasto encontrado', type: ExpenseDto })
   findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: number) {
     return this.expensesService.findOne(id, userId);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar gasto' })
-  @ApiResponse({ status: 200, description: 'Gasto actualizado' })
+  @ApiResponse({ status: 200, description: 'Gasto actualizado', type: ExpenseDto })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateExpenseDto,
@@ -64,7 +65,7 @@ export class ExpensesController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar gasto' })
-  @ApiResponse({ status: 200, description: 'Gasto eliminado' })
+  @ApiResponse({ status: 200, description: 'Gasto eliminado', type: ExpenseDto })
   remove(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: number) {
     return this.expensesService.remove(id, userId);
   }

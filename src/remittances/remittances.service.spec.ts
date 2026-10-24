@@ -169,9 +169,9 @@ describe('RemittancesService', () => {
       completedRemittancesHaveTwoMovements: true,
     });
     expect(result.positions).toEqual(expect.arrayContaining([
-      expect.objectContaining({ currencyId: 2, positionSaldo: 110, movementSaldo: 110, difference: 0, cashBalance: 110, ok: true }),
+      expect.objectContaining({ currencyId: 2, positionSaldo: '110', movementSaldo: '110', difference: '0', cashBalance: '110', ok: true }),
     ]));
-    expect(result.primaryCashLedger).toEqual(expect.objectContaining({ status: 'VERIFIED', openingBalance: 10000, remittanceDelta: -2700, expectedBalance: 7300, actualBalance: 7300, ok: true }));
+    expect(result.primaryCashLedger).toEqual(expect.objectContaining({ status: 'VERIFIED', openingBalance: '10000', remittanceDelta: '-2700', expectedBalance: '7300', actualBalance: '7300', ok: true }));
   });
 
   it.each([
@@ -229,7 +229,7 @@ describe('RemittancesService', () => {
     const result = await service().reconcile(7);
 
     expect(result.ok).toBe(true);
-    expect(result.positions[0]).toEqual(expect.objectContaining({ movementSaldo: 60, cashPositionDifference: 0, ok: true }));
+    expect(result.positions[0]).toEqual(expect.objectContaining({ movementSaldo: '60', cashPositionDifference: '0', ok: true }));
   });
 
   it('includes cash-versus-position mismatches in the overall reconciliation status', async () => {
@@ -249,7 +249,7 @@ describe('RemittancesService', () => {
 
     expect(result.ok).toBe(false);
     expect(result.checks.cashMatchesPositions).toBe(false);
-    expect(result.positions[0]).toEqual(expect.objectContaining({ cashPositionDifference: -1, ok: false }));
+    expect(result.positions[0]).toEqual(expect.objectContaining({ cashPositionDifference: '-1', ok: false }));
   });
 
   it('marks reconciliation as failed for mismatches, invalid positions, negative cash and incomplete remittances', async () => {
@@ -269,7 +269,7 @@ describe('RemittancesService', () => {
     expect(result.checks.movementsHaveValidPositions).toBe(false);
     expect(result.checks.cashBalancesNonNegative).toBe(false);
     expect(result.checks.completedRemittancesHaveTwoMovements).toBe(false);
-    expect(result.positions[0]).toEqual(expect.objectContaining({ difference: 100, movementSaldo: 0, ok: false }));
+    expect(result.positions[0]).toEqual(expect.objectContaining({ difference: '100', movementSaldo: '0', ok: false }));
     expect(result.remittanceIssues).toEqual([expect.objectContaining({ remittanceId: 1, movementCount: 1, localLegValid: false, ok: false })]);
   });
 });

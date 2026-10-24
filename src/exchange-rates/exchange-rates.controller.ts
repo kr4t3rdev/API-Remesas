@@ -20,6 +20,14 @@ import { ExchangeRatesService } from './exchange-rates.service';
 import { UpdateExchangeRateDto } from './dto/update-exchange-rate.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import {
+  ExchangeRateComputedDto,
+  ExchangeRateDto,
+  ExchangeRateUpdateResponseDto,
+  ExchangeRateWithCurrencyDto,
+  ExchangeRatesCurrentResponseDto,
+  RemoveExchangeRateResponseDto,
+} from './exchange-rates.swagger';
 
 @ApiTags('Exchange Rates')
 @ApiBearerAuth()
@@ -30,14 +38,14 @@ export class ExchangeRatesController {
 
   @Get()
   @ApiOperation({ summary: 'Obtener tasas actuales' })
-  @ApiResponse({ status: 200, description: 'Lista de tasas actuales' })
+  @ApiResponse({ status: 200, description: 'Lista de tasas actuales', type: ExchangeRatesCurrentResponseDto })
   findCurrent(@CurrentUser('id') userId: number) {
     return this.exchangeRatesService.findCurrent(userId);
   }
 
   @Get('all')
   @ApiOperation({ summary: 'Obtener todas las tasas (incluyendo inactivas)' })
-  @ApiResponse({ status: 200, description: 'Lista de todas las tasas' })
+  @ApiResponse({ status: 200, description: 'Lista de todas las tasas', type: ExchangeRateComputedDto, isArray: true })
   findAll(@CurrentUser('id') userId: number) {
     return this.exchangeRatesService.findAll(userId);
   }
@@ -45,7 +53,7 @@ export class ExchangeRatesController {
   @Get('history')
   @ApiOperation({ summary: 'Historial de tasas' })
   @ApiQuery({ name: 'currencyId', required: false, type: Number })
-  @ApiResponse({ status: 200, description: 'Historial de tasas' })
+  @ApiResponse({ status: 200, description: 'Historial de tasas', type: ExchangeRateWithCurrencyDto, isArray: true })
   getHistory(
     @CurrentUser('id') userId: number,
     @Query('currencyId') currencyId?: number,
@@ -58,7 +66,7 @@ export class ExchangeRatesController {
 
   @Get(':currencyId')
   @ApiOperation({ summary: 'Historial de tasas por moneda' })
-  @ApiResponse({ status: 200, description: 'Historial de tasas de la moneda' })
+  @ApiResponse({ status: 200, description: 'Historial de tasas de la moneda', type: ExchangeRateDto, isArray: true })
   findByCurrency(
     @CurrentUser('id') userId: number,
     @Param('currencyId', ParseIntPipe) currencyId: number,
@@ -68,7 +76,7 @@ export class ExchangeRatesController {
 
   @Put(':currencyId')
   @ApiOperation({ summary: 'Actualizar tasa de cambio' })
-  @ApiResponse({ status: 200, description: 'Tasa actualizada' })
+  @ApiResponse({ status: 200, description: 'Tasa actualizada', type: ExchangeRateUpdateResponseDto })
   @ApiResponse({ status: 404, description: 'Moneda no encontrada' })
   update(
     @CurrentUser('id') userId: number,
@@ -80,7 +88,7 @@ export class ExchangeRatesController {
 
   @Delete(':currencyId')
   @ApiOperation({ summary: 'Eliminar tasa de cambio' })
-  @ApiResponse({ status: 200, description: 'Tasa eliminada' })
+  @ApiResponse({ status: 200, description: 'Tasa eliminada', type: RemoveExchangeRateResponseDto })
   @ApiResponse({ status: 400, description: 'No se puede eliminar la tasa porque tiene transacciones asociadas' })
   @ApiResponse({ status: 404, description: 'Tasa no encontrada' })
   remove(

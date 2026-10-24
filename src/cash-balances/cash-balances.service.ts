@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
+import { toDecimalString } from '../common/utils/decimal-serialization';
 
 @Injectable()
 export class CashBalancesService {
@@ -14,7 +15,7 @@ export class CashBalancesService {
 
     return balances.map((b) => ({
       ...b,
-      balance: Number(b.balance),
+      balance: toDecimalString(b.balance),
     }));
   }
 
@@ -25,12 +26,12 @@ export class CashBalancesService {
     });
 
     if (!balance) {
-      return { currencyId, balance: 0, currency: null };
+      return { currencyId, balance: '0', currency: null };
     }
 
     return {
       ...balance,
-      balance: Number(balance.balance),
+      balance: toDecimalString(balance.balance),
     };
   }
 }

@@ -16,6 +16,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { WorkerPaymentsService } from './worker-payments.service';
+import { WorkerDto, WorkerMutationResultDto } from './worker-payments.swagger';
 import {
   CreateWorkerDto,
   UpdateWorkerDto,
@@ -35,21 +36,21 @@ export class WorkerPaymentsController {
 
   @Post()
   @ApiOperation({ summary: 'Crear trabajador' })
-  @ApiResponse({ status: 201, description: 'Trabajador creado' })
+  @ApiResponse({ status: 201, description: 'Trabajador creado', type: WorkerDto })
   create(@Body() createDto: CreateWorkerDto, @CurrentUser('id') userId: number) {
     return this.workerPaymentsService.create(createDto, userId);
   }
 
   @Get()
   @ApiOperation({ summary: 'Listar trabajadores' })
-  @ApiResponse({ status: 200, description: 'Lista de trabajadores' })
+  @ApiResponse({ status: 200, description: 'Lista de trabajadores', type: WorkerDto, isArray: true })
   findAll(@CurrentUser('id') userId: number) {
     return this.workerPaymentsService.findAll(userId);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener trabajador por ID con transacciones' })
-  @ApiResponse({ status: 200, description: 'Trabajador encontrado' })
+  @ApiResponse({ status: 200, description: 'Trabajador encontrado', type: WorkerDto })
   findOne(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser('id') userId: number,
@@ -77,7 +78,7 @@ export class WorkerPaymentsController {
 
   @Post(':id/transaction')
   @ApiOperation({ summary: 'Registrar transacción del trabajador' })
-  @ApiResponse({ status: 201, description: 'Transacción registrada' })
+  @ApiResponse({ status: 201, description: 'Transacción registrada', type: WorkerMutationResultDto })
   createTransaction(
     @Param('id', ParseIntPipe) id: number,
     @Body() createDto: CreateTransactionDto,

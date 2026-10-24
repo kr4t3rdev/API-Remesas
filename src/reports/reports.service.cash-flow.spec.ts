@@ -50,21 +50,21 @@ describe('ReportsService report periods and cash flow', () => {
     expect(result.currencies).toEqual([
       {
         currency: { code: 'CUP', symbol: '$' },
-        inflows: { transactions: 2700, adjustments: 0, total: 2700 },
-        outflows: { transactions: 1200, expenses: 0, adjustments: 0, total: 1200 },
-        balance: 1500,
+        inflows: { transactions: '2700', adjustments: '0', total: '2700' },
+        outflows: { transactions: '1200', expenses: '0', adjustments: '0', total: '1200' },
+        balance: '1500',
       },
       {
         currency: { code: 'EUR', symbol: '€' },
-        inflows: { transactions: 0, adjustments: 0, total: 0 },
-        outflows: { transactions: 0, expenses: 5, adjustments: 2, total: 7 },
-        balance: -7,
+        inflows: { transactions: '0', adjustments: '0', total: '0' },
+        outflows: { transactions: '0', expenses: '5', adjustments: '2', total: '7' },
+        balance: '-7',
       },
       {
         currency: { code: 'USD', symbol: '$' },
-        inflows: { transactions: 0, adjustments: 3, total: 3 },
-        outflows: { transactions: 0, expenses: 10, adjustments: 0, total: 10 },
-        balance: -7,
+        inflows: { transactions: '0', adjustments: '3', total: '3' },
+        outflows: { transactions: '0', expenses: '10', adjustments: '0', total: '10' },
+        balance: '-7',
       },
     ]);
     expect(result).not.toHaveProperty('inflows');
@@ -103,7 +103,7 @@ describe('ReportsService report periods and cash flow', () => {
     expect(result.dailyBreakdown).toContainEqual(
       expect.objectContaining({
         expenses: 1,
-        expensesTotalCup: 2700,
+        expensesTotalCup: '2700',
         expensesUnconverted: 0,
       }),
     );
@@ -130,7 +130,7 @@ describe('ReportsService report periods and cash flow', () => {
       '2026-07-09',
     );
 
-    expect(result.dailyBreakdown).toEqual(expect.arrayContaining([expect.objectContaining({ expensesTotalCup: 2700 })]));
+    expect(result.dailyBreakdown).toEqual(expect.arrayContaining([expect.objectContaining({ expensesTotalCup: '2700' })]));
     expect(prisma.exchangeRate.findFirst).not.toHaveBeenCalled();
     expect(findFirst).toHaveBeenCalledWith(expect.objectContaining({
       where: expect.objectContaining({
@@ -147,7 +147,7 @@ describe('ReportsService report periods and cash flow', () => {
     const expense = {
       amount: new Decimal(10),
       currencyId: 2,
-      date: new Date('2026-07-08T12:00:00.000Z'),
+      date: new Date('2026-07-09T12:00:00.000Z'),
       currency: { code: 'USD' },
     };
     const findFirst = jest.fn().mockResolvedValue({ rate: new Decimal(270) });
@@ -172,17 +172,17 @@ describe('ReportsService report periods and cash flow', () => {
         { type: 'VENTA', totalCup: new Decimal(5400), marginProfit: new Decimal(400), currency: { code: 'USD' } },
       ]) },
       expense: { findMany: jest.fn().mockResolvedValue([
-        { amount: new Decimal(100), currencyId: 1, date: new Date('2026-07-09T12:00:00.000Z'), currency: { code: 'CUP' } },
+        { amount: new Decimal(100), currencyId: 1, date: new Date('2026-07-10T12:00:00.000Z'), currency: { code: 'CUP' } },
       ]) },
     };
 
     const result = await new ReportsService(prisma as any).getDailyReport(7, '2026-07-09');
 
-    expect(result.profit).toEqual({ margin: 7.41, marginProfit: 400, net: 300 });
+    expect(result.profit).toEqual({ margin: 7.41, marginProfit: '400', net: '300' });
   });
 
   it('omits an exact daily and period net when any expense cannot be converted', async () => {
-    const expense = { amount: new Decimal(10), currencyId: 2, date: new Date('2026-07-09T12:00:00.000Z'), currency: { code: 'USD' } };
+    const expense = { amount: new Decimal(10), currencyId: 2, date: new Date('2026-07-10T12:00:00.000Z'), currency: { code: 'USD' } };
     const prisma = {
       transaction: { findMany: jest.fn().mockResolvedValue([]) },
       expense: { findMany: jest.fn().mockResolvedValue([expense]) },

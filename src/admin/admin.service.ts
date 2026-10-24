@@ -6,8 +6,29 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { UpdateAdminUserDto } from './dto/update-admin-user.dto';
 import { AdminUserActionDto, AdminUserControlActionType } from './dto/admin-user-action.dto';
 import { CreateAdminUserDto } from './dto/create-admin-user.dto';
+import { Decimal } from 'decimal.js';
+import { toDecimalString } from '../common/utils/decimal-serialization';
 
 const DEFAULT_BLOCK_MINUTES = 30;
+
+/**
+ * Campos seguros de usuario para respuestas admin. Nunca incluye el hash
+ * de contraseña: getBlockedUsers y applyUserControlAction retornaban filas
+ * completas de Prisma y filtraban el hash al cliente (task 1.12, hallazgo
+ * de fidelidad contrato-codigo).
+ */
+const ADMIN_USER_SELECT = {
+  id: true,
+  email: true,
+  name: true,
+  role: true,
+  isActive: true,
+  isBanned: true,
+  blockedUntil: true,
+  bannedUntil: true,
+  failedLoginAttempts: true,
+  createdAt: true,
+} satisfies Prisma.UserSelect;
 
 @Injectable()
 export class AdminService {
@@ -56,8 +77,8 @@ export class AdminService {
       where: { paidAt: { gte: from, lte: to } },
     });
 
-    const mrrEstimateCup = payments.reduce((sum, p) => sum + Number(p.amountCup), 0);
-    const arpuEstimateCup = totalUsers > 0 ? mrrEstimateCup / totalUsers : 0;
+    const mrrEstimateCup = payments.reduce((sum, p) => sum.plus(p.amountCup), new Decimal(0));
+    const arpuEstimateCup = totalUsers > 0 ? mrrEstimateCup.div(totalUsers) : new Decimal(0);
 
     // trialToPaidConversionPct: licencias que pasaron TRIAL -> ACTIVE en el
     // período (transition registrada en LicenseEvent) sobre total de TRIAL
@@ -115,9 +136,9 @@ export class AdminService {
       licensesByState,
       expiringIn7d,
       expiringIn30d,
-      mrrEstimateCup,
-      arpuEstimateCup,
-      revenueAtRiskCup: mrrEstimateCup * 0.2,
+      mrrEstimateCup: toDecimalString(mrrEstimateCup),
+      arpuEstimateCup: toDecimalString(arpuEstimateCup),
+      revenueAtRiskCup: toDecimalString(mrrEstimateCup.mul(0.2)),
       churnPeriod: licensesByState.CANCELLED ?? 0,
       reactivatedPeriod,
       trialToPaidConversionPct: Number(trialToPaidConversionPct.toFixed(2)),
@@ -175,10 +196,12 @@ export class AdminService {
       }),
     ]);
 
+    let totalBilling = new Decimal(0);
     const series = buckets.map((bucket) => {
       const billing = payments
         .filter((p) => p.paidAt >= bucket.start && p.paidAt <= bucket.end)
-        .reduce((sum, p) => sum + Number(p.amountCup), 0);
+        .reduce((sum, p) => sum.plus(p.amountCup), new Decimal(0));
+      totalBilling = totalBilling.plus(billing);
 
       const newUsers = users.filter(
         (u) => u.createdAt >= bucket.start && u.createdAt <= bucket.end,
@@ -192,7 +215,7 @@ export class AdminService {
         label: bucket.label,
         year: bucket.year,
         month: bucket.month,
-        billingCup: Number(billing.toFixed(2)),
+        billingCup: toDecimalString(billing),
         newUsers,
         churn,
       };
@@ -202,7 +225,7 @@ export class AdminService {
       monthsBack,
       series,
       totals: {
-        billingCup: series.reduce((sum, s) => sum + s.billingCup, 0),
+        billingCup: toDecimalString(totalBilling),
         newUsers: series.reduce((sum, s) => sum + s.newUsers, 0),
         churn: series.reduce((sum, s) => sum + s.churn, 0),
       },
@@ -261,14 +284,14 @@ export class AdminService {
         },
       },
     });
-    const dailyRevenue = dailyPayments.reduce((sum, p) => sum + Number(p.amountCup), 0);
+    const dailyRevenue = dailyPayments.reduce((sum, p) => sum.plus(p.amountCup), new Decimal(0));
 
     return {
       totalUsers,
       activeUsers,
       blockedUsers,
       expiringLicenses,
-      dailyRevenue,
+      dailyRevenue: toDecimalString(dailyRevenue),
       activeLicenses,
     };
   }
@@ -526,6 +549,7 @@ export class AdminService {
             blockedUntil: blockUntil,
             failedLoginAttempts: 0,
           },
+          select: ADMIN_USER_SELECT,
         });
 
         await this.createActionAudit({
@@ -547,6 +571,7 @@ export class AdminService {
             blockedUntil: null,
             failedLoginAttempts: 0,
           },
+          select: ADMIN_USER_SELECT,
         });
 
         await this.createActionAudit({
@@ -565,6 +590,7 @@ export class AdminService {
         const updated = await this.prisma.user.update({
           where: { id: userId },
           data: { isActive: false },
+          select: ADMIN_USER_SELECT,
         });
 
         await this.createActionAudit({
@@ -587,6 +613,7 @@ export class AdminService {
             isBanned: false,
             blockedUntil: null,
           },
+          select: ADMIN_USER_SELECT,
         });
 
         await this.createActionAudit({
@@ -669,6 +696,7 @@ export class AdminService {
         const updated = await this.prisma.user.update({
           where: { id: userId },
           data: { role: newRole },
+          select: ADMIN_USER_SELECT,
         });
 
         await this.createActionAudit({
@@ -756,6 +784,7 @@ export class AdminService {
         OR: [{ isBanned: true }, { blockedUntil: { gt: now } }],
       },
       orderBy: { updatedAt: 'desc' },
+      select: ADMIN_USER_SELECT,
     });
   }
 

@@ -11,7 +11,7 @@ describe('ReportsService FX rendimiento', () => {
       currencyPosition: { findMany: jest.fn().mockResolvedValue([{ currencyId: 2, saldo: new Decimal(90), costoPromedio: new Decimal(250), reviewStatus: 'UNREVIEWED', reviewedAt: null, currency: { code: 'USD' } }]) },
     };
     const result = await new ReportsService(prisma).getFxPerformanceReport(7, '2026-07-01', '2026-07-31', 'USD');
-    expect(result.totalRendimiento).toBe(200);
+    expect(result.totalRendimiento).toBe('200');
     expect(result.movements).toHaveLength(1);
     expect(result.positions[0]).toEqual(expect.objectContaining({ reviewStatus: 'UNREVIEWED', reviewedAt: null, availableForSale: false }));
   });

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
+import { toDecimalString } from '../common/utils/decimal-serialization';
 import { CreateBankAccountDto } from './dto/create-bank-account.dto';
 import { UpdateBankAccountDto } from './dto/update-bank-account.dto';
 
@@ -67,7 +68,7 @@ export class BankAccountsService {
     return {
       id: account.id,
       name: account.name,
-      balance: Number(account.balance),
+      balance: toDecimalString(account.balance),
       currency: account.currency,
     };
   }
@@ -90,8 +91,8 @@ export class BankAccountsService {
     const serializedTransfers = transfers.map((transfer) => {
       const isSource = transfer.sourceBankAccountId === id;
       const amount = transfer.type === 'COMPRA'
-        ? (isSource ? Number(transfer.totalCup) : Number(transfer.amount))
-        : (isSource ? Number(transfer.amount) : Number(transfer.totalCup));
+        ? (isSource ? toDecimalString(transfer.totalCup) : toDecimalString(transfer.amount))
+        : (isSource ? toDecimalString(transfer.amount) : toDecimalString(transfer.totalCup));
       return {
         id: `transfer:${transfer.id}`,
         transactionId: transfer.id,
@@ -102,7 +103,7 @@ export class BankAccountsService {
         currency: (isSource && transfer.type === 'COMPRA') || (!isSource && transfer.type === 'VENTA')
           ? { code: 'CUP', id: null }
           : transfer.currency,
-        rate: Number(transfer.rate),
+        rate: toDecimalString(transfer.rate),
         sourceType: transfer.sourceType,
         destinationType: transfer.destinationType,
         sourceBankAccountId: transfer.sourceBankAccountId,

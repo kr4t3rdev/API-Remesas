@@ -18,6 +18,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { ObjectivesService } from './objectives.service';
+import { ObjectiveDto, ObjectiveProgressDto } from './objectives.swagger';
 import { CreateObjectiveDto } from './dto/create-objective.dto';
 import { UpdateObjectiveDto } from './dto/update-objective.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
@@ -33,7 +34,7 @@ export class ObjectivesController {
 
   @Post()
   @ApiOperation({ summary: 'Crear objetivo' })
-  @ApiResponse({ status: 201, description: 'Objetivo creado' })
+  @ApiResponse({ status: 201, description: 'Objetivo creado', type: ObjectiveDto })
   create(@Body() createDto: CreateObjectiveDto, @CurrentUser('id') userId: number) {
     return this.objectivesService.create(createDto, userId);
   }
@@ -41,28 +42,28 @@ export class ObjectivesController {
   @Get()
   @ApiOperation({ summary: 'Listar objetivos' })
   @ApiQuery({ name: 'status', required: false })
-  @ApiResponse({ status: 200, description: 'Lista de objetivos' })
+  @ApiResponse({ status: 200, description: 'Lista de objetivos', type: ObjectiveDto, isArray: true })
   findAll(@CurrentUser('id') userId: number, @Query('status') status?: string) {
     return this.objectivesService.findAll(userId, status);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener objetivo por ID' })
-  @ApiResponse({ status: 200, description: 'Objetivo encontrado' })
+  @ApiResponse({ status: 200, description: 'Objetivo encontrado', type: ObjectiveDto })
   findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: number) {
     return this.objectivesService.findOne(id, userId);
   }
 
   @Get(':id/progress')
   @ApiOperation({ summary: 'Obtener progreso del objetivo' })
-  @ApiResponse({ status: 200, description: 'Progreso del objetivo' })
+  @ApiResponse({ status: 200, description: 'Progreso del objetivo', type: ObjectiveProgressDto })
   getProgress(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: number) {
     return this.objectivesService.getProgress(id, userId);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar objetivo' })
-  @ApiResponse({ status: 200, description: 'Objetivo actualizado' })
+  @ApiResponse({ status: 200, description: 'Objetivo actualizado', type: ObjectiveDto })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateObjectiveDto,
@@ -73,7 +74,7 @@ export class ObjectivesController {
 
   @Patch(':id/status')
   @ApiOperation({ summary: 'Cambiar estado del objetivo' })
-  @ApiResponse({ status: 200, description: 'Estado actualizado' })
+  @ApiResponse({ status: 200, description: 'Estado actualizado', type: ObjectiveDto })
   updateStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateStatusDto: UpdateStatusDto,
@@ -84,7 +85,7 @@ export class ObjectivesController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar objetivo' })
-  @ApiResponse({ status: 200, description: 'Objetivo eliminado' })
+  @ApiResponse({ status: 200, description: 'Objetivo eliminado', type: ObjectiveDto })
   remove(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: number) {
     return this.objectivesService.remove(id, userId);
   }

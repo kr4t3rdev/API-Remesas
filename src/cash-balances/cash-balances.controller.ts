@@ -14,6 +14,7 @@ import {
 import { CashBalancesService } from './cash-balances.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { CashBalanceDto } from '../cash/cash.swagger';
 
 @ApiTags('Cash Balances')
 @ApiBearerAuth()
@@ -24,14 +25,14 @@ export class CashBalancesController {
 
   @Get()
   @ApiOperation({ summary: 'Obtener saldos de caja por moneda' })
-  @ApiResponse({ status: 200, description: 'Lista de saldos' })
+  @ApiResponse({ status: 200, description: 'Lista de saldos', type: CashBalanceDto, isArray: true })
   findAll(@CurrentUser('id') userId: number) {
     return this.cashBalancesService.findAll(userId);
   }
 
   @Get(':currencyId')
   @ApiOperation({ summary: 'Obtener saldo de una moneda específica' })
-  @ApiResponse({ status: 200, description: 'Saldo de la moneda' })
+  @ApiResponse({ status: 200, description: 'Saldo de la moneda (currency null si no hay saldo registrado)', type: CashBalanceDto })
   findByCurrency(
     @CurrentUser('id') userId: number,
     @Param('currencyId', ParseIntPipe) currencyId: number,

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../database/prisma/prisma.service";
+import { toDecimalString } from "../common/utils/decimal-serialization";
 import { CreateObjectiveDto } from "./dto/create-objective.dto";
 import { UpdateObjectiveDto } from "./dto/update-objective.dto";
 import { UpdateStatusDto } from "./dto/update-status.dto";
@@ -110,17 +111,17 @@ export class ObjectivesService {
   async getProgress(id: number, userId: number) {
     const objective = await this.findOne(id, userId);
 
-    const targetAmount = Number(objective.targetAmount);
-    const currentAmount = Number(objective.currentAmount);
+    const targetAmount = new Decimal(String(objective.targetAmount ?? 0));
+    const currentAmount = new Decimal(String(objective.currentAmount ?? 0));
     const percentage =
-      targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0;
+      targetAmount.gt(0) ? Number(currentAmount.div(targetAmount).mul(100)) : 0;
 
     return {
       ...objective,
-      targetAmount,
-      currentAmount,
+      targetAmount: toDecimalString(targetAmount),
+      currentAmount: toDecimalString(currentAmount),
       percentage: Math.min(percentage, 100),
-      remaining: Math.max(targetAmount - currentAmount, 0),
+      remaining: toDecimalString(Decimal.max(targetAmount.minus(currentAmount), 0)),
     };
   }
 

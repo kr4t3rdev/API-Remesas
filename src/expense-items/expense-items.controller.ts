@@ -18,6 +18,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { ExpenseItemsService } from './expense-items.service';
+import { ExpenseItemDto, ExpenseItemReportDto } from './expense-items.swagger';
 import { CreateExpenseItemDto } from './dto/create-expense-item.dto';
 import { UpdateExpenseItemDto } from './dto/update-expense-item.dto';
 import { QueryExpenseItemDto } from './dto/query-expense-item.dto';
@@ -55,6 +56,7 @@ export class ExpenseItemsController {
 
   @Get('reports/:period')
   @ApiOperation({ summary: 'Generar reporte de gastos' })
+  @ApiResponse({ status: 200, type: ExpenseItemReportDto })
   @ApiParam({ name: 'period', enum: ['month', 'quarter', 'semester', 'year', 'all', 'single'] })
   @ApiResponse({ status: 200, description: 'Reporte generado' })
   @ApiResponse({ status: 400, description: 'Parámetros inválidos' })

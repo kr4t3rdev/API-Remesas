@@ -19,6 +19,7 @@ import {
   ApiHeader,
 } from '@nestjs/swagger';
 import { TransactionsService } from './transactions.service';
+import { TransactionDto } from '../common/swagger/shared-response.dto';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { QueryTransactionDto } from './dto/query-transaction.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -36,7 +37,7 @@ export class TransactionsController {
   @Post()
   @ApiHeader({ name: 'Idempotency-Key', required: true, description: 'Unique key for safely retrying the transaction request' })
   @ApiOperation({ summary: 'Crear transacción (compra/venta)' })
-  @ApiResponse({ status: 201, description: 'Transacción creada' })
+  @ApiResponse({ status: 201, description: 'Transacción creada', type: TransactionDto })
   create(
     @CurrentUser('id') userId: number,
     @Body() createDto: CreateTransactionDto,
@@ -50,7 +51,7 @@ export class TransactionsController {
 
   @Get()
   @ApiOperation({ summary: 'Listar transacciones' })
-  @ApiResponse({ status: 200, description: 'Lista de transacciones' })
+  @ApiResponse({ status: 200, description: 'Lista de transacciones', type: TransactionDto, isArray: true })
   findAll(
     @CurrentUser('id') userId: number,
     @Query() query: QueryTransactionDto,
@@ -60,7 +61,7 @@ export class TransactionsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener transacción por ID' })
-  @ApiResponse({ status: 200, description: 'Transacción encontrada' })
+  @ApiResponse({ status: 200, description: 'Transacción encontrada', type: TransactionDto })
   @ApiResponse({ status: 404, description: 'Transacción no encontrada' })
   findOne(
     @CurrentUser('id') userId: number,

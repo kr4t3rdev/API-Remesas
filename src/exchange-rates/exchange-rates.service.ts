@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { PrismaService } from '../database/prisma/prisma.service';
 import { UpdateExchangeRateDto } from './dto/update-exchange-rate.dto';
 import { Decimal } from '@prisma/client/runtime/library';
+import { toDecimalString } from '../common/utils/decimal-serialization';
 
 @Injectable()
 export class ExchangeRatesService {
@@ -24,8 +25,8 @@ export class ExchangeRatesService {
 
     return rates.map((rate) => ({
       ...rate,
-      buyRate: Number(rate.referenceRate) * (1 - Number(rate.buyMargin)),
-      sellRate: Number(rate.referenceRate) * (1 + Number(rate.sellMargin)),
+      buyRate: toDecimalString(rate.referenceRate.mul(new Decimal(1).minus(rate.buyMargin))),
+      sellRate: toDecimalString(rate.referenceRate.mul(new Decimal(1).plus(rate.sellMargin))),
     }));
   }
 
@@ -43,8 +44,8 @@ export class ExchangeRatesService {
 
     const serializedRates = rates.map((rate) => ({
       ...rate,
-      buyRate: Number(rate.referenceRate) * (1 - Number(rate.buyMargin)),
-      sellRate: Number(rate.referenceRate) * (1 + Number(rate.sellMargin)),
+      buyRate: toDecimalString(rate.referenceRate.mul(new Decimal(1).minus(rate.buyMargin))),
+      sellRate: toDecimalString(rate.referenceRate.mul(new Decimal(1).plus(rate.sellMargin))),
     }));
 
     return { rates: serializedRates, cupCurrencyId: cupCurrency?.id };
@@ -118,8 +119,8 @@ export class ExchangeRatesService {
 
     return {
       ...result,
-      buyRate: Number(result.referenceRate) * (1 - Number(result.buyMargin)),
-      sellRate: Number(result.referenceRate) * (1 + Number(result.sellMargin)),
+      buyRate: toDecimalString(result.referenceRate.mul(new Decimal(1).minus(result.buyMargin))),
+      sellRate: toDecimalString(result.referenceRate.mul(new Decimal(1).plus(result.sellMargin))),
       isNewRate,
     };
   }

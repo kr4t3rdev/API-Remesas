@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { CurrencyMovementType, Prisma, RemittanceStatus } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { PrismaService } from '../database/prisma/prisma.service';
+import { toDecimalString } from '../common/utils/decimal-serialization';
 import { FxOperationsService } from '../fx-operations/fx-operations.service';
 import { RemittanceEventDto } from './dto/remittance-event.dto';
 
@@ -247,11 +248,11 @@ export class RemittancesService {
       return {
         currencyId: position.currencyId,
         currency: position.currency,
-        positionSaldo: positionSaldo.toNumber(),
-        movementSaldo: movementSaldo.toNumber(),
-        difference: difference.toNumber(),
-        cashBalance: cashBalance?.toNumber() ?? null,
-        cashPositionDifference: cashBalance?.sub(positionSaldo).toNumber() ?? null,
+        positionSaldo,
+        movementSaldo,
+        difference,
+        cashBalance,
+        cashPositionDifference: cashBalance?.sub(positionSaldo) ?? null,
         reviewStatus: position.reviewStatus,
         movementCount: movementCountByPosition.get(position.id) ?? 0,
         ok: difference.eq(0) && positionSaldo.gte(0) && cashBalance !== null && cashBalance.eq(positionSaldo),
@@ -306,21 +307,21 @@ export class RemittancesService {
       const actualBalance = new Decimal(primaryCash.balance);
       primaryCashLedger = {
         status: 'VERIFIED',
-        openingBalance: openingBalance.toNumber(),
-        remittanceDelta: remittanceDelta.toNumber(),
-        expectedBalance: expectedBalance.toNumber(),
-        actualBalance: actualBalance.toNumber(),
-        difference: actualBalance.sub(expectedBalance).toNumber(),
+        openingBalance,
+        remittanceDelta,
+        expectedBalance,
+        actualBalance,
+        difference: actualBalance.sub(expectedBalance),
         ok: actualBalance.eq(expectedBalance),
       };
     }
     const checks = {
-      positionsMatchMovements: positionsReport.every((position) => position.difference === 0),
-      positionsNonNegative: positionsReport.every((position) => position.positionSaldo >= 0),
+      positionsMatchMovements: positionsReport.every((position) => position.difference.isZero()),
+      positionsNonNegative: positionsReport.every((position) => position.positionSaldo.gte(0)),
       movementsHaveValidPositions,
       localRemittanceMovementsValid: remittanceIssues.every((remittance) => remittance.localLegValid),
       cashBalancesNonNegative: (cashBalances as any[]).every((cash) => new Decimal(cash.balance).gte(0)),
-      cashMatchesPositions: positionsReport.every((position) => position.cashPositionDifference === 0),
+      cashMatchesPositions: positionsReport.every((position) => position.cashPositionDifference !== null && position.cashPositionDifference.isZero()),
       primaryCashLedgerReconciled: primaryCashLedger.ok === true,
       completedRemittancesHaveTwoMovements: remittanceIssues.every((remittance) => remittance.movementCount === 2),
     };
@@ -333,9 +334,29 @@ export class RemittancesService {
       linkedProviderMovements: (movements as any[]).filter((movement) => movement.remittanceId != null).length,
       linkedMovements: movements.length,
       checks,
-      positions: positionsReport,
+      positions: positionsReport.map((position) => ({
+        currencyId: position.currencyId,
+        currency: position.currency,
+        positionSaldo: toDecimalString(position.positionSaldo),
+        movementSaldo: toDecimalString(position.movementSaldo),
+        difference: toDecimalString(position.difference),
+        cashBalance: position.cashBalance === null ? null : toDecimalString(position.cashBalance),
+        cashPositionDifference: position.cashPositionDifference === null ? null : toDecimalString(position.cashPositionDifference),
+        reviewStatus: position.reviewStatus,
+        movementCount: position.movementCount,
+        ok: position.ok,
+      })),
       remittanceIssues,
-      primaryCashLedger,
+      primaryCashLedger: primaryCashLedger.status === 'VERIFIED'
+        ? {
+            ...primaryCashLedger,
+            openingBalance: toDecimalString(primaryCashLedger.openingBalance),
+            remittanceDelta: toDecimalString(primaryCashLedger.remittanceDelta),
+            expectedBalance: toDecimalString(primaryCashLedger.expectedBalance),
+            actualBalance: toDecimalString(primaryCashLedger.actualBalance),
+            difference: toDecimalString(primaryCashLedger.difference),
+          }
+        : primaryCashLedger,
     };
   }
 }

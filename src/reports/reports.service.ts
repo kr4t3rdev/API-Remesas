@@ -1,4 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
+import { Decimal } from 'decimal.js';
+import { toDecimalString } from '../common/utils/decimal-serialization';
 import { PrismaService } from '../database/prisma/prisma.service';
 import type {
   AccountsReportDto,
@@ -14,6 +16,9 @@ import type {
 } from './reports.types';
 
 const CUP_CURRENCY_CODE = 'CUP';
+
+/** Coerce any Decimal-like value (Prisma Decimal, string, number) to decimal.js. */
+const dec = (value: unknown): Decimal => new Decimal(String(value ?? 0));
 
 @Injectable()
 export class ReportsService {
@@ -76,8 +81,8 @@ export class ReportsService {
     currencyCode: string | undefined,
     referenceDate: Date,
     primaryCurrencyCode: string,
-  ): Promise<number | null> {
-    if (currencyCode === primaryCurrencyCode) return 1;
+  ): Promise<Decimal | null> {
+    if (currencyCode === primaryCurrencyCode) return new Decimal(1);
 
     const rate = await this.prisma.rateHistory.findFirst({
       where: {
@@ -89,7 +94,7 @@ export class ReportsService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return rate ? Number(rate.rate) : null;
+    return rate ? dec(rate.rate) : null;
   }
 
   /**
@@ -97,7 +102,7 @@ export class ReportsService {
    * cada gasto. Devuelve el total convertido a CUP y la lista de gastos que no
    * se pudieron convertir (sin tasa registrada).
    */
-  private async sumExpensesInCup(
+  private async sumExpensesInCupDecimal(
     userId: number,
     expenses: Array<{
       amount: any;
@@ -105,11 +110,11 @@ export class ReportsService {
       currencyId: number;
       currency: { code: string };
     }>,
-  ): Promise<{ totalInCup: number | null; unconvertedCount: number }> {
-    if (!expenses.length) return { totalInCup: 0, unconvertedCount: 0 };
+  ): Promise<{ total: Decimal | null; unconvertedCount: number }> {
+    if (!expenses.length) return { total: new Decimal(0), unconvertedCount: 0 };
 
     const primaryCurrencyCode = await this.getPrimaryCurrencyCode(userId);
-    let total = 0;
+    let total = new Decimal(0);
     let hasAnyConversion = false;
     let unconverted = 0;
 
@@ -125,13 +130,29 @@ export class ReportsService {
         unconverted += 1;
         continue;
       }
-      total += Number(expense.amount) * rate;
+      total = total.plus(dec(expense.amount).mul(rate));
       hasAnyConversion = true;
     }
 
     return {
-      totalInCup: hasAnyConversion ? Number(total.toFixed(2)) : null,
+      total: hasAnyConversion ? total : null,
       unconvertedCount: unconverted,
+    };
+  }
+
+  private async sumExpensesInCup(
+    userId: number,
+    expenses: Array<{
+      amount: any;
+      date: Date;
+      currencyId: number;
+      currency: { code: string };
+    }>,
+  ): Promise<{ totalInCup: string | null; unconvertedCount: number }> {
+    const result = await this.sumExpensesInCupDecimal(userId, expenses);
+    return {
+      totalInCup: result.total === null ? null : toDecimalString(result.total),
+      unconvertedCount: result.unconvertedCount,
     };
   }
 
@@ -160,24 +181,24 @@ export class ReportsService {
 
     const totalCompras = transactions
       .filter((t) => t.type === 'COMPRA')
-      .reduce((sum, t) => sum + Number(t.totalCup), 0);
+      .reduce((sum, t) => sum.plus(t.totalCup), new Decimal(0));
 
     const totalVentas = transactions
       .filter((t) => t.type === 'VENTA')
-      .reduce((sum, t) => sum + Number(t.totalCup), 0);
+      .reduce((sum, t) => sum.plus(t.totalCup), new Decimal(0));
 
-    const totalGastos = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
-    const gastosInCup = await this.sumExpensesInCup(userId, expenses);
+    const totalGastos = expenses.reduce((sum, e) => sum.plus(e.amount), new Decimal(0));
+    const gastosInCup = await this.sumExpensesInCupDecimal(userId, expenses);
     const totalProfit = transactions.reduce(
-      (sum, t) => sum + Number(t.marginProfit),
-      0,
+      (sum, t) => sum.plus(t.marginProfit),
+      new Decimal(0),
     );
 
     const net = gastosInCup.unconvertedCount > 0
       ? null
-      : totalProfit - (gastosInCup.totalInCup ?? 0);
-    const marginPct = totalVentas > 0
-      ? (totalProfit / totalVentas) * 100
+      : totalProfit.minus(gastosInCup.total ?? 0);
+    const marginPct = totalVentas.gt(0)
+      ? Number(totalProfit.div(totalVentas).mul(100).toDecimalPlaces(2))
       : 0;
 
     return {
@@ -186,20 +207,20 @@ export class ReportsService {
         total: transactions.length,
         compras: transactions.filter((t) => t.type === 'COMPRA').length,
         ventas: transactions.filter((t) => t.type === 'VENTA').length,
-        totalCompras,
-        totalVentas,
+        totalCompras: toDecimalString(totalCompras),
+        totalVentas: toDecimalString(totalVentas),
       },
       expenses: {
         total: expenses.length,
-        totalAmount: totalGastos,
-        totalAmountInCup: gastosInCup.totalInCup,
+        totalAmount: toDecimalString(totalGastos),
+        totalAmountInCup: gastosInCup.total === null ? null : toDecimalString(gastosInCup.total),
         unconvertedCount: gastosInCup.unconvertedCount,
         byCategory: this.groupByCategory(expenses),
       },
       profit: {
-        margin: Number(marginPct.toFixed(2)),
-        marginProfit: totalProfit,
-        net: net === null ? null : Number(net.toFixed(2)),
+        margin: marginPct,
+        marginProfit: toDecimalString(totalProfit),
+        net: net === null ? null : toDecimalString(net),
       },
     };
   }
@@ -230,15 +251,15 @@ export class ReportsService {
     const dailyReports = await this.getDailyBreakdown(userId, start, end);
 
     const totalExpensesAmount = expenses.reduce(
-      (sum, e) => sum + Number(e.amount),
-      0,
+      (sum, e) => sum.plus(e.amount),
+      new Decimal(0),
     );
-    const gastosInCup = await this.sumExpensesInCup(userId, expenses);
-    const totalExpensesInCup = gastosInCup.totalInCup;
+    const gastosInCup = await this.sumExpensesInCupDecimal(userId, expenses);
+    const totalExpensesInCup = gastosInCup.total;
 
     const marginProfit = transactions.reduce(
-      (sum, t) => sum + Number(t.marginProfit),
-      0,
+      (sum, t) => sum.plus(t.marginProfit),
+      new Decimal(0),
     );
 
     return {
@@ -246,13 +267,13 @@ export class ReportsService {
       summary: {
         totalTransactions: transactions.length,
         totalExpensesCount: expenses.length,
-        totalExpensesAmount,
-        totalExpensesInCup,
+        totalExpensesAmount: toDecimalString(totalExpensesAmount),
+        totalExpensesInCup: totalExpensesInCup === null ? null : toDecimalString(totalExpensesInCup),
         unconvertedExpensesCount: gastosInCup.unconvertedCount,
-        marginProfit,
+        marginProfit: toDecimalString(marginProfit),
         netProfit: gastosInCup.unconvertedCount > 0
           ? null
-          : Number((marginProfit - (totalExpensesInCup ?? 0)).toFixed(2)),
+          : toDecimalString(marginProfit.minus(totalExpensesInCup ?? 0)),
       },
       dailyBreakdown: dailyReports,
       transactionsByCurrency: this.groupByCurrency(transactions),
@@ -277,31 +298,31 @@ export class ReportsService {
 
     const byCurrency = this.groupProfitByCurrency(transactions);
     const totalMarginProfit = transactions.reduce(
-      (sum, t) => sum + Number(t.marginProfit),
-      0,
+      (sum, t) => sum.plus(t.marginProfit),
+      new Decimal(0),
     );
     const totalCompras = transactions
       .filter((t) => t.type === 'COMPRA')
-      .reduce((sum, t) => sum + Number(t.totalCup), 0);
+      .reduce((sum, t) => sum.plus(t.totalCup), new Decimal(0));
     const totalVentas = transactions
       .filter((t) => t.type === 'VENTA')
-      .reduce((sum, t) => sum + Number(t.totalCup), 0);
+      .reduce((sum, t) => sum.plus(t.totalCup), new Decimal(0));
 
     return {
       period: { startDate, endDate },
-      totalMarginProfit,
-      totalCompras,
-      totalVentas,
-      netFlow: totalVentas - totalCompras,
+      totalMarginProfit: toDecimalString(totalMarginProfit),
+      totalCompras: toDecimalString(totalCompras),
+      totalVentas: toDecimalString(totalVentas),
+      netFlow: toDecimalString(totalVentas.minus(totalCompras)),
       byCurrency,
       transactions: transactions.map((t) => ({
         id: t.id,
         type: t.type,
         currency: t.currency.code,
-        amount: Number(t.amount),
-        rate: Number(t.rate),
-        totalCup: Number(t.totalCup),
-        marginProfit: Number(t.marginProfit),
+        amount: toDecimalString(t.amount),
+        rate: toDecimalString(t.rate),
+        totalCup: toDecimalString(t.totalCup),
+        marginProfit: toDecimalString(t.marginProfit),
         createdAt: t.createdAt,
       })),
     };
@@ -333,14 +354,14 @@ export class ReportsService {
     return {
       currencyId,
       currency: transactions[0]?.currency || null,
-      currentBalance: cashBalance ? Number(cashBalance.balance) : 0,
+      currentBalance: cashBalance ? toDecimalString(cashBalance.balance) : '0',
       totalTransactions: transactions.length,
-      totalCompras: transactions
+      totalCompras: toDecimalString(transactions
         .filter((t) => t.type === 'COMPRA')
-        .reduce((sum, t) => sum + Number(t.amount), 0),
-      totalVentas: transactions
+        .reduce((sum, t) => sum.plus(t.amount), new Decimal(0))),
+      totalVentas: toDecimalString(transactions
         .filter((t) => t.type === 'VENTA')
-        .reduce((sum, t) => sum + Number(t.amount), 0),
+        .reduce((sum, t) => sum.plus(t.amount), new Decimal(0))),
       transactions,
     };
   }
@@ -376,7 +397,7 @@ export class ReportsService {
 
     return {
       total: expenses.length,
-      totalAmount: expenses.reduce((sum, e) => sum + Number(e.amount), 0),
+      totalAmount: toDecimalString(expenses.reduce((sum, e) => sum.plus(e.amount), new Decimal(0))),
       totalAmountInCup: gastosInCup.totalInCup,
       unconvertedCount: gastosInCup.unconvertedCount,
       byCategory: totalByCategory,
@@ -396,7 +417,7 @@ export class ReportsService {
     if (!accountIds.length) {
       return {
         totalAccounts: 0,
-        totalBalance: 0,
+        totalBalance: '0',
         accounts: [],
       };
     }
@@ -452,17 +473,17 @@ export class ReportsService {
 
       return {
         ...account,
-        balance: Number(account.balance),
+        balance: toDecimalString(account.balance),
         transactionCount: expenseCount + transferCount,
       };
     });
 
     return {
       totalAccounts: accounts.length,
-      totalBalance: accounts.reduce(
-        (sum, a) => sum + Number(a.balance),
-        0,
-      ),
+      totalBalance: toDecimalString(accounts.reduce(
+        (sum, a) => sum.plus(a.balance),
+        new Decimal(0),
+      )),
       accounts: accountsWithSummary,
     };
   }
@@ -474,17 +495,17 @@ export class ReportsService {
     });
 
     const objectivesWithProgress: ObjectivesReportDto['objectives'] = objectives.map((obj) => {
-      const targetAmount = Number(obj.targetAmount);
-      const currentAmount = Number(obj.currentAmount);
+      const targetAmount = dec(obj.targetAmount);
+      const currentAmount = dec(obj.currentAmount);
       const percentage =
-        targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0;
+        targetAmount.gt(0) ? Number(currentAmount.div(targetAmount).mul(100)) : 0;
 
       return {
         ...obj,
-        targetAmount,
-        currentAmount,
+        targetAmount: toDecimalString(targetAmount),
+        currentAmount: toDecimalString(currentAmount),
         percentage: Math.min(percentage, 100),
-        remaining: Math.max(targetAmount - currentAmount, 0),
+        remaining: toDecimalString(Decimal.max(targetAmount.minus(currentAmount), 0)),
       };
     });
 
@@ -519,34 +540,36 @@ export class ReportsService {
       include: { currency: true },
     });
 
-    type Bucket = CashFlowReportDto['currencies'][number];
-    const emptyBucket = (code: string, symbol: string): Bucket => ({
+    // Los tres campos de cada sección son acumuladores de dinero (no contadores),
+    // igual que en la implementación original.
+    type SectionAcc = { transactions: Decimal; expenses: Decimal; adjustments: Decimal; total: Decimal };
+    type BucketAcc = {
+      currency: { code: string; symbol: string };
+      inflows: SectionAcc;
+      outflows: SectionAcc;
+    };
+    const emptySection = (): SectionAcc => ({ transactions: new Decimal(0), expenses: new Decimal(0), adjustments: new Decimal(0), total: new Decimal(0) });
+    const emptyBucket = (code: string, symbol: string): BucketAcc => ({
       currency: { code, symbol },
-      inflows: { transactions: 0, adjustments: 0, total: 0 },
-      outflows: { transactions: 0, expenses: 0, adjustments: 0, total: 0 },
-      balance: 0,
+      inflows: emptySection(),
+      outflows: emptySection(),
     });
-    const buckets = new Map<string, Bucket>();
+    const buckets = new Map<string, BucketAcc>();
     const add = (
       code: string,
       symbol: string,
       section: 'inflows' | 'outflows',
       field: 'transactions' | 'expenses' | 'adjustments',
-      amount: number,
+      amount: Decimal,
     ) => {
       const bucket = buckets.get(code) ?? emptyBucket(code, symbol);
-      const currentAmount = (bucket[section] as Record<string, number>)[field] ?? 0;
-      const nextSection = {
-        ...bucket[section],
-        [field]: Number((currentAmount + amount).toFixed(2)),
+      const current = bucket[section];
+      const nextSection: SectionAcc = {
+        ...current,
+        [field]: (current[field] as Decimal).plus(amount),
+        total: current.total.plus(amount),
       };
-      const total = Object.entries(nextSection)
-        .filter(([key]) => key !== 'total')
-        .reduce((sum, [, value]) => sum + value, 0);
-      buckets.set(code, {
-        ...bucket,
-        [section]: { ...nextSection, total: Number(total.toFixed(2)) },
-      });
+      buckets.set(code, { ...bucket, [section]: nextSection });
     };
 
     transactions.forEach((transaction) => {
@@ -555,7 +578,7 @@ export class ReportsService {
         '$',
         transaction.type === 'VENTA' ? 'inflows' : 'outflows',
         'transactions',
-        Number(transaction.totalCup),
+        dec(transaction.totalCup),
       );
     });
     expenses.forEach((expense) => {
@@ -564,7 +587,7 @@ export class ReportsService {
         expense.currency.symbol,
         'outflows',
         'expenses',
-        Number(expense.amount),
+        dec(expense.amount),
       );
     });
     adjustments.forEach((adjustment) => {
@@ -573,7 +596,7 @@ export class ReportsService {
         adjustment.currency.symbol,
         adjustment.type === 'INGRESO' ? 'inflows' : 'outflows',
         'adjustments',
-        Number(adjustment.amount),
+        dec(adjustment.amount),
       );
     });
 
@@ -581,9 +604,20 @@ export class ReportsService {
       period: { startDate, endDate },
       currencies: [...buckets.values()]
         .map((bucket) => ({
-          ...bucket,
-          balance: Number(
-            (bucket.inflows.total - bucket.outflows.total).toFixed(2),
+          currency: bucket.currency,
+          inflows: {
+            transactions: toDecimalString(bucket.inflows.transactions),
+            adjustments: toDecimalString(bucket.inflows.adjustments),
+            total: toDecimalString(bucket.inflows.total),
+          },
+          outflows: {
+            transactions: toDecimalString(bucket.outflows.transactions),
+            expenses: toDecimalString(bucket.outflows.expenses),
+            adjustments: toDecimalString(bucket.outflows.adjustments),
+            total: toDecimalString(bucket.outflows.total),
+          },
+          balance: toDecimalString(
+            bucket.inflows.total.minus(bucket.outflows.total),
           ),
         }))
         .sort((a, b) =>
@@ -619,15 +653,15 @@ export class ReportsService {
       orderBy: { createdAt: 'desc' },
     });
 
-    const discrepancies = audits.filter((a) => Number(a.difference) !== 0);
+    const discrepancies = audits.filter((a) => !dec(a.difference).isZero());
 
     return {
       totalAudits: audits.length,
       withDiscrepancies: discrepancies.length,
-      totalDiscrepancy: discrepancies.reduce(
-        (sum, a) => sum + Number(a.difference),
-        0,
-      ),
+      totalDiscrepancy: toDecimalString(discrepancies.reduce(
+        (sum, a) => sum.plus(a.difference),
+        new Decimal(0),
+      )),
       audits,
     };
   }
@@ -711,11 +745,11 @@ export class ReportsService {
       string,
       {
         transactions: number;
-        transactionsTotalCup: number;
+        transactionsTotalCup: Decimal;
         expenses: number;
-        expensesTotalCup: number;
+        expensesTotalCup: Decimal;
         expensesUnconverted: number;
-        marginProfit: number;
+        marginProfit: Decimal;
       }
     >();
 
@@ -726,11 +760,11 @@ export class ReportsService {
     while (cursor <= endDay) {
       buckets.set(dateKey(cursor), {
         transactions: 0,
-        transactionsTotalCup: 0,
+        transactionsTotalCup: new Decimal(0),
         expenses: 0,
-        expensesTotalCup: 0,
+        expensesTotalCup: new Decimal(0),
         expensesUnconverted: 0,
-        marginProfit: 0,
+        marginProfit: new Decimal(0),
       });
       cursor.setUTCDate(cursor.getUTCDate() + 1);
     }
@@ -740,8 +774,8 @@ export class ReportsService {
       const bucket = buckets.get(key);
       if (!bucket) continue;
       bucket.transactions += 1;
-      bucket.transactionsTotalCup += Number(tx.totalCup);
-      bucket.marginProfit += Number(tx.marginProfit);
+      bucket.transactionsTotalCup = bucket.transactionsTotalCup.plus(tx.totalCup);
+      bucket.marginProfit = bucket.marginProfit.plus(tx.marginProfit);
     }
 
     for (const expense of expenses) {
@@ -759,7 +793,7 @@ export class ReportsService {
       if (rate === null) {
         bucket.expensesUnconverted += 1;
       } else {
-        bucket.expensesTotalCup += Number(expense.amount) * rate;
+        bucket.expensesTotalCup = bucket.expensesTotalCup.plus(dec(expense.amount).mul(rate));
       }
     }
 
@@ -768,11 +802,11 @@ export class ReportsService {
       .map(([date, b]) => ({
         date,
         transactions: b.transactions,
-        transactionsTotalCup: Number(b.transactionsTotalCup.toFixed(2)),
+        transactionsTotalCup: toDecimalString(b.transactionsTotalCup),
         expenses: b.expenses,
-        expensesTotalCup: Number(b.expensesTotalCup.toFixed(2)),
+        expensesTotalCup: toDecimalString(b.expensesTotalCup),
         expensesUnconverted: b.expensesUnconverted,
-        marginProfit: Number(b.marginProfit.toFixed(2)),
+        marginProfit: toDecimalString(b.marginProfit),
       }));
   }
   async getFxPerformanceReport(
@@ -794,8 +828,9 @@ export class ReportsService {
       where: { userId, type: 'SALE', createdAt: { gte: start, lte: end }, ...(currencyCode ? { currency: { code: currencyCode } } : {}) },
       include: { currency: true }, orderBy: { createdAt: 'asc' },
     });
-    const sales = movements.map((movement: any) => ({ id: movement.id, currency: movement.currency.code, amount: Number(movement.amount), rate: Number(movement.rate), costoPromedio: Number(movement.costSnapshot ?? 0), rendimiento: Number(movement.realizedProfit ?? 0), createdAt: movement.createdAt }));
+    const sales = movements.map((movement: any) => ({ id: movement.id, currency: movement.currency.code, amount: toDecimalString(movement.amount), rate: toDecimalString(movement.rate), costoPromedio: toDecimalString(movement.costSnapshot ?? 0), rendimiento: toDecimalString(movement.realizedProfit ?? 0), createdAt: movement.createdAt }));
     const positions = await this.prisma.currencyPosition.findMany({ where: { userId, ...(currencyCode ? { currency: { code: currencyCode } } : {}) }, include: { currency: true }, orderBy: { currencyId: 'asc' } });
-    return { period: { startDate, endDate }, currency: currencyCode ?? null, totalRendimiento: sales.reduce((sum: number, sale: any) => sum + sale.rendimiento, 0), movements: sales, positions: positions.map((position: any) => ({ currencyId: position.currencyId, currency: position.currency.code, saldo: Number(position.saldo), costoPromedio: position.costoPromedio == null ? null : Number(position.costoPromedio), reviewStatus: position.reviewStatus, reviewedAt: position.reviewedAt, availableForSale: position.reviewStatus === 'REVIEWED' && Number(position.saldo) > 0 })) };
+    const totalRendimiento = sales.reduce((sum: Decimal, sale: any) => sum.plus(sale.rendimiento), new Decimal(0));
+    return { period: { startDate, endDate }, currency: currencyCode ?? null, totalRendimiento: toDecimalString(totalRendimiento), movements: sales, positions: positions.map((position: any) => ({ currencyId: position.currencyId, currency: position.currency.code, saldo: toDecimalString(position.saldo), costoPromedio: position.costoPromedio == null ? null : toDecimalString(position.costoPromedio), reviewStatus: position.reviewStatus, reviewedAt: position.reviewedAt, availableForSale: position.reviewStatus === 'REVIEWED' && dec(position.saldo).gt(0) })) };
   }
 }

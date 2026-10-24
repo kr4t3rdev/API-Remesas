@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
+import { toDecimalString } from "../common/utils/decimal-serialization";
+import { Decimal } from "decimal.js";
 import { CreateExpenseItemDto } from './dto/create-expense-item.dto';
 import { UpdateExpenseItemDto } from './dto/update-expense-item.dto';
 import { QueryExpenseItemDto } from './dto/query-expense-item.dto';
-import { Decimal } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class ExpenseItemsService {
@@ -170,24 +171,24 @@ export class ExpenseItemsService {
 
   private buildReport(items: any[], period: string, periodInfo?: { start: string; end: string }) {
     const count = items.length;
-    let total = 0;
+    let total = new Decimal(0);
 
     const itemsWithAmounts = items.map((item) => {
-      const amount = parseFloat(String(item.amount));
-      total += amount;
+      const amount = new Decimal(String(item.amount ?? 0));
+      total = total.plus(amount);
       return {
         ...item,
-        amount: amount,
+        amount: toDecimalString(amount),
       };
     });
 
-    const average = count > 0 ? total / count : 0;
+    const average = count > 0 ? total.div(count) : new Decimal(0);
 
     return {
       items: itemsWithAmounts,
-      total: Math.round(total * 100) / 100,
+      total: toDecimalString(total),
       count,
-      average: Math.round(average * 100) / 100,
+      average: toDecimalString(average),
       period: periodInfo,
     };
   }
