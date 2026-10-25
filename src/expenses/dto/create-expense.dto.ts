@@ -2,17 +2,16 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,
   IsInt,
-  IsNumber,
   IsDateString,
   IsOptional,
   IsNotEmpty,
   IsEnum,
-  Min,
   ValidateIf,
   MaxLength,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { TransferAccountType } from '@prisma/client';
+import { IsDecimalString } from '../../common/decorators/is-decimal-string.decorator';
 
 export enum ExpenseCategory {
   RENTA = 'renta',
@@ -28,10 +27,9 @@ export class CreateExpenseDto {
   @IsNotEmpty()
   description: string;
 
-  @ApiProperty({ example: 5000.0 })
-  @IsNumber()
-  @Min(0.01)
-  amount: number;
+  @ApiProperty({ example: '5000.00', description: 'Importe en decimal string', type: String })
+  @IsDecimalString({ min: '0.01' })
+  amount: string;
 
   @ApiProperty({ example: 1 })
   @IsInt()

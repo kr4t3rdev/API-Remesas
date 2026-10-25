@@ -32,8 +32,8 @@ import com.squareup.moshi.JsonClass
  *
  * @param type 
  * @param currencyId 
- * @param amount 
- * @param rate 
+ * @param amount Importe en decimal string
+ * @param rate Tasa en decimal string
  * @param operationKind 
  * @param persistRate Persist this effective rate as the active rate for this transaction side
  * @param notes 
@@ -55,11 +55,13 @@ data class CreateFxTransferDto (
     @Json(name = "currencyId")
     val currencyId: java.math.BigDecimal,
 
+    /* Importe en decimal string */
     @Json(name = "amount")
-    val amount: java.math.BigDecimal,
+    val amount: kotlin.String,
 
+    /* Tasa en decimal string */
     @Json(name = "rate")
-    val rate: java.math.BigDecimal,
+    val rate: kotlin.String,
 
     @Json(name = "operationKind")
     val operationKind: CreateFxTransferDto.OperationKind? = OperationKind.TRANSFER,
@@ -91,7 +93,7 @@ data class CreateFxTransferDto (
 
     /* Profit credited to the worker balance in workerCurrencyId */
     @Json(name = "workerProfit")
-    val workerProfit: java.math.BigDecimal? = null,
+    val workerProfit: kotlin.String? = null,
 
     /* Currency of the worker profit */
     @Json(name = "workerCurrencyId")

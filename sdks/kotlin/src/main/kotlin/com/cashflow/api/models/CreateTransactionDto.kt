@@ -43,11 +43,11 @@ data class CreateTransactionDto (
 
     /* Cantidad de la transacción */
     @Json(name = "amount")
-    val amount: java.math.BigDecimal,
+    val amount: kotlin.String,
 
     /* Ganancia generada por la transacción */
     @Json(name = "profit")
-    val profit: java.math.BigDecimal,
+    val profit: kotlin.String,
 
     /* ID de la moneda */
     @Json(name = "currencyId")

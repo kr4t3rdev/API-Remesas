@@ -6101,16 +6101,19 @@
         "type": "object",
         "properties": {
           "referenceRate": {
-            "type": "number",
-            "example": 200
+            "type": "string",
+            "example": "200.00",
+            "description": "Tasa de referencia en decimal string"
           },
           "buyMargin": {
-            "type": "number",
-            "example": 0.05
+            "type": "string",
+            "example": "0.05",
+            "description": "Margen de compra en decimal string"
           },
           "sellMargin": {
-            "type": "number",
-            "example": 0.05
+            "type": "string",
+            "example": "0.05",
+            "description": "Margen de venta en decimal string"
           }
         },
         "required": [
@@ -6220,12 +6223,14 @@
         "type": "object",
         "properties": {
           "amount": {
-            "type": "number",
-            "description": "Cantidad de la transacción"
+            "type": "string",
+            "description": "Cantidad de la transacción",
+            "example": "100.00"
           },
           "profit": {
-            "type": "number",
-            "description": "Ganancia generada por la transacción"
+            "type": "string",
+            "description": "Ganancia generada por la transacción",
+            "example": "5.50"
           },
           "description": {
             "type": "string",
@@ -6367,10 +6372,14 @@
             "type": "number"
           },
           "amount": {
-            "type": "number"
+            "type": "string",
+            "example": "100.00",
+            "description": "Importe en decimal string"
           },
           "rate": {
-            "type": "number"
+            "type": "string",
+            "example": "180.5",
+            "description": "Tasa en decimal string"
           },
           "operationKind": {
             "type": "string",
@@ -6417,8 +6426,9 @@
             "description": "Worker receiving profit from this FX operation"
           },
           "workerProfit": {
-            "type": "number",
-            "description": "Profit credited to the worker balance in workerCurrencyId"
+            "type": "string",
+            "description": "Profit credited to the worker balance in workerCurrencyId",
+            "example": "25.50"
           },
           "workerCurrencyId": {
             "type": "number",
@@ -6470,8 +6480,9 @@
             "description": "Currency whose existing cash balance is being opened"
           },
           "openingCost": {
-            "type": "number",
-            "description": "Historical weighted average cost per unit"
+            "type": "string",
+            "description": "Historical weighted average cost per unit",
+            "example": "240.5000"
           }
         },
         "required": [
@@ -6526,8 +6537,9 @@
             "example": 1
           },
           "actualBalance": {
-            "type": "number",
-            "example": 5000
+            "type": "string",
+            "example": "5000.00",
+            "description": "Saldo real en decimal string"
           },
           "notes": {
             "type": "string",
@@ -6604,8 +6616,9 @@
             "example": 1
           },
           "amount": {
-            "type": "number",
-            "example": 100
+            "type": "string",
+            "example": "100.00",
+            "description": "Importe en decimal string"
           },
           "type": {
             "type": "string",
@@ -6696,8 +6709,9 @@
             "example": "1234567890"
           },
           "initialBalance": {
-            "type": "number",
-            "example": 1000
+            "type": "string",
+            "example": "1000.00",
+            "description": "Saldo inicial en decimal string"
           },
           "isActive": {
             "type": "boolean",
@@ -6962,8 +6976,9 @@
             "example": "1234567890"
           },
           "initialBalance": {
-            "type": "number",
-            "example": 1000
+            "type": "string",
+            "example": "1000.00",
+            "description": "Saldo inicial en decimal string"
           },
           "isActive": {
             "type": "boolean",
@@ -6980,8 +6995,9 @@
             "example": "Renta del local"
           },
           "amount": {
-            "type": "number",
-            "example": 5000
+            "type": "string",
+            "example": "5000.00",
+            "description": "Importe en decimal string"
           },
           "currencyId": {
             "type": "number",
@@ -7138,8 +7154,9 @@
             "example": "Renta del local"
           },
           "amount": {
-            "type": "number",
-            "example": 5000
+            "type": "string",
+            "example": "5000.00",
+            "description": "Importe en decimal string"
           },
           "currencyId": {
             "type": "number",
@@ -7189,8 +7206,9 @@
             "example": "Alcanzar $50,000 en ventas"
           },
           "targetAmount": {
-            "type": "number",
-            "example": 50000
+            "type": "string",
+            "example": "50000.00",
+            "description": "Meta en decimal string"
           },
           "currencyId": {
             "type": "number",
@@ -7386,8 +7404,9 @@
             "example": "Alcanzar $50,000 en ventas"
           },
           "targetAmount": {
-            "type": "number",
-            "example": 50000
+            "type": "string",
+            "example": "50000.00",
+            "description": "Meta en decimal string"
           },
           "currencyId": {
             "type": "number",
@@ -8138,8 +8157,9 @@
             "example": 2
           },
           "rate": {
-            "type": "number",
-            "example": 200.5
+            "type": "string",
+            "example": "200.50",
+            "description": "Tasa en decimal string"
           },
           "source": {
             "type": "string",
@@ -8384,16 +8404,19 @@
             "default": true
           },
           "monthlyUsd": {
-            "type": "number",
-            "example": 25
+            "type": "string",
+            "example": "25.00",
+            "description": "Precio mensual USD en decimal string"
           },
           "semiannualUsd": {
-            "type": "number",
-            "example": 85.5
+            "type": "string",
+            "example": "85.50",
+            "description": "Precio semestral USD en decimal string"
           },
           "annualUsd": {
-            "type": "number",
-            "example": 162
+            "type": "string",
+            "example": "162.00",
+            "description": "Precio anual USD en decimal string"
           }
         },
         "required": [
@@ -8418,16 +8441,19 @@
             "default": true
           },
           "monthlyUsd": {
-            "type": "number",
-            "example": 25
+            "type": "string",
+            "example": "25.00",
+            "description": "Precio mensual USD en decimal string"
           },
           "semiannualUsd": {
-            "type": "number",
-            "example": 85.5
+            "type": "string",
+            "example": "85.50",
+            "description": "Precio semestral USD en decimal string"
           },
           "annualUsd": {
-            "type": "number",
-            "example": 162
+            "type": "string",
+            "example": "162.00",
+            "description": "Precio anual USD en decimal string"
           }
         }
       },
@@ -8628,12 +8654,14 @@
             "example": "MONTHLY"
           },
           "amountUsd": {
-            "type": "number",
-            "example": 15
+            "type": "string",
+            "example": "15.00",
+            "description": "Importe USD en decimal string"
           },
           "exchangeRateUsed": {
-            "type": "number",
-            "example": 350
+            "type": "string",
+            "example": "350.00",
+            "description": "Tasa de cambio usada (decimal string)"
           },
           "bankAccountId": {
             "type": "number",
@@ -9899,8 +9927,9 @@
         "type": "object",
         "properties": {
           "amount": {
-            "type": "number",
-            "description": "Monto a entregar al trabajador"
+            "type": "string",
+            "description": "Monto a entregar al trabajador",
+            "example": "100.00"
           },
           "sourceType": {
             "type": "string",
@@ -9924,8 +9953,9 @@
         "type": "object",
         "properties": {
           "amount": {
-            "type": "number",
-            "description": "Monto a depositar"
+            "type": "string",
+            "description": "Monto a depositar",
+            "example": "100.00"
           },
           "destinationType": {
             "type": "string",
@@ -9954,9 +9984,9 @@
             "description": "Nombre del gasto"
           },
           "amount": {
-            "type": "number",
-            "example": 5000,
-            "description": "Monto del gasto"
+            "type": "string",
+            "example": "5000.00",
+            "description": "Monto del gasto en decimal string"
           },
           "category": {
             "type": "string",
@@ -10098,8 +10128,9 @@
             "example": "Mantenimiento de Inmuebles"
           },
           "amount": {
-            "type": "number",
-            "example": 3500
+            "type": "string",
+            "example": "3500.00",
+            "description": "Monto en decimal string"
           },
           "category": {
             "type": "string",
@@ -10287,12 +10318,14 @@
         "type": "object",
         "properties": {
           "safetyBuffer": {
-            "type": "number",
-            "example": 1000
+            "type": "string",
+            "example": "1000.00",
+            "description": "Colchón de seguridad en decimal string"
           },
           "insuranceLimit": {
-            "type": "number",
-            "example": 5000
+            "type": "string",
+            "example": "5000.00",
+            "description": "Límite de seguro en decimal string"
           }
         },
         "required": [
@@ -10444,8 +10477,9 @@
             "format": "date"
           },
           "actualBalance": {
-            "type": "number",
-            "example": 1500.5
+            "type": "string",
+            "example": "1500.50",
+            "description": "Saldo real en decimal string"
           },
           "notes": {
             "type": "string",
@@ -10549,16 +10583,22 @@
             "type": "number"
           },
           "foreignAmount": {
-            "type": "number"
+            "type": "string",
+            "example": "100.00",
+            "description": "Importe en moneda extranjera (decimal string)"
           },
           "localCurrencyId": {
             "type": "number"
           },
           "localAmount": {
-            "type": "number"
+            "type": "string",
+            "example": "24000.00",
+            "description": "Importe en moneda local (decimal string)"
           },
           "rate": {
-            "type": "number"
+            "type": "string",
+            "example": "240.5",
+            "description": "Tasa aplicada (decimal string)"
           },
           "idempotencyKey": {
             "type": "string"

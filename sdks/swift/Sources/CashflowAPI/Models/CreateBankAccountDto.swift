@@ -16,10 +16,11 @@ public struct CreateBankAccountDto: Codable, JSONEncodable, Hashable {
     public var bankName: String
     public var currencyId: Double
     public var accountNumber: String
-    public var initialBalance: Double?
+    /** Saldo inicial en decimal string */
+    public var initialBalance: String?
     public var isActive: Bool = true
 
-    public init(name: String, bankName: String, currencyId: Double, accountNumber: String, initialBalance: Double? = nil, isActive: Bool = true) {
+    public init(name: String, bankName: String, currencyId: Double, accountNumber: String, initialBalance: String? = nil, isActive: Bool = true) {
         self.name = name
         self.bankName = bankName
         self.currencyId = currencyId

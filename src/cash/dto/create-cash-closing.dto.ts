@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsInt, IsNumber, IsOptional, IsString, Matches, Min } from 'class-validator';
+import { IsDateString, IsInt, IsOptional, IsString, Matches } from 'class-validator';
+import { IsDecimalString } from '../../common/decorators/is-decimal-string.decorator';
 
 export class CreateCashClosingDto {
   @ApiProperty({ example: 1 })
@@ -11,10 +12,9 @@ export class CreateCashClosingDto {
   @IsDateString()
   businessDate!: string;
 
-  @ApiProperty({ example: 1500.5 })
-  @IsNumber({ maxDecimalPlaces: 2 })
-  @Min(0)
-  actualBalance!: number;
+  @ApiProperty({ example: '1500.50', description: 'Saldo real en decimal string', type: String })
+  @IsDecimalString({ min: '0', maxDecimalPlaces: 2 })
+  actualBalance!: string;
 
   @ApiPropertyOptional({ example: 'Cierre sin diferencias' })
   @IsOptional()

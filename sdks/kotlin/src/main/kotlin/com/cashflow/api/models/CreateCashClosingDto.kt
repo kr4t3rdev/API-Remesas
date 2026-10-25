@@ -32,7 +32,7 @@ import com.squareup.moshi.JsonClass
  *
  * @param currencyId 
  * @param businessDate 
- * @param actualBalance 
+ * @param actualBalance Saldo real en decimal string
  * @param notes 
  */
 
@@ -45,8 +45,9 @@ data class CreateCashClosingDto (
     @Json(name = "businessDate")
     val businessDate: java.time.LocalDate,
 
+    /* Saldo real en decimal string */
     @Json(name = "actualBalance")
-    val actualBalance: java.math.BigDecimal,
+    val actualBalance: kotlin.String,
 
     @Json(name = "notes")
     val notes: kotlin.String? = null

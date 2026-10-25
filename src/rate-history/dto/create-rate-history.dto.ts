@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsEnum, IsOptional, IsString, Min } from 'class-validator';
+import { IsNumber, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsDecimalString } from '../../common/decorators/is-decimal-string.decorator';
 
 export enum RateSource {
   MANUAL = 'MANUAL',
@@ -15,10 +16,9 @@ export class CreateRateHistoryDto {
   @IsNumber()
   currencyToId: number;
 
-  @ApiProperty({ example: 200.5 })
-  @IsNumber()
-  @Min(0)
-  rate: number;
+  @ApiProperty({ example: '200.50', description: 'Tasa en decimal string', type: String })
+  @IsDecimalString({ min: '0' })
+  rate: string;
 
   @ApiProperty({ enum: RateSource, example: RateSource.MANUAL })
   @IsEnum(RateSource)

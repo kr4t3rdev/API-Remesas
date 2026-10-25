@@ -15,9 +15,9 @@ public struct OpenCurrencyPositionDto: Codable, JSONEncodable, Hashable {
     /** Currency whose existing cash balance is being opened */
     public var currencyId: Double
     /** Historical weighted average cost per unit */
-    public var openingCost: Double
+    public var openingCost: String
 
-    public init(currencyId: Double, openingCost: Double) {
+    public init(currencyId: Double, openingCost: String) {
         self.currencyId = currencyId
         self.openingCost = openingCost
     }

@@ -1,11 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNumber, IsOptional, Min, IsEnum, IsNotEmpty, IsInt } from 'class-validator';
+import { IsOptional, Min, IsEnum, IsNotEmpty, IsInt } from 'class-validator';
+import { IsDecimalString } from '../../common/decorators/is-decimal-string.decorator';
 
 export class AddBalanceDto {
-  @ApiProperty({ description: 'Monto a entregar al trabajador' })
-  @IsNumber()
-  @Min(0.01, { message: 'El monto debe ser mayor a cero' })
-  amount: number;
+  @ApiProperty({ description: 'Monto a entregar al trabajador', type: String, example: '100.00' })
+  @IsDecimalString({ min: '0.01', message: 'El monto debe ser mayor a cero' })
+  amount: string;
 
   @ApiPropertyOptional({ description: 'Tipo de origen: CASH o BANK_ACCOUNT' })
   @IsOptional()

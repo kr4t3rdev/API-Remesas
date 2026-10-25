@@ -13,9 +13,9 @@ import AnyCodable
 public struct CreateTransactionDto: Codable, JSONEncodable, Hashable {
 
     /** Cantidad de la transacción */
-    public var amount: Double
+    public var amount: String
     /** Ganancia generada por la transacción */
-    public var profit: Double
+    public var profit: String
     /** Descripción de la transacción */
     public var description: String?
     /** Tipo de destino: CASH o BANK_ACCOUNT */
@@ -25,7 +25,7 @@ public struct CreateTransactionDto: Codable, JSONEncodable, Hashable {
     /** ID de la moneda */
     public var currencyId: Double
 
-    public init(amount: Double, profit: Double, description: String? = nil, destinationType: String? = nil, destinationId: Double? = nil, currencyId: Double) {
+    public init(amount: String, profit: String, description: String? = nil, destinationType: String? = nil, destinationId: Double? = nil, currencyId: Double) {
         self.amount = amount
         self.profit = profit
         self.description = description

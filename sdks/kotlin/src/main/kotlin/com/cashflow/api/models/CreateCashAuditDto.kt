@@ -31,7 +31,7 @@ import com.squareup.moshi.JsonClass
  * 
  *
  * @param currencyId 
- * @param actualBalance 
+ * @param actualBalance Saldo real en decimal string
  * @param notes 
  */
 
@@ -41,8 +41,9 @@ data class CreateCashAuditDto (
     @Json(name = "currencyId")
     val currencyId: java.math.BigDecimal,
 
+    /* Saldo real en decimal string */
     @Json(name = "actualBalance")
-    val actualBalance: java.math.BigDecimal,
+    val actualBalance: kotlin.String,
 
     @Json(name = "notes")
     val notes: kotlin.String? = null

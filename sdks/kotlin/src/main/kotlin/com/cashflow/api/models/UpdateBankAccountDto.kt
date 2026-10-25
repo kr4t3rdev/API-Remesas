@@ -34,7 +34,7 @@ import com.squareup.moshi.JsonClass
  * @param bankName 
  * @param currencyId 
  * @param accountNumber 
- * @param initialBalance 
+ * @param initialBalance Saldo inicial en decimal string
  * @param isActive 
  */
 
@@ -53,8 +53,9 @@ data class UpdateBankAccountDto (
     @Json(name = "accountNumber")
     val accountNumber: kotlin.String? = null,
 
+    /* Saldo inicial en decimal string */
     @Json(name = "initialBalance")
-    val initialBalance: java.math.BigDecimal? = null,
+    val initialBalance: kotlin.String? = null,
 
     @Json(name = "isActive")
     val isActive: kotlin.Boolean? = true

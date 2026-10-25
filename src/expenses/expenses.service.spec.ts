@@ -20,7 +20,7 @@ describe('ExpensesService', () => {
   } as any;
   const service = new ExpensesService(prisma);
   const base = {
-    description: 'Rent', amount: 100, currencyId: 1, category: 'renta',
+    description: 'Rent', amount: '100', currencyId: 1, category: 'renta',
     date: '2026-07-16', sourceType: 'CASH' as const,
   };
 
@@ -62,7 +62,7 @@ describe('ExpensesService', () => {
     tx.bankAccount.updateMany.mockResolvedValue({ count: 1 });
     tx.expense.updateMany.mockResolvedValue({ count: 1 });
     tx.expense.findFirst.mockResolvedValue({ id: 1 });
-    await service.update(1, { amount: 80, sourceType: 'BANK_ACCOUNT', sourceBankAccountId: 5 }, 7);
+    await service.update(1, { amount: '80', sourceType: 'BANK_ACCOUNT', sourceBankAccountId: 5 }, 7);
     expect(tx.cashBalance.upsert).toHaveBeenCalled();
     expect(tx.bankAccount.updateMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ id: 5, balance: { gte: expect.anything() } }) }));
   });
@@ -102,7 +102,7 @@ describe('ExpensesService', () => {
     tx.expense.updateMany.mockResolvedValue({ count: 1 });
     tx.expense.deleteMany.mockResolvedValue({ count: 1 });
 
-    await service.update(1, { amount: 90 }, 7);
+    await service.update(1, { amount: '90' }, 7);
     expect(tx.$queryRaw.mock.calls[0][0].join('?')).toContain('"userId" = ? FOR UPDATE');
     expect(tx.$queryRaw.mock.calls[0].slice(1)).toEqual([1, 7]);
     expect(tx.$queryRaw.mock.invocationCallOrder[0]).toBeLessThan(tx.cashBalance.upsert.mock.invocationCallOrder[0]);

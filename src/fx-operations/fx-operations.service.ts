@@ -90,7 +90,7 @@ export class FxOperationsService {
     )) {
       throw new BadRequestException('Worker FX transfers must use CASH accounts only');
     }
-    if (dto.workerProfit !== undefined && dto.workerProfit < 0) {
+    if (dto.workerProfit !== undefined && new Decimal(dto.workerProfit).lessThan(0)) {
       throw new BadRequestException('Worker profit cannot be negative');
     }
     const effectiveWorkerCurrencyId = dto.workerCurrencyId;

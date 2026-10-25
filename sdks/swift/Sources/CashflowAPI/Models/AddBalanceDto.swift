@@ -13,7 +13,7 @@ import AnyCodable
 public struct AddBalanceDto: Codable, JSONEncodable, Hashable {
 
     /** Monto a entregar al trabajador */
-    public var amount: Double
+    public var amount: String
     /** Tipo de origen: CASH o BANK_ACCOUNT */
     public var sourceType: String?
     /** ID del origen (bankAccountId si sourceType es BANK_ACCOUNT) */
@@ -21,7 +21,7 @@ public struct AddBalanceDto: Codable, JSONEncodable, Hashable {
     /** ID de la moneda */
     public var currencyId: Double
 
-    public init(amount: Double, sourceType: String? = nil, sourceId: Double? = nil, currencyId: Double) {
+    public init(amount: String, sourceType: String? = nil, sourceId: Double? = nil, currencyId: Double) {
         self.amount = amount
         self.sourceType = sourceType
         self.sourceId = sourceId

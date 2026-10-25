@@ -16,10 +16,11 @@ public struct UpdateBankAccountDto: Codable, JSONEncodable, Hashable {
     public var bankName: String?
     public var currencyId: Double?
     public var accountNumber: String?
-    public var initialBalance: Double?
+    /** Saldo inicial en decimal string */
+    public var initialBalance: String?
     public var isActive: Bool? = true
 
-    public init(name: String? = nil, bankName: String? = nil, currencyId: Double? = nil, accountNumber: String? = nil, initialBalance: Double? = nil, isActive: Bool? = true) {
+    public init(name: String? = nil, bankName: String? = nil, currencyId: Double? = nil, accountNumber: String? = nil, initialBalance: String? = nil, isActive: Bool? = true) {
         self.name = name
         self.bankName = bankName
         self.currencyId = currencyId

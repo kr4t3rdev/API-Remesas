@@ -15,11 +15,14 @@ public struct UpdatePlanDto: Codable, JSONEncodable, Hashable {
     public var name: String?
     public var description: String?
     public var isActive: Bool? = true
-    public var monthlyUsd: Double?
-    public var semiannualUsd: Double?
-    public var annualUsd: Double?
+    /** Precio mensual USD en decimal string */
+    public var monthlyUsd: String?
+    /** Precio semestral USD en decimal string */
+    public var semiannualUsd: String?
+    /** Precio anual USD en decimal string */
+    public var annualUsd: String?
 
-    public init(name: String? = nil, description: String? = nil, isActive: Bool? = true, monthlyUsd: Double? = nil, semiannualUsd: Double? = nil, annualUsd: Double? = nil) {
+    public init(name: String? = nil, description: String? = nil, isActive: Bool? = true, monthlyUsd: String? = nil, semiannualUsd: String? = nil, annualUsd: String? = nil) {
         self.name = name
         self.description = description
         self.isActive = isActive

@@ -14,10 +14,11 @@ public struct CreateCashClosingDto: Codable, JSONEncodable, Hashable {
 
     public var currencyId: Double
     public var businessDate: Date
-    public var actualBalance: Double
+    /** Saldo real en decimal string */
+    public var actualBalance: String
     public var notes: String?
 
-    public init(currencyId: Double, businessDate: Date, actualBalance: Double, notes: String? = nil) {
+    public init(currencyId: Double, businessDate: Date, actualBalance: String, notes: String? = nil) {
         self.currencyId = currencyId
         self.businessDate = businessDate
         self.actualBalance = actualBalance

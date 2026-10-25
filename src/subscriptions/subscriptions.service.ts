@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { BillingCycle, LicenseState } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime/library';
 import { PrismaService } from '../database/prisma/prisma.service';
 
 const CYCLE_DAYS: Record<BillingCycle, number> = {
@@ -131,22 +132,24 @@ export class SubscriptionsService {
     userLicenseId?: number;
     planId: number;
     cycle: BillingCycle;
-    amountUsd: number;
-    exchangeRateUsed: number;
+    amountUsd: string;
+    exchangeRateUsed: string;
     paidAt?: Date;
     notes?: string;
   }) {
-    const expectedAmount = CYCLE_USD[input.cycle];
-    if (Number(input.amountUsd.toFixed(2)) !== expectedAmount) {
-      throw new BadRequestException(`Monto USD inválido para ${input.cycle}. Esperado: ${expectedAmount}`);
+    const amountUsd = new Decimal(input.amountUsd);
+    const exchangeRateUsed = new Decimal(input.exchangeRateUsed);
+    const expectedAmount = new Decimal(CYCLE_USD[input.cycle]);
+    if (!amountUsd.toDecimalPlaces(2).eq(expectedAmount)) {
+      throw new BadRequestException(`Monto USD inválido para ${input.cycle}. Esperado: ${expectedAmount.toFixed(2)}`);
     }
 
-    if (input.exchangeRateUsed <= 0) {
+    if (exchangeRateUsed.lessThanOrEqualTo(0)) {
       throw new BadRequestException('La tasa de cambio debe ser mayor que 0');
     }
 
     const now = input.paidAt ?? new Date();
-    const amountCup = input.amountUsd * input.exchangeRateUsed;
+    const amountCup = amountUsd.mul(exchangeRateUsed).toDecimalPlaces(2);
 
     let userLicenseId = input.userLicenseId;
 
@@ -180,8 +183,8 @@ export class SubscriptionsService {
         userLicenseId,
         planId: input.planId,
         cycle: input.cycle,
-        amountUsd: input.amountUsd,
-        exchangeRateUsed: input.exchangeRateUsed,
+        amountUsd: new Decimal(input.amountUsd),
+        exchangeRateUsed: new Decimal(input.exchangeRateUsed),
         amountCup,
         paidAt: now,
         notes: input.notes,
@@ -196,8 +199,8 @@ export class SubscriptionsService {
     userLicenseId?: number;
     planId: number;
     cycle: BillingCycle;
-    amountUsd: number;
-    exchangeRateUsed: number;
+    amountUsd: string;
+    exchangeRateUsed: string;
     bankAccountId?: number;
     paidAt?: Date;
     notes?: string;

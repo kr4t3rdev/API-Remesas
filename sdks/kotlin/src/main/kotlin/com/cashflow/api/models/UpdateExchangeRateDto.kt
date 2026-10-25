@@ -30,22 +30,25 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * @param referenceRate 
- * @param buyMargin 
- * @param sellMargin 
+ * @param referenceRate Tasa de referencia en decimal string
+ * @param buyMargin Margen de compra en decimal string
+ * @param sellMargin Margen de venta en decimal string
  */
 
 
 data class UpdateExchangeRateDto (
 
+    /* Tasa de referencia en decimal string */
     @Json(name = "referenceRate")
-    val referenceRate: java.math.BigDecimal,
+    val referenceRate: kotlin.String,
 
+    /* Margen de compra en decimal string */
     @Json(name = "buyMargin")
-    val buyMargin: java.math.BigDecimal,
+    val buyMargin: kotlin.String,
 
+    /* Margen de venta en decimal string */
     @Json(name = "sellMargin")
-    val sellMargin: java.math.BigDecimal
+    val sellMargin: kotlin.String
 
 ) {
 

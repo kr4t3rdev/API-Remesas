@@ -43,7 +43,7 @@ data class OpenCurrencyPositionDto (
 
     /* Historical weighted average cost per unit */
     @Json(name = "openingCost")
-    val openingCost: java.math.BigDecimal
+    val openingCost: kotlin.String
 
 ) {
 

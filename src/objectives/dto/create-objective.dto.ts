@@ -2,11 +2,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,
   IsInt,
-  IsNumber,
   IsOptional,
   IsNotEmpty,
-  Min,
 } from 'class-validator';
+import { IsDecimalString } from '../../common/decorators/is-decimal-string.decorator';
 
 export class CreateObjectiveDto {
   @ApiProperty({ example: 'Meta de ventas Q1' })
@@ -19,10 +18,9 @@ export class CreateObjectiveDto {
   @IsString()
   description?: string;
 
-  @ApiProperty({ example: 50000.0 })
-  @IsNumber()
-  @Min(0.01)
-  targetAmount: number;
+  @ApiProperty({ example: '50000.00', description: 'Meta en decimal string', type: String })
+  @IsDecimalString({ min: '0.01' })
+  targetAmount: string;
 
   @ApiProperty({ example: 1 })
   @IsInt()

@@ -12,11 +12,14 @@ import AnyCodable
 
 public struct UpdateExchangeRateDto: Codable, JSONEncodable, Hashable {
 
-    public var referenceRate: Double
-    public var buyMargin: Double
-    public var sellMargin: Double
+    /** Tasa de referencia en decimal string */
+    public var referenceRate: String
+    /** Margen de compra en decimal string */
+    public var buyMargin: String
+    /** Margen de venta en decimal string */
+    public var sellMargin: String
 
-    public init(referenceRate: Double, buyMargin: Double, sellMargin: Double) {
+    public init(referenceRate: String, buyMargin: String, sellMargin: String) {
         self.referenceRate = referenceRate
         self.buyMargin = buyMargin
         self.sellMargin = sellMargin

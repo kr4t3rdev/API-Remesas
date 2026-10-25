@@ -21,13 +21,15 @@ public struct RegisterPaymentDto: Codable, JSONEncodable, Hashable {
     public var userLicenseId: Double?
     public var planId: Double
     public var cycle: Cycle
-    public var amountUsd: Double
-    public var exchangeRateUsed: Double
+    /** Importe USD en decimal string */
+    public var amountUsd: String
+    /** Tasa de cambio usada (decimal string) */
+    public var exchangeRateUsed: String
     public var bankAccountId: Double?
     public var paidAt: String?
     public var notes: String?
 
-    public init(userId: Double, userLicenseId: Double? = nil, planId: Double, cycle: Cycle, amountUsd: Double, exchangeRateUsed: Double, bankAccountId: Double? = nil, paidAt: String? = nil, notes: String? = nil) {
+    public init(userId: Double, userLicenseId: Double? = nil, planId: Double, cycle: Cycle, amountUsd: String, exchangeRateUsed: String, bankAccountId: Double? = nil, paidAt: String? = nil, notes: String? = nil) {
         self.userId = userId
         self.userLicenseId = userLicenseId
         self.planId = planId

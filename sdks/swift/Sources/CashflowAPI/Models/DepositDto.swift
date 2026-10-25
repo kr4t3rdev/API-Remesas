@@ -13,7 +13,7 @@ import AnyCodable
 public struct DepositDto: Codable, JSONEncodable, Hashable {
 
     /** Monto a depositar */
-    public var amount: Double
+    public var amount: String
     /** Tipo de destino: CASH o BANK_ACCOUNT */
     public var destinationType: String?
     /** ID del destino (bankAccountId si destinationType es BANK_ACCOUNT) */
@@ -21,7 +21,7 @@ public struct DepositDto: Codable, JSONEncodable, Hashable {
     /** ID de la moneda */
     public var currencyId: Double
 
-    public init(amount: Double, destinationType: String? = nil, destinationId: Double? = nil, currencyId: Double) {
+    public init(amount: String, destinationType: String? = nil, destinationId: Double? = nil, currencyId: Double) {
         self.amount = amount
         self.destinationType = destinationType
         self.destinationId = destinationId

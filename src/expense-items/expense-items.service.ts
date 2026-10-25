@@ -11,13 +11,14 @@ export class ExpenseItemsService {
   constructor(private prisma: PrismaService) {}
 
   async create(createDto: CreateExpenseItemDto, userId: number) {
-    // Round amount to 2 decimal places
-    const amount = Math.round(createDto.amount * 100) / 100;
+    // Redondeo a 2 decimales con aritmética decimal exacta (no float):
+    // el monto entra como decimal string y se guarda como Decimal.
+    const amount = new Decimal(createDto.amount).toDecimalPlaces(2);
 
     return this.prisma.expenseItem.create({
       data: {
         name: createDto.name.trim(),
-        amount: new Decimal(amount),
+        amount,
         category: createDto.category?.trim() || null,
         userId,
       },
@@ -69,8 +70,7 @@ export class ExpenseItemsService {
     }
 
     if (updateDto.amount !== undefined) {
-      const amount = Math.round(updateDto.amount * 100) / 100;
-      data.amount = new Decimal(amount);
+      data.amount = new Decimal(updateDto.amount).toDecimalPlaces(2);
     }
 
     if (updateDto.category !== undefined) {

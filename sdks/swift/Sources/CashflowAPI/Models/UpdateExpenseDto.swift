@@ -24,7 +24,8 @@ public struct UpdateExpenseDto: Codable, JSONEncodable, Hashable {
         case otros = "otros"
     }
     public var description: String?
-    public var amount: Double?
+    /** Importe en decimal string */
+    public var amount: String?
     public var currencyId: Double?
     public var sourceType: SourceType?
     /** Required when sourceType is BANK_ACCOUNT */
@@ -33,7 +34,7 @@ public struct UpdateExpenseDto: Codable, JSONEncodable, Hashable {
     public var date: String?
     public var notes: String?
 
-    public init(description: String? = nil, amount: Double? = nil, currencyId: Double? = nil, sourceType: SourceType? = nil, sourceBankAccountId: Double? = nil, category: Category? = nil, date: String? = nil, notes: String? = nil) {
+    public init(description: String? = nil, amount: String? = nil, currencyId: Double? = nil, sourceType: SourceType? = nil, sourceBankAccountId: Double? = nil, category: Category? = nil, date: String? = nil, notes: String? = nil) {
         self.description = description
         self.amount = amount
         self.currencyId = currencyId

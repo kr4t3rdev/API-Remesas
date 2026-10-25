@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsDecimalString } from '../../common/decorators/is-decimal-string.decorator';
 
 export class CreatePlanDto {
   @ApiProperty({ example: 'Plan Estándar' })
@@ -16,20 +17,17 @@ export class CreatePlanDto {
   @IsBoolean()
   isActive?: boolean;
 
-  @ApiProperty({ example: 25 })
-  @IsNumber()
-  @Min(0)
-  monthlyUsd!: number;
+  @ApiProperty({ example: '25.00', description: 'Precio mensual USD en decimal string', type: String })
+  @IsDecimalString({ min: '0' })
+  monthlyUsd!: string;
 
-  @ApiPropertyOptional({ example: 85.5 })
+  @ApiPropertyOptional({ example: '85.50', description: 'Precio semestral USD en decimal string', type: String })
   @IsOptional()
-  @IsNumber()
-  @Min(0)
-  semiannualUsd?: number;
+  @IsDecimalString({ min: '0' })
+  semiannualUsd?: string;
 
-  @ApiPropertyOptional({ example: 162 })
+  @ApiPropertyOptional({ example: '162.00', description: 'Precio anual USD en decimal string', type: String })
   @IsOptional()
-  @IsNumber()
-  @Min(0)
-  annualUsd?: number;
+  @IsDecimalString({ min: '0' })
+  annualUsd?: string;
 }

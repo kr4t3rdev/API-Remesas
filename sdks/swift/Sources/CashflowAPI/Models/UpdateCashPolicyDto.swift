@@ -12,10 +12,12 @@ import AnyCodable
 
 public struct UpdateCashPolicyDto: Codable, JSONEncodable, Hashable {
 
-    public var safetyBuffer: Double
-    public var insuranceLimit: Double
+    /** Colchón de seguridad en decimal string */
+    public var safetyBuffer: String
+    /** Límite de seguro en decimal string */
+    public var insuranceLimit: String
 
-    public init(safetyBuffer: Double, insuranceLimit: Double) {
+    public init(safetyBuffer: String, insuranceLimit: String) {
         self.safetyBuffer = safetyBuffer
         self.insuranceLimit = insuranceLimit
     }

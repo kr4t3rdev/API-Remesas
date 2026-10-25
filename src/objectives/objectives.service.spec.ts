@@ -33,7 +33,7 @@ describe("ObjectivesService tenant isolation", () => {
 
     await expect(
       service.create(
-        { name: "Goal", targetAmount: 100, currencyId: 1, bankAccountId: 99 },
+        { name: "Goal", targetAmount: '100', currencyId: 1, bankAccountId: 99 },
         7,
       ),
     ).rejects.toThrow(NotFoundException);
@@ -47,7 +47,7 @@ describe("ObjectivesService tenant isolation", () => {
 
   it("uses the same error for a foreign and a nonexistent bank account", async () => {
     prisma.bankAccount.findFirst.mockResolvedValue(null);
-    const input = { name: "Goal", targetAmount: 100, currencyId: 1 };
+    const input = { name: "Goal", targetAmount: '100', currencyId: 1 };
 
     const foreign = service.create({ ...input, bankAccountId: 99 }, 7);
     await expect(foreign).rejects.toMatchObject({
@@ -65,7 +65,7 @@ describe("ObjectivesService tenant isolation", () => {
     prisma.objective.create.mockResolvedValue({ id: 1, bankAccountId: 20 });
 
     await service.create(
-      { name: "Goal", targetAmount: 100, currencyId: 1, bankAccountId: 20 },
+      { name: "Goal", targetAmount: '100', currencyId: 1, bankAccountId: 20 },
       7,
     );
 

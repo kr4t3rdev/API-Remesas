@@ -30,8 +30,10 @@ public struct CreateFxTransferDto: Codable, JSONEncodable, Hashable {
     }
     public var type: ModelType
     public var currencyId: Double
-    public var amount: Double
-    public var rate: Double
+    /** Importe en decimal string */
+    public var amount: String
+    /** Tasa en decimal string */
+    public var rate: String
     public var operationKind: OperationKind? = .transfer
     /** Persist this effective rate as the active rate for this transaction side */
     public var persistRate: Bool? = false
@@ -45,11 +47,11 @@ public struct CreateFxTransferDto: Codable, JSONEncodable, Hashable {
     /** Worker receiving profit from this FX operation */
     public var workerId: Double?
     /** Profit credited to the worker balance in workerCurrencyId */
-    public var workerProfit: Double?
+    public var workerProfit: String?
     /** Currency of the worker profit */
     public var workerCurrencyId: Double?
 
-    public init(type: ModelType, currencyId: Double, amount: Double, rate: Double, operationKind: OperationKind? = .transfer, persistRate: Bool? = false, notes: String? = nil, sourceType: SourceType? = .cash, sourceBankAccountId: Double? = nil, destinationType: DestinationType? = .cash, destinationBankAccountId: Double? = nil, workerId: Double? = nil, workerProfit: Double? = nil, workerCurrencyId: Double? = nil) {
+    public init(type: ModelType, currencyId: Double, amount: String, rate: String, operationKind: OperationKind? = .transfer, persistRate: Bool? = false, notes: String? = nil, sourceType: SourceType? = .cash, sourceBankAccountId: Double? = nil, destinationType: DestinationType? = .cash, destinationBankAccountId: Double? = nil, workerId: Double? = nil, workerProfit: String? = nil, workerCurrencyId: Double? = nil) {
         self.type = type
         self.currencyId = currencyId
         self.amount = amount

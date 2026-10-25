@@ -20,7 +20,7 @@ describe('BankAccountsService tenant isolation', () => {
     const findMany = jest.fn(({ where }: any) => Promise.resolve(accounts.filter((row) => row.userId === where.userId && row.isActive === where.isActive)));
     const service = new BankAccountsService({ bankAccount: { create, findMany } } as unknown as PrismaService);
 
-    await service.create(USER_A, { name: 'A account', bankName: 'Bank A', accountNumber: '123', currencyId: 1, initialBalance: 50 });
+    await service.create(USER_A, { name: 'A account', bankName: 'Bank A', accountNumber: '123', currencyId: 1, initialBalance: '50' });
     await expect(service.findAll(USER_A)).resolves.toEqual([accounts[0]]);
 
     expect(create).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ userId: USER_A }) }));

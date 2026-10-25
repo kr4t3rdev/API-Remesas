@@ -4,7 +4,7 @@ describe('FxOperationsController', () => {
   it('forwards Idempotency-Key to the transfer service', async () => {
     const service = { createTransfer: jest.fn().mockResolvedValue({ id: 1 }) };
     const controller = new FxOperationsController(service as any);
-    const dto = { type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 260 };
+    const dto = { type: 'COMPRA' as any, currencyId: 2, amount: '10', rate: '260' };
 
     await controller.createTransfer(7, dto, 'fx-123');
 
@@ -14,7 +14,7 @@ describe('FxOperationsController', () => {
   it.each([undefined, '', '   '])('rejects a blank Idempotency-Key before invoking the transfer service', async (key) => {
     const service = { createTransfer: jest.fn() };
     const controller = new FxOperationsController(service as any);
-    const dto = { type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 260 };
+    const dto = { type: 'COMPRA' as any, currencyId: 2, amount: '10', rate: '260' };
 
     expect(() => controller.createTransfer(7, dto, key)).toThrow('Idempotency-Key header is required for FX transfers');
     expect(service.createTransfer).not.toHaveBeenCalled();

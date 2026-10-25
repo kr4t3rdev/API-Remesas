@@ -31,7 +31,7 @@ import com.squareup.moshi.JsonClass
  * 
  *
  * @param name 
- * @param amount 
+ * @param amount Monto en decimal string
  * @param category Null para eliminar categoría
  */
 
@@ -41,8 +41,9 @@ data class UpdateExpenseItemDto (
     @Json(name = "name")
     val name: kotlin.String? = null,
 
+    /* Monto en decimal string */
     @Json(name = "amount")
-    val amount: java.math.BigDecimal? = null,
+    val amount: kotlin.String? = null,
 
     /* Null para eliminar categoría */
     @Json(name = "category")

@@ -33,8 +33,8 @@ import com.squareup.moshi.JsonClass
  * @param userId 
  * @param planId 
  * @param cycle 
- * @param amountUsd 
- * @param exchangeRateUsed 
+ * @param amountUsd Importe USD en decimal string
+ * @param exchangeRateUsed Tasa de cambio usada (decimal string)
  * @param userLicenseId 
  * @param bankAccountId 
  * @param paidAt 
@@ -53,11 +53,13 @@ data class RegisterPaymentDto (
     @Json(name = "cycle")
     val cycle: RegisterPaymentDto.Cycle,
 
+    /* Importe USD en decimal string */
     @Json(name = "amountUsd")
-    val amountUsd: java.math.BigDecimal,
+    val amountUsd: kotlin.String,
 
+    /* Tasa de cambio usada (decimal string) */
     @Json(name = "exchangeRateUsed")
-    val exchangeRateUsed: java.math.BigDecimal,
+    val exchangeRateUsed: kotlin.String,
 
     @Json(name = "userLicenseId")
     val userLicenseId: java.math.BigDecimal? = null,

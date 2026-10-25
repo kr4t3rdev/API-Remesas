@@ -234,7 +234,7 @@ describe('FX operations foundation', () => {
     [{ id: 1, code: 'CUP', isActive: true }, { id: 1, code: 'CUP', isActive: true }],
   ])('rejects an inactive or CUP currency as the FX divisa', async (divisa, cup) => {
     const prisma = { currency: { findUnique: jest.fn().mockResolvedValueOnce(divisa).mockResolvedValueOnce(cup) } } as any;
-    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 260 }))
+    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: '10', rate: '260' }))
       .rejects.toThrow('Active non-CUP FX currency not found');
   });
   it('derives the selected side margin while preserving the reference rate', () => {
@@ -260,7 +260,7 @@ describe('FX operations foundation', () => {
       })),
     } as any;
 
-    const dto: OpenCurrencyPositionDto = { currencyId: 2, openingCost: 250 };
+    const dto: OpenCurrencyPositionDto = { currencyId: 2, openingCost: '250' };
     await expect(new FxOperationsService(prisma).openPosition(7, dto)).resolves.toEqual(expect.objectContaining({ movement: { id: 32 } }));
     expect(positionCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ saldo: new Decimal(100), openingSaldo: new Decimal(100), openingCost: new Decimal(250), reviewStatus: 'REVIEWED' }) });
     expect(movementCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ type: 'OPENING', amount: new Decimal(100), rate: new Decimal(250), costSnapshot: new Decimal(250) }) });
@@ -281,7 +281,7 @@ describe('FX operations foundation', () => {
         })),
     } as any;
 
-    await expect(new FxOperationsService(prisma).openPosition(7, { currencyId: 2, openingCost: 250 }))
+    await expect(new FxOperationsService(prisma).openPosition(7, { currencyId: 2, openingCost: '250' }))
       .resolves.toEqual(expect.objectContaining({ movement: { id: 32 } }));
     expect(prisma.$transaction).toHaveBeenCalledTimes(2);
   });
@@ -297,7 +297,7 @@ describe('FX operations foundation', () => {
     } as any;
 
     await expect(new FxOperationsService(prisma).createTransfer(7, {
-      type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 260,
+      type: 'COMPRA' as any, currencyId: 2, amount: '10', rate: '260',
     }, 'retry-exhausted')).rejects.toBe(conflict);
     expect(prisma.$transaction).toHaveBeenCalledTimes(3);
   });
@@ -307,7 +307,7 @@ describe('FX operations foundation', () => {
       currency: { findUnique: jest.fn().mockResolvedValue({ id: 1, code: 'CUP', isActive: true }) },
     } as any;
 
-    await expect(new FxOperationsService(prisma).openPosition(7, { currencyId: 1, openingCost: 1 }))
+    await expect(new FxOperationsService(prisma).openPosition(7, { currencyId: 1, openingCost: '1' }))
       .rejects.toThrow('Active non-CUP FX currency not found');
   });
 
@@ -324,7 +324,7 @@ describe('FX operations foundation', () => {
       })),
     } as any;
 
-    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 260 }))
+    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: '10', rate: '260' }))
       .rejects.toThrow(CurrencyPositionUnavailableError);
   });
 
@@ -343,7 +343,7 @@ describe('FX operations foundation', () => {
     } as any;
 
     await expect(new FxOperationsService(prisma).createTransfer(7, {
-      type: 'COMPRA' as any, currencyId: 2, amount: 50, rate: 260,
+      type: 'COMPRA' as any, currencyId: 2, amount: '50', rate: '260',
     }, 'fx-123')).resolves.toEqual({ transaction: existing, movement: existing.fxMovements[0] });
     expect(prisma.$transaction).not.toHaveBeenCalled();
   });
@@ -351,7 +351,7 @@ describe('FX operations foundation', () => {
     const existing = { id: 11, userId: 7, idempotencyKey: 'fx-123', type: 'COMPRA', currencyId: 2, amount: 50, rate: 260, notes: null, fxMovements: [{ id: 12 }] };
     const prisma = { transaction: { findUnique: jest.fn().mockResolvedValue(existing) }, currency: { findUnique: jest.fn() }, $transaction: jest.fn() } as any;
 
-    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'VENTA' as any, currencyId: 2, amount: 50, rate: 260 }, 'fx-123'))
+    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'VENTA' as any, currencyId: 2, amount: '50', rate: '260' }, 'fx-123'))
       .rejects.toThrow('Idempotency key was already used for a different transfer');
   });
   it('treats worker context as part of idempotent intent', async () => {
@@ -363,14 +363,14 @@ describe('FX operations foundation', () => {
     const prisma = { transaction: { findUnique: jest.fn().mockResolvedValue(existing) }, currency: { findUnique: jest.fn() }, $transaction: jest.fn() } as any;
 
     await expect(new FxOperationsService(prisma).createTransfer(7, {
-      type: 'COMPRA' as any, currencyId: 2, amount: 50, rate: 260,
-      workerId: 4, workerProfit: 3.5, workerCurrencyId: 2,
+      type: 'COMPRA' as any, currencyId: 2, amount: '50', rate: '260',
+      workerId: 4, workerProfit: '3.5', workerCurrencyId: 2,
     }, 'fx-worker')).resolves.toEqual({ transaction: existing, movement: existing.fxMovements[0] });
     expect(prisma.$transaction).not.toHaveBeenCalled();
 
     await expect(new FxOperationsService(prisma).createTransfer(7, {
-      type: 'COMPRA' as any, currencyId: 2, amount: 50, rate: 260,
-      workerId: 4, workerProfit: 4, workerCurrencyId: 2,
+      type: 'COMPRA' as any, currencyId: 2, amount: '50', rate: '260',
+      workerId: 4, workerProfit: '4', workerCurrencyId: 2,
     }, 'fx-worker')).resolves.toEqual({ transaction: existing, movement: existing.fxMovements[0] });
   });
   it('includes operation kind and rate persistence in idempotency intent', async () => {
@@ -378,7 +378,7 @@ describe('FX operations foundation', () => {
     const prisma = { transaction: { findUnique: jest.fn().mockResolvedValue(existing) } } as any;
 
     await expect(new FxOperationsService(prisma).createTransfer(7, {
-      type: 'COMPRA' as any, currencyId: 2, amount: 50, rate: 260,
+      type: 'COMPRA' as any, currencyId: 2, amount: '50', rate: '260',
       operationKind: 'REMITTANCE' as any, persistRate: false,
     }, 'fx-kind')).rejects.toThrow('Idempotency key was already used for a different transfer');
   });
@@ -407,7 +407,7 @@ describe('FX operations foundation', () => {
     } as any;
 
     await new FxOperationsService(prisma).createTransfer(7, {
-      type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 200,
+      type: 'COMPRA' as any, currencyId: 2, amount: '10', rate: '200',
       operationKind: 'REMITTANCE' as any, persistRate: true,
     });
 
@@ -431,7 +431,7 @@ describe('FX operations foundation', () => {
       })),
     } as any;
 
-    await new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 1.1 });
+    await new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: '10', rate: '1.1' });
 
     expect(sourceCashUpdate).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ userId: 7, currencyId: 3 }) }));
     expect(destinationCashUpsert).toHaveBeenCalledWith(expect.objectContaining({ where: { userId_currencyId: { userId: 7, currencyId: 2 } } }));
@@ -458,7 +458,7 @@ describe('FX operations foundation', () => {
     } as any;
 
     await new FxOperationsService(prisma).createTransfer(7, {
-      type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 1.1, persistRate: true,
+      type: 'COMPRA' as any, currencyId: 2, amount: '10', rate: '1.1', persistRate: true,
       sourceType: 'BANK_ACCOUNT' as any, sourceBankAccountId: 30,
       destinationType: 'BANK_ACCOUNT' as any, destinationBankAccountId: 20,
     }, 'non-cup-primary');
@@ -491,7 +491,7 @@ describe('FX operations foundation', () => {
     } as any;
 
     const result = await new FxOperationsService(prisma).createTransfer(7, {
-      type: 'VENTA' as any, currencyId: 2, amount: 10, rate: 270,
+      type: 'VENTA' as any, currencyId: 2, amount: '10', rate: '270',
     }, 'standard-sale');
 
     expect(positionUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
@@ -518,7 +518,7 @@ describe('FX operations foundation', () => {
       currency: { findUnique: jest.fn().mockResolvedValueOnce({ id: 2, code: 'USD', isActive: true }).mockResolvedValueOnce({ id: 1, code: 'CUP', isActive: true }) },
       $transaction: jest.fn().mockRejectedValue(new (require('@prisma/client').Prisma.PrismaClientKnownRequestError)('duplicate', { code: 'P2002', clientVersion: '5.8.1' })),
     } as any;
-    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'VENTA' as any, currencyId: 2, amount: 50, rate: 260 }, 'fx-race'))
+    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'VENTA' as any, currencyId: 2, amount: '50', rate: '260' }, 'fx-race'))
       .rejects.toThrow('Idempotency key was already used for a different transfer');
   });
   it('calculates the weighted-average purchase cost', () => {
@@ -555,7 +555,7 @@ describe('FX operations foundation', () => {
         currencyPosition: { findUnique: jest.fn().mockResolvedValue({ id: 9, saldo: new Decimal(100), costoPromedio: new Decimal(250), reviewStatus: 'UNREVIEWED', reviewedAt: null }) },
       })),
     } as any;
-    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 260 }))
+    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: '10', rate: '260' }))
       .rejects.toThrow(CurrencyPositionUnavailableError);
   });
 
@@ -588,7 +588,7 @@ describe('FX operations foundation', () => {
         }
       }),
     } as any;
-    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: 50, rate: 260 })).rejects.toThrow('legacy write failed');
+    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: '50', rate: '260' })).rejects.toThrow('legacy write failed');
     expect(state.transactions).toHaveLength(0);
     expect(state.movements).toHaveLength(0);
     expect(state.cash).toHaveLength(0);
@@ -608,8 +608,8 @@ describe('FX operations foundation', () => {
     await expect(service.createTransfer(7, {
       type: 'COMPRA' as any,
       currencyId: 2,
-      amount: 50,
-      rate: 260,
+      amount: '50',
+      rate: '260',
     })).rejects.toThrow('legacy write failed');
     expect(transaction).toHaveBeenCalledTimes(1);
   });
@@ -639,7 +639,7 @@ describe('FX operations foundation', () => {
     } as any;
 
     await new FxOperationsService(prisma).createTransfer(7, {
-      type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 260,
+      type: 'COMPRA' as any, currencyId: 2, amount: '10', rate: '260',
       sourceType: 'BANK_ACCOUNT' as any, sourceBankAccountId: 3,
       destinationType: 'BANK_ACCOUNT' as any, destinationBankAccountId: 4,
     });
@@ -661,6 +661,6 @@ describe('FX operations foundation', () => {
         cashBalance: { updateMany: jest.fn().mockResolvedValue({ count: 0 }), upsert: jest.fn() },
       })),
     } as any;
-    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: 10, rate: 260 })).rejects.toThrow(InsufficientSaldoError);
+    await expect(new FxOperationsService(prisma).createTransfer(7, { type: 'COMPRA' as any, currencyId: 2, amount: '10', rate: '260' })).rejects.toThrow(InsufficientSaldoError);
   });
 });

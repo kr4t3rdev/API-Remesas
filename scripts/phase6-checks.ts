@@ -145,8 +145,8 @@ async function main() {
     userId: testUser.id,
     planId: standardPlan.id,
     cycle: 'MONTHLY',
-    amountUsd: 15,
-    exchangeRateUsed: 380,
+    amountUsd: '15',
+    exchangeRateUsed: '380',
     notes: 'Phase6 KPI renewal probe',
   });
 

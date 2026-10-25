@@ -14,11 +14,12 @@ public struct UpdateObjectiveDto: Codable, JSONEncodable, Hashable {
 
     public var name: String?
     public var description: String?
-    public var targetAmount: Double?
+    /** Meta en decimal string */
+    public var targetAmount: String?
     public var currencyId: Double?
     public var bankAccountId: Double?
 
-    public init(name: String? = nil, description: String? = nil, targetAmount: Double? = nil, currencyId: Double? = nil, bankAccountId: Double? = nil) {
+    public init(name: String? = nil, description: String? = nil, targetAmount: String? = nil, currencyId: Double? = nil, bankAccountId: Double? = nil) {
         self.name = name
         self.description = description
         self.targetAmount = targetAmount

@@ -17,11 +17,12 @@ public struct CreateCashAdjustmentDto: Codable, JSONEncodable, Hashable {
         case egreso = "EGRESO"
     }
     public var currencyId: Double
-    public var amount: Double
+    /** Importe en decimal string */
+    public var amount: String
     public var type: ModelType
     public var reason: String
 
-    public init(currencyId: Double, amount: Double, type: ModelType, reason: String) {
+    public init(currencyId: Double, amount: String, type: ModelType, reason: String) {
         self.currencyId = currencyId
         self.amount = amount
         self.type = type

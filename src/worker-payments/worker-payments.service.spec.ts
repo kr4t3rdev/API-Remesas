@@ -23,11 +23,11 @@ describe('WorkerPaymentsService multicurrency ledger', () => {
 
   it('rejects missing or inactive currencies before creating a worker balance', async () => {
     tx.currency.findFirst.mockResolvedValueOnce(null);
-    await expect(service.addBalance(1, { amount: 10, currencyId: 99 }, 7)).rejects.toThrow(/moneda no existe o está inactiva/i);
+    await expect(service.addBalance(1, { amount: '10', currencyId: 99 }, 7)).rejects.toThrow(/moneda no existe o está inactiva/i);
     expect(tx.workerBalance.upsert).not.toHaveBeenCalled();
 
     tx.currency.findFirst.mockResolvedValueOnce(null);
-    await expect(service.deposit(1, { amount: 10, currencyId: 99 }, 7)).rejects.toThrow(/moneda no existe o está inactiva/i);
+    await expect(service.deposit(1, { amount: '10', currencyId: 99 }, 7)).rejects.toThrow(/moneda no existe o está inactiva/i);
     expect(tx.workerBalance.upsert).not.toHaveBeenCalled();
   });
 
@@ -37,15 +37,15 @@ describe('WorkerPaymentsService multicurrency ledger', () => {
   });
 
   it('requires a destination to reconcile a worker deposit', async () => {
-    await expect(service.deposit(1, { amount: 10, currencyId: 1 }, 7)).rejects.toThrow(/destino es obligatorio/i);
+    await expect(service.deposit(1, { amount: '10', currencyId: 1 }, 7)).rejects.toThrow(/destino es obligatorio/i);
     expect(tx.workerTransaction.create).not.toHaveBeenCalled();
   });
 
   it('keeps separate balances for two currencies', async () => {
     const usd = { ...workerBalance, id: 11, currencyId: 2, balance: new Decimal(25) };
     tx.workerBalance.upsert.mockResolvedValueOnce(workerBalance).mockResolvedValueOnce(usd);
-    await service.addBalance(1, { amount: 10, currencyId: 1 }, 7);
-    await service.addBalance(1, { amount: 10, currencyId: 2 }, 7);
+    await service.addBalance(1, { amount: '10', currencyId: 1 }, 7);
+    await service.addBalance(1, { amount: '10', currencyId: 2 }, 7);
     expect(tx.workerBalance.upsert).toHaveBeenNthCalledWith(1, expect.objectContaining({ where: { workerId_currencyId: { workerId: 1, currencyId: 1 } } }));
     expect(tx.workerBalance.upsert).toHaveBeenNthCalledWith(2, expect.objectContaining({ where: { workerId_currencyId: { workerId: 1, currencyId: 2 } } }));
     expect(tx.workerTransaction.create).toHaveBeenNthCalledWith(1, expect.objectContaining({ data: expect.objectContaining({ currencyId: 1 }) }));
@@ -54,19 +54,19 @@ describe('WorkerPaymentsService multicurrency ledger', () => {
 
   it('rejects missing or inactive bank accounts', async () => {
     tx.bankAccount.findFirst.mockResolvedValue(null);
-    await expect(service.addBalance(1, { amount: 10, sourceType: 'BANK_ACCOUNT', sourceId: 99, currencyId: 1 }, 7)).rejects.toThrow(/cuenta bancaria/i);
+    await expect(service.addBalance(1, { amount: '10', sourceType: 'BANK_ACCOUNT', sourceId: 99, currencyId: 1 }, 7)).rejects.toThrow(/cuenta bancaria/i);
     tx.bankAccount.findFirst.mockResolvedValue({ id: 99, userId: 7, currencyId: 1, balance: 20, isActive: false });
-    await expect(service.addBalance(1, { amount: 10, sourceType: 'BANK_ACCOUNT', sourceId: 99, currencyId: 1 }, 7)).rejects.toThrow('activa');
+    await expect(service.addBalance(1, { amount: '10', sourceType: 'BANK_ACCOUNT', sourceId: 99, currencyId: 1 }, 7)).rejects.toThrow('activa');
   });
 
   it('rejects bank currency mismatch', async () => {
     tx.bankAccount.findFirst.mockResolvedValue({ id: 99, userId: 7, currencyId: 2, balance: 20, isActive: true });
-    await expect(service.addBalance(1, { amount: 10, sourceType: 'BANK_ACCOUNT', sourceId: 99, currencyId: 1 }, 7)).rejects.toThrow('moneda');
+    await expect(service.addBalance(1, { amount: '10', sourceType: 'BANK_ACCOUNT', sourceId: 99, currencyId: 1 }, 7)).rejects.toThrow('moneda');
   });
 
   it('rejects a destination that does not exist before debiting worker', async () => {
     tx.cashBalance.findUnique.mockResolvedValue(null);
-    await expect(service.deposit(1, { amount: 10, destinationType: 'CASH', currencyId: 1 }, 7)).rejects.toThrow(/caja/i);
+    await expect(service.deposit(1, { amount: '10', destinationType: 'CASH', currencyId: 1 }, 7)).rejects.toThrow(/caja/i);
     expect(tx.workerTransaction.create).not.toHaveBeenCalled();
   });
 
@@ -74,7 +74,7 @@ describe('WorkerPaymentsService multicurrency ledger', () => {
     tx.cashBalance.findUnique.mockResolvedValue({ userId: 7, currencyId: 1, balance: new Decimal(20) });
     tx.cashBalance.update.mockResolvedValue({});
 
-    await service.deposit(1, { amount: 10, destinationType: 'CASH', currencyId: 1 }, 7);
+    await service.deposit(1, { amount: '10', destinationType: 'CASH', currencyId: 1 }, 7);
 
     expect(tx.workerBalance.update).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ balance: { decrement: new Decimal(10) } }),
@@ -98,7 +98,7 @@ describe('WorkerPaymentsService multicurrency ledger', () => {
     tx.cashBalance.findUnique.mockResolvedValue({ userId: 7, currencyId: 2, balance: new Decimal(20) });
     tx.cashBalance.update.mockResolvedValue({});
 
-    await service.deposit(1, { amount: 4, destinationType: 'CASH', currencyId: 2 }, 7);
+    await service.deposit(1, { amount: '4', destinationType: 'CASH', currencyId: 2 }, 7);
 
     expect(tx.workerBalance.update).toHaveBeenCalledWith(expect.objectContaining({
       where: { id: foreignBalance.id },
@@ -130,7 +130,7 @@ describe('WorkerPaymentsService multicurrency ledger', () => {
     tx.cashBalance.findUnique.mockResolvedValue({ userId: 7, currencyId: 1, balance: new Decimal(20) });
     tx.cashBalance.update.mockResolvedValue({});
 
-    await service.deposit(1, { amount: 2500, destinationType: 'CASH', currencyId: 1 }, 7);
+    await service.deposit(1, { amount: '2500', destinationType: 'CASH', currencyId: 1 }, 7);
 
     expect(tx.workerBalance.update).toHaveBeenCalledWith(expect.objectContaining({
       where: { id: primaryBalance.id },
@@ -177,7 +177,7 @@ describe('WorkerPaymentsService multicurrency ledger', () => {
         return callback(tx);
       });
 
-    await service.addBalance(1, { amount: 10, currencyId: 1 }, 7);
+    await service.addBalance(1, { amount: '10', currencyId: 1 }, 7);
     expect(prisma.$transaction).toHaveBeenCalledTimes(2);
   });
 });

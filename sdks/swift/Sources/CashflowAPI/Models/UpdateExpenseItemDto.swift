@@ -13,11 +13,12 @@ import AnyCodable
 public struct UpdateExpenseItemDto: Codable, JSONEncodable, Hashable {
 
     public var name: String?
-    public var amount: Double?
+    /** Monto en decimal string */
+    public var amount: String?
     /** Null para eliminar categoría */
     public var category: String?
 
-    public init(name: String? = nil, amount: Double? = nil, category: String? = nil) {
+    public init(name: String? = nil, amount: String? = nil, category: String? = nil) {
         self.name = name
         self.amount = amount
         self.category = category

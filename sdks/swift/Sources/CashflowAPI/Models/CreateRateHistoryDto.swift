@@ -18,12 +18,13 @@ public struct CreateRateHistoryDto: Codable, JSONEncodable, Hashable {
     }
     public var currencyFromId: Double
     public var currencyToId: Double
-    public var rate: Double
+    /** Tasa en decimal string */
+    public var rate: String
     public var source: Source
     public var referenceType: String?
     public var referenceId: Double?
 
-    public init(currencyFromId: Double, currencyToId: Double, rate: Double, source: Source, referenceType: String? = nil, referenceId: Double? = nil) {
+    public init(currencyFromId: Double, currencyToId: Double, rate: String, source: Source, referenceType: String? = nil, referenceId: Double? = nil) {
         self.currencyFromId = currencyFromId
         self.currencyToId = currencyToId
         self.rate = rate

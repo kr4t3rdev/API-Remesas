@@ -34,10 +34,10 @@ import com.squareup.moshi.JsonClass
  * @param sourceId 
  * @param status 
  * @param foreignCurrencyId 
- * @param foreignAmount 
+ * @param foreignAmount Importe en moneda extranjera (decimal string)
  * @param localCurrencyId 
- * @param localAmount 
- * @param rate 
+ * @param localAmount Importe en moneda local (decimal string)
+ * @param rate Tasa aplicada (decimal string)
  * @param userId Ignored. Tenant identity is resolved from provider credentials.
  * @param idempotencyKey 
  */
@@ -57,17 +57,20 @@ data class RemittanceEventDto (
     @Json(name = "foreignCurrencyId")
     val foreignCurrencyId: java.math.BigDecimal,
 
+    /* Importe en moneda extranjera (decimal string) */
     @Json(name = "foreignAmount")
-    val foreignAmount: java.math.BigDecimal,
+    val foreignAmount: kotlin.String,
 
     @Json(name = "localCurrencyId")
     val localCurrencyId: java.math.BigDecimal,
 
+    /* Importe en moneda local (decimal string) */
     @Json(name = "localAmount")
-    val localAmount: java.math.BigDecimal,
+    val localAmount: kotlin.String,
 
+    /* Tasa aplicada (decimal string) */
     @Json(name = "rate")
-    val rate: java.math.BigDecimal,
+    val rate: kotlin.String,
 
     /* Ignored. Tenant identity is resolved from provider credentials. */
     @Json(name = "userId")

@@ -41,7 +41,7 @@ data class DepositDto (
 
     /* Monto a depositar */
     @Json(name = "amount")
-    val amount: java.math.BigDecimal,
+    val amount: kotlin.String,
 
     /* ID de la moneda */
     @Json(name = "currencyId")

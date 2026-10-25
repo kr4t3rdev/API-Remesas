@@ -70,7 +70,7 @@ describe('CashService tenant isolation', () => {
       cashClosing: { findUnique: jest.fn().mockResolvedValue(null), create: jest.fn().mockResolvedValue(closingA) },
     };
     const prisma = { $transaction: jest.fn((callback) => callback(tx)) } as unknown as PrismaService;
-    await new CashService(prisma).createClosing(USER_A, { currencyId: 1, businessDate: '2026-07-16', actualBalance: 10 });
+    await new CashService(prisma).createClosing(USER_A, { currencyId: 1, businessDate: '2026-07-16', actualBalance: '10' });
     const businessDate = new Date('2026-07-16T00:00:00.000Z');
     expect(tx.cashBalance.findUnique).toHaveBeenCalledWith({ where: { userId_currencyId: { userId: USER_A, currencyId: 1 } } });
     expect(tx.cashClosing.findUnique).toHaveBeenCalledWith(expect.objectContaining({ where: { userId_currencyId_businessDate: { userId: USER_A, currencyId: 1, businessDate } } }));

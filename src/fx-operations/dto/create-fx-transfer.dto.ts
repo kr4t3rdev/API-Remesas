@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsInt, IsNumber, IsOptional, IsString, Max, Min, ValidateIf } from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, ValidateIf } from 'class-validator';
 import { FxOperationKind, TransactionType, TransferAccountType } from '@prisma/client';
+import { IsDecimalString } from '../../common/decorators/is-decimal-string.decorator';
 
 export class CreateFxTransferDto {
   @ApiProperty({ enum: TransactionType })
@@ -11,17 +12,13 @@ export class CreateFxTransferDto {
   @IsInt()
   currencyId: number;
 
-  @ApiProperty()
-  @IsNumber({ maxDecimalPlaces: 2 })
-  @Min(0.01)
-  @Max(9999999999999.99)
-  amount: number;
+  @ApiProperty({ type: String, example: '100.00', description: 'Importe en decimal string' })
+  @IsDecimalString({ min: '0.01', max: '9999999999999.99', maxDecimalPlaces: 2 })
+  amount: string;
 
-  @ApiProperty()
-  @IsNumber({ maxDecimalPlaces: 4 })
-  @Min(0.0001)
-  @Max(999999.9999)
-  rate: number;
+  @ApiProperty({ type: String, example: '180.5', description: 'Tasa en decimal string' })
+  @IsDecimalString({ min: '0.0001', max: '999999.9999', maxDecimalPlaces: 4 })
+  rate: string;
 
   @ApiPropertyOptional({ enum: FxOperationKind, default: FxOperationKind.TRANSFER })
   @IsOptional()
@@ -63,13 +60,11 @@ export class CreateFxTransferDto {
   @IsInt()
   workerId?: number;
 
-  @ApiPropertyOptional({ description: 'Profit credited to the worker balance in workerCurrencyId' })
+  @ApiPropertyOptional({ description: 'Profit credited to the worker balance in workerCurrencyId', type: String, example: '25.50' })
   @IsOptional()
   @ValidateIf((dto) => dto.workerId !== undefined)
-  @IsNumber({ maxDecimalPlaces: 2 })
-  @Min(0)
-  @Max(9999999999999.99)
-  workerProfit?: number;
+  @IsDecimalString({ min: '0', max: '9999999999999.99', maxDecimalPlaces: 2 })
+  workerProfit?: string;
 
   @ApiPropertyOptional({ description: 'Currency of the worker profit' })
   @ValidateIf((dto) => dto.workerId !== undefined)

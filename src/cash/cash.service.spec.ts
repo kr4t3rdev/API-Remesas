@@ -165,8 +165,8 @@ describe('CashService', () => {
     };
 
     const result = await new CashService(prisma as unknown as PrismaService).updatePolicy(7, 2, {
-      safetyBuffer: 10.5,
-      insuranceLimit: 1000,
+      safetyBuffer: '10.5',
+      insuranceLimit: '1000',
     });
 
     expect(prisma.cashPolicy.upsert).toHaveBeenCalledWith(expect.objectContaining({
@@ -210,7 +210,7 @@ describe('CashService', () => {
     const result = await service.createClosing(7, {
       currencyId: 1,
       businessDate: '2026-07-11',
-      actualBalance: 1490,
+      actualBalance: '1490',
     });
 
     expect(transaction).toHaveBeenCalled();
@@ -234,7 +234,7 @@ describe('CashService', () => {
     }));
 
     const result = await new CashService({ $transaction: transaction } as unknown as PrismaService).createClosing(7, {
-      currencyId: 1, businessDate: '2026-07-11', actualBalance: 1490, notes: 'same',
+      currencyId: 1, businessDate: '2026-07-11', actualBalance: '1490', notes: 'same',
     });
 
     expect(result.id).toBe(9);
@@ -253,16 +253,16 @@ describe('CashService', () => {
     }));
 
     await expect(new CashService({ $transaction: transaction } as unknown as PrismaService).createClosing(7, {
-      currencyId: 1, businessDate: '2026-07-11', actualBalance: 1491, notes: 'new',
+      currencyId: 1, businessDate: '2026-07-11', actualBalance: '1491', notes: 'new',
     })).rejects.toBeInstanceOf(ConflictException);
   });
 
   it('accepts only calendar dates in the closing DTO', async () => {
     const valid = await validate(plainToInstance(CreateCashClosingDto, {
-      currencyId: 1, businessDate: '2026-07-11', actualBalance: 10,
+      currencyId: 1, businessDate: '2026-07-11', actualBalance: '10',
     }));
     const invalid = await validate(plainToInstance(CreateCashClosingDto, {
-      currencyId: 1, businessDate: '2026-07-11T12:00:00.000Z', actualBalance: 10,
+      currencyId: 1, businessDate: '2026-07-11T12:00:00.000Z', actualBalance: '10',
     }));
 
     expect(valid).toHaveLength(0);

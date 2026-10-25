@@ -31,7 +31,7 @@ import com.squareup.moshi.JsonClass
  * 
  *
  * @param description 
- * @param amount 
+ * @param amount Importe en decimal string
  * @param currencyId 
  * @param sourceType 
  * @param category 
@@ -46,8 +46,9 @@ data class CreateExpenseDto (
     @Json(name = "description")
     val description: kotlin.String,
 
+    /* Importe en decimal string */
     @Json(name = "amount")
-    val amount: java.math.BigDecimal,
+    val amount: kotlin.String,
 
     @Json(name = "currencyId")
     val currencyId: java.math.BigDecimal,

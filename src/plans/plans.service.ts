@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Decimal } from '@prisma/client/runtime/library';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
@@ -18,27 +19,44 @@ export class PlansService {
   }
 
   create(dto: CreatePlanDto) {
-    const monthlyUsd = dto.monthlyUsd;
+    // Los precios entran como decimal string y se persisten como Decimal
+    // (sin pasar por float). Los derivados usan aritmética decimal exacta.
+    const monthlyUsd = new Decimal(dto.monthlyUsd);
     return this.prisma.plan.create({
       data: {
         name: dto.name,
         description: dto.description,
         isActive: dto.isActive ?? true,
         monthlyUsd,
-        semiannualUsd: dto.semiannualUsd ?? Number((monthlyUsd * 6).toFixed(2)),
-        annualUsd: dto.annualUsd ?? Number((monthlyUsd * 12).toFixed(2)),
+        semiannualUsd:
+          dto.semiannualUsd !== undefined
+            ? new Decimal(dto.semiannualUsd)
+            : monthlyUsd.mul(6).toDecimalPlaces(2),
+        annualUsd:
+          dto.annualUsd !== undefined
+            ? new Decimal(dto.annualUsd)
+            : monthlyUsd.mul(12).toDecimalPlaces(2),
       },
     });
   }
 
   async update(id: number, dto: UpdatePlanDto) {
     await this.findOne(id);
-    const data = { ...dto } as UpdatePlanDto;
+    const data: any = { ...dto };
 
-    if (typeof data.monthlyUsd === 'number') {
-      if (typeof data.semiannualUsd !== 'number') data.semiannualUsd = Number((data.monthlyUsd * 6).toFixed(2));
-      if (typeof data.annualUsd !== 'number') data.annualUsd = Number((data.monthlyUsd * 12).toFixed(2));
+    if (typeof data.monthlyUsd === 'string') {
+      const monthlyUsd = new Decimal(data.monthlyUsd);
+      if (typeof data.semiannualUsd !== 'string') {
+        data.semiannualUsd = monthlyUsd.mul(6).toDecimalPlaces(2);
+      }
+      if (typeof data.annualUsd !== 'string') {
+        data.annualUsd = monthlyUsd.mul(12).toDecimalPlaces(2);
+      }
     }
+
+    if (typeof data.monthlyUsd === 'string') data.monthlyUsd = new Decimal(data.monthlyUsd);
+    if (typeof data.semiannualUsd === 'string') data.semiannualUsd = new Decimal(data.semiannualUsd);
+    if (typeof data.annualUsd === 'string') data.annualUsd = new Decimal(data.annualUsd);
 
     return this.prisma.plan.update({ where: { id }, data });
   }

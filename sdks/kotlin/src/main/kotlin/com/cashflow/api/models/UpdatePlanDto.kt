@@ -33,9 +33,9 @@ import com.squareup.moshi.JsonClass
  * @param name 
  * @param description 
  * @param isActive 
- * @param monthlyUsd 
- * @param semiannualUsd 
- * @param annualUsd 
+ * @param monthlyUsd Precio mensual USD en decimal string
+ * @param semiannualUsd Precio semestral USD en decimal string
+ * @param annualUsd Precio anual USD en decimal string
  */
 
 
@@ -50,14 +50,17 @@ data class UpdatePlanDto (
     @Json(name = "isActive")
     val isActive: kotlin.Boolean? = true,
 
+    /* Precio mensual USD en decimal string */
     @Json(name = "monthlyUsd")
-    val monthlyUsd: java.math.BigDecimal? = null,
+    val monthlyUsd: kotlin.String? = null,
 
+    /* Precio semestral USD en decimal string */
     @Json(name = "semiannualUsd")
-    val semiannualUsd: java.math.BigDecimal? = null,
+    val semiannualUsd: kotlin.String? = null,
 
+    /* Precio anual USD en decimal string */
     @Json(name = "annualUsd")
-    val annualUsd: java.math.BigDecimal? = null
+    val annualUsd: kotlin.String? = null
 
 ) {
 

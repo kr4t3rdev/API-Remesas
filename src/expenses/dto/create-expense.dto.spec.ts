@@ -5,7 +5,7 @@ import { CreateExpenseDto } from './create-expense.dto';
 describe('CreateExpenseDto notes', () => {
   const base = {
     description: 'Internet',
-    amount: 50,
+    amount: '50',
     currencyId: 1,
     sourceType: 'CASH',
     category: 'servicios',

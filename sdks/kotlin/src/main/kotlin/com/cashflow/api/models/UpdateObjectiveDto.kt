@@ -32,7 +32,7 @@ import com.squareup.moshi.JsonClass
  *
  * @param name 
  * @param description 
- * @param targetAmount 
+ * @param targetAmount Meta en decimal string
  * @param currencyId 
  * @param bankAccountId 
  */
@@ -46,8 +46,9 @@ data class UpdateObjectiveDto (
     @Json(name = "description")
     val description: kotlin.String? = null,
 
+    /* Meta en decimal string */
     @Json(name = "targetAmount")
-    val targetAmount: java.math.BigDecimal? = null,
+    val targetAmount: kotlin.String? = null,
 
     @Json(name = "currencyId")
     val currencyId: java.math.BigDecimal? = null,

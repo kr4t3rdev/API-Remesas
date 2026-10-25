@@ -32,7 +32,7 @@ import com.squareup.moshi.JsonClass
  *
  * @param currencyFromId 
  * @param currencyToId 
- * @param rate 
+ * @param rate Tasa en decimal string
  * @param source 
  * @param referenceType 
  * @param referenceId 
@@ -47,8 +47,9 @@ data class CreateRateHistoryDto (
     @Json(name = "currencyToId")
     val currencyToId: java.math.BigDecimal,
 
+    /* Tasa en decimal string */
     @Json(name = "rate")
-    val rate: java.math.BigDecimal,
+    val rate: kotlin.String,
 
     @Json(name = "source")
     val source: CreateRateHistoryDto.Source,

@@ -33,11 +33,20 @@ export class RemittancesService {
   }
 
   private validateEvent(event: RemittanceEventDto) {
-    if (!event.provider?.trim() || !event.sourceId?.trim() || event.foreignAmount <= 0 || event.localAmount <= 0 || event.rate <= 0) {
+    const foreignAmount = new Decimal(event.foreignAmount);
+    const localAmount = new Decimal(event.localAmount);
+    const rate = new Decimal(event.rate);
+    if (
+      !event.provider?.trim()
+      || !event.sourceId?.trim()
+      || foreignAmount.lessThanOrEqualTo(0)
+      || localAmount.lessThanOrEqualTo(0)
+      || rate.lessThanOrEqualTo(0)
+    ) {
       throw new UnprocessableEntityException({ code: 'REMITTANCE_INVALID_EVENT', message: 'Remittance event is invalid' });
     }
-    const expectedLocalAmount = new Decimal(event.foreignAmount).mul(new Decimal(event.rate)).toDecimalPlaces(2);
-    const actualLocalAmount = new Decimal(event.localAmount).toDecimalPlaces(2);
+    const expectedLocalAmount = foreignAmount.mul(rate).toDecimalPlaces(2);
+    const actualLocalAmount = localAmount.toDecimalPlaces(2);
     if (!actualLocalAmount.eq(expectedLocalAmount)) {
       throw new UnprocessableEntityException({
         code: 'REMITTANCE_AMOUNT_MISMATCH',

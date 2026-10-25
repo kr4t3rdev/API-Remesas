@@ -14,12 +14,12 @@ public struct CreateExpenseItemDto: Codable, JSONEncodable, Hashable {
 
     /** Nombre del gasto */
     public var name: String
-    /** Monto del gasto */
-    public var amount: Double
+    /** Monto del gasto en decimal string */
+    public var amount: String
     /** Categoría opcional */
     public var category: String?
 
-    public init(name: String, amount: Double, category: String? = nil) {
+    public init(name: String, amount: String, category: String? = nil) {
         self.name = name
         self.amount = amount
         self.category = category

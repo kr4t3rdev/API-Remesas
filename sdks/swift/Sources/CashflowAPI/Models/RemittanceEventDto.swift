@@ -24,13 +24,16 @@ public struct RemittanceEventDto: Codable, JSONEncodable, Hashable {
     public var sourceId: String
     public var status: Status
     public var foreignCurrencyId: Double
-    public var foreignAmount: Double
+    /** Importe en moneda extranjera (decimal string) */
+    public var foreignAmount: String
     public var localCurrencyId: Double
-    public var localAmount: Double
-    public var rate: Double
+    /** Importe en moneda local (decimal string) */
+    public var localAmount: String
+    /** Tasa aplicada (decimal string) */
+    public var rate: String
     public var idempotencyKey: String?
 
-    public init(userId: Double? = nil, provider: String, sourceId: String, status: Status, foreignCurrencyId: Double, foreignAmount: Double, localCurrencyId: Double, localAmount: Double, rate: Double, idempotencyKey: String? = nil) {
+    public init(userId: Double? = nil, provider: String, sourceId: String, status: Status, foreignCurrencyId: Double, foreignAmount: String, localCurrencyId: Double, localAmount: String, rate: String, idempotencyKey: String? = nil) {
         self.userId = userId
         self.provider = provider
         self.sourceId = sourceId

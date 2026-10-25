@@ -47,7 +47,7 @@ describe('ExpenseItemsService', () => {
     it('debería crear un gasto exitosamente', async () => {
       const createDto = {
         name: 'Arrendamientos de Inmuebles',
-        amount: 5000,
+        amount: '5000',
         category: 'Inmuebles',
       };
 
@@ -75,7 +75,7 @@ describe('ExpenseItemsService', () => {
     it('debería crear un gasto sin categoría', async () => {
       const createDto = {
         name: 'Telefonía',
-        amount: 360,
+        amount: '360',
       };
 
       prisma.expenseItem.create.mockResolvedValue({
@@ -94,7 +94,7 @@ describe('ExpenseItemsService', () => {
     it('debería redondear monto a 2 decimales', async () => {
       const createDto = {
         name: 'Test',
-        amount: 100.999,
+        amount: '100.999',
       };
 
       prisma.expenseItem.create.mockResolvedValue({
@@ -167,7 +167,7 @@ describe('ExpenseItemsService', () => {
     it('debería actualizar un gasto', async () => {
       const updateDto = {
         name: 'Mantenimiento de Inmuebles',
-        amount: 3500,
+        amount: '3500',
       };
 
       prisma.expenseItem.findFirst.mockResolvedValue(mockExpenseItem);

@@ -2254,12 +2254,21 @@ export interface components {
             updatedAt: string;
         };
         UpdateExchangeRateDto: {
-            /** @example 200 */
-            referenceRate: number;
-            /** @example 0.05 */
-            buyMargin: number;
-            /** @example 0.05 */
-            sellMargin: number;
+            /**
+             * @description Tasa de referencia en decimal string
+             * @example 200.00
+             */
+            referenceRate: string;
+            /**
+             * @description Margen de compra en decimal string
+             * @example 0.05
+             */
+            buyMargin: string;
+            /**
+             * @description Margen de venta en decimal string
+             * @example 0.05
+             */
+            sellMargin: string;
         };
         ExchangeRateUpdateResponseDto: {
             /** @example 10 */
@@ -2322,10 +2331,16 @@ export interface components {
             message: string;
         };
         CreateTransactionDto: {
-            /** @description Cantidad de la transacción */
-            amount: number;
-            /** @description Ganancia generada por la transacción */
-            profit: number;
+            /**
+             * @description Cantidad de la transacción
+             * @example 100.00
+             */
+            amount: string;
+            /**
+             * @description Ganancia generada por la transacción
+             * @example 5.50
+             */
+            profit: string;
             /** @description Descripción de la transacción */
             description?: string;
             /** @description Tipo de destino: CASH o BANK_ACCOUNT */
@@ -2373,8 +2388,16 @@ export interface components {
             /** @enum {string} */
             type: "COMPRA" | "VENTA";
             currencyId: number;
-            amount: number;
-            rate: number;
+            /**
+             * @description Importe en decimal string
+             * @example 100.00
+             */
+            amount: string;
+            /**
+             * @description Tasa en decimal string
+             * @example 180.5
+             */
+            rate: string;
             /**
              * @default TRANSFER
              * @enum {string}
@@ -2402,8 +2425,11 @@ export interface components {
             destinationBankAccountId?: number;
             /** @description Worker receiving profit from this FX operation */
             workerId?: number;
-            /** @description Profit credited to the worker balance in workerCurrencyId */
-            workerProfit?: number;
+            /**
+             * @description Profit credited to the worker balance in workerCurrencyId
+             * @example 25.50
+             */
+            workerProfit?: string;
             /** @description Currency of the worker profit */
             workerCurrencyId?: number;
         };
@@ -2423,8 +2449,11 @@ export interface components {
         OpenCurrencyPositionDto: {
             /** @description Currency whose existing cash balance is being opened */
             currencyId: number;
-            /** @description Historical weighted average cost per unit */
-            openingCost: number;
+            /**
+             * @description Historical weighted average cost per unit
+             * @example 240.5000
+             */
+            openingCost: string;
         };
         CashBalanceDto: {
             /** @example 1 */
@@ -2444,8 +2473,11 @@ export interface components {
         CreateCashAuditDto: {
             /** @example 1 */
             currencyId: number;
-            /** @example 5000 */
-            actualBalance: number;
+            /**
+             * @description Saldo real en decimal string
+             * @example 5000.00
+             */
+            actualBalance: string;
             /** @example Nota del arqueo */
             notes?: string;
         };
@@ -2472,8 +2504,11 @@ export interface components {
         CreateCashAdjustmentDto: {
             /** @example 1 */
             currencyId: number;
-            /** @example 100 */
-            amount: number;
+            /**
+             * @description Importe en decimal string
+             * @example 100.00
+             */
+            amount: string;
             /**
              * @example INGRESO
              * @enum {string}
@@ -2508,8 +2543,11 @@ export interface components {
             currencyId: number;
             /** @example 1234567890 */
             accountNumber: string;
-            /** @example 1000 */
-            initialBalance?: number;
+            /**
+             * @description Saldo inicial en decimal string
+             * @example 1000.00
+             */
+            initialBalance?: string;
             /**
              * @default true
              * @example true
@@ -2606,8 +2644,11 @@ export interface components {
             currencyId?: number;
             /** @example 1234567890 */
             accountNumber?: string;
-            /** @example 1000 */
-            initialBalance?: number;
+            /**
+             * @description Saldo inicial en decimal string
+             * @example 1000.00
+             */
+            initialBalance?: string;
             /**
              * @default true
              * @example true
@@ -2617,8 +2658,11 @@ export interface components {
         CreateExpenseDto: {
             /** @example Renta del local */
             description: string;
-            /** @example 5000 */
-            amount: number;
+            /**
+             * @description Importe en decimal string
+             * @example 5000.00
+             */
+            amount: string;
             /** @example 1 */
             currencyId: number;
             /** @enum {string} */
@@ -2677,8 +2721,11 @@ export interface components {
         UpdateExpenseDto: {
             /** @example Renta del local */
             description?: string;
-            /** @example 5000 */
-            amount?: number;
+            /**
+             * @description Importe en decimal string
+             * @example 5000.00
+             */
+            amount?: string;
             /** @example 1 */
             currencyId?: number;
             /** @enum {string} */
@@ -2700,8 +2747,11 @@ export interface components {
             name: string;
             /** @example Alcanzar $50,000 en ventas */
             description?: string;
-            /** @example 50000 */
-            targetAmount: number;
+            /**
+             * @description Meta en decimal string
+             * @example 50000.00
+             */
+            targetAmount: string;
             /** @example 1 */
             currencyId: number;
             /** @example 1 */
@@ -2773,8 +2823,11 @@ export interface components {
             name?: string;
             /** @example Alcanzar $50,000 en ventas */
             description?: string;
-            /** @example 50000 */
-            targetAmount?: number;
+            /**
+             * @description Meta en decimal string
+             * @example 50000.00
+             */
+            targetAmount?: string;
             /** @example 1 */
             currencyId?: number;
             /** @example 1 */
@@ -3011,8 +3064,11 @@ export interface components {
             currencyFromId: number;
             /** @example 2 */
             currencyToId: number;
-            /** @example 200.5 */
-            rate: number;
+            /**
+             * @description Tasa en decimal string
+             * @example 200.50
+             */
+            rate: string;
             /**
              * @example MANUAL
              * @enum {string}
@@ -3106,12 +3162,21 @@ export interface components {
              * @example true
              */
             isActive: boolean;
-            /** @example 25 */
-            monthlyUsd: number;
-            /** @example 85.5 */
-            semiannualUsd?: number;
-            /** @example 162 */
-            annualUsd?: number;
+            /**
+             * @description Precio mensual USD en decimal string
+             * @example 25.00
+             */
+            monthlyUsd: string;
+            /**
+             * @description Precio semestral USD en decimal string
+             * @example 85.50
+             */
+            semiannualUsd?: string;
+            /**
+             * @description Precio anual USD en decimal string
+             * @example 162.00
+             */
+            annualUsd?: string;
         };
         UpdatePlanDto: {
             /** @example Plan Estándar */
@@ -3123,12 +3188,21 @@ export interface components {
              * @example true
              */
             isActive: boolean;
-            /** @example 25 */
-            monthlyUsd?: number;
-            /** @example 85.5 */
-            semiannualUsd?: number;
-            /** @example 162 */
-            annualUsd?: number;
+            /**
+             * @description Precio mensual USD en decimal string
+             * @example 25.00
+             */
+            monthlyUsd?: string;
+            /**
+             * @description Precio semestral USD en decimal string
+             * @example 85.50
+             */
+            semiannualUsd?: string;
+            /**
+             * @description Precio anual USD en decimal string
+             * @example 162.00
+             */
+            annualUsd?: string;
         };
         SubscriptionLicenseDto: {
             /** @example 5 */
@@ -3207,10 +3281,16 @@ export interface components {
              * @enum {string}
              */
             cycle: "MONTHLY" | "SEMIANNUAL" | "ANNUAL";
-            /** @example 15 */
-            amountUsd: number;
-            /** @example 350 */
-            exchangeRateUsed: number;
+            /**
+             * @description Importe USD en decimal string
+             * @example 15.00
+             */
+            amountUsd: string;
+            /**
+             * @description Tasa de cambio usada (decimal string)
+             * @example 350.00
+             */
+            exchangeRateUsed: string;
             /** @example 1 */
             bankAccountId?: number;
             /** @example 2026-03-05T12:00:00.000Z */
@@ -3692,8 +3772,11 @@ export interface components {
             workerBalance: components["schemas"]["WorkerBalanceDto"];
         };
         AddBalanceDto: {
-            /** @description Monto a entregar al trabajador */
-            amount: number;
+            /**
+             * @description Monto a entregar al trabajador
+             * @example 100.00
+             */
+            amount: string;
             /** @description Tipo de origen: CASH o BANK_ACCOUNT */
             sourceType?: string;
             /** @description ID del origen (bankAccountId si sourceType es BANK_ACCOUNT) */
@@ -3702,8 +3785,11 @@ export interface components {
             currencyId: number;
         };
         DepositDto: {
-            /** @description Monto a depositar */
-            amount: number;
+            /**
+             * @description Monto a depositar
+             * @example 100.00
+             */
+            amount: string;
             /** @description Tipo de destino: CASH o BANK_ACCOUNT */
             destinationType?: string;
             /** @description ID del destino (bankAccountId si destinationType es BANK_ACCOUNT) */
@@ -3718,10 +3804,10 @@ export interface components {
              */
             name: string;
             /**
-             * @description Monto del gasto
-             * @example 5000
+             * @description Monto del gasto en decimal string
+             * @example 5000.00
              */
-            amount: number;
+            amount: string;
             /**
              * @description Categoría opcional
              * @example Inmuebles
@@ -3774,8 +3860,11 @@ export interface components {
         UpdateExpenseItemDto: {
             /** @example Mantenimiento de Inmuebles */
             name?: string;
-            /** @example 3500 */
-            amount?: number;
+            /**
+             * @description Monto en decimal string
+             * @example 3500.00
+             */
+            amount?: string;
             /**
              * @description Null para eliminar categoría
              * @example Inmuebles
@@ -3840,10 +3929,16 @@ export interface components {
             insuranceLimit: string;
         };
         UpdateCashPolicyDto: {
-            /** @example 1000 */
-            safetyBuffer: number;
-            /** @example 5000 */
-            insuranceLimit: number;
+            /**
+             * @description Colchón de seguridad en decimal string
+             * @example 1000.00
+             */
+            safetyBuffer: string;
+            /**
+             * @description Límite de seguro en decimal string
+             * @example 5000.00
+             */
+            insuranceLimit: string;
         };
         CashPolicyDetailDto: {
             currency: components["schemas"]["CurrencyDto"];
@@ -3909,8 +4004,11 @@ export interface components {
              * @example 2026-07-11
              */
             businessDate: string;
-            /** @example 1500.5 */
-            actualBalance: number;
+            /**
+             * @description Saldo real en decimal string
+             * @example 1500.50
+             */
+            actualBalance: string;
             /** @example Cierre sin diferencias */
             notes?: string;
         };
@@ -3943,10 +4041,22 @@ export interface components {
             /** @enum {string} */
             status: "PENDING" | "COMPLETED" | "FAILED";
             foreignCurrencyId: number;
-            foreignAmount: number;
+            /**
+             * @description Importe en moneda extranjera (decimal string)
+             * @example 100.00
+             */
+            foreignAmount: string;
             localCurrencyId: number;
-            localAmount: number;
-            rate: number;
+            /**
+             * @description Importe en moneda local (decimal string)
+             * @example 24000.00
+             */
+            localAmount: string;
+            /**
+             * @description Tasa aplicada (decimal string)
+             * @example 240.5
+             */
+            rate: string;
             idempotencyKey?: string;
         };
         RemittanceDto: {

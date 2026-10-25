@@ -48,12 +48,12 @@ describe('SubscriptionsService', () => {
       userId: 1,
       planId: 1,
       cycle: 'MONTHLY',
-      amountUsd: 15,
-      exchangeRateUsed: 350,
+      amountUsd: '15',
+      exchangeRateUsed: '350',
     });
 
-    expect(result.amountUsd).toBe(15);
-    expect(result.amountCup).toBe(5250);
+    expect(result.amountUsd.toString()).toBe('15');
+    expect(result.amountCup.toString()).toBe('5250');
   });
 
   it('debería aceptar monto 85.50 para ciclo semestral', async () => {
@@ -61,12 +61,12 @@ describe('SubscriptionsService', () => {
       userId: 1,
       planId: 1,
       cycle: 'SEMIANNUAL',
-      amountUsd: 85.5,
-      exchangeRateUsed: 350,
+      amountUsd: '85.5',
+      exchangeRateUsed: '350',
     });
 
-    expect(result.amountUsd).toBe(85.5);
-    expect(result.amountCup).toBe(29925);
+    expect(result.amountUsd.toString()).toBe('85.5');
+    expect(result.amountCup.toString()).toBe('29925');
   });
 
   it('debería aceptar monto 162 para ciclo anual', async () => {
@@ -74,12 +74,12 @@ describe('SubscriptionsService', () => {
       userId: 1,
       planId: 1,
       cycle: 'ANNUAL',
-      amountUsd: 162,
-      exchangeRateUsed: 350,
+      amountUsd: '162',
+      exchangeRateUsed: '350',
     });
 
-    expect(result.amountUsd).toBe(162);
-    expect(result.amountCup).toBe(56700);
+    expect(result.amountUsd.toString()).toBe('162');
+    expect(result.amountCup.toString()).toBe('56700');
   });
 
   it('debería rechazar monto USD inválido por ciclo', async () => {
@@ -88,8 +88,8 @@ describe('SubscriptionsService', () => {
         userId: 1,
         planId: 1,
         cycle: 'MONTHLY',
-        amountUsd: 99,
-        exchangeRateUsed: 350,
+        amountUsd: '99',
+        exchangeRateUsed: '350',
       }),
     ).rejects.toThrow(BadRequestException);
   });
@@ -99,8 +99,8 @@ describe('SubscriptionsService', () => {
       userId: 1,
       planId: 1,
       cycle: 'MONTHLY',
-      amountUsd: 15,
-      exchangeRateUsed: 350,
+      amountUsd: '15',
+      exchangeRateUsed: '350',
       bankAccountId: 2,
     });
 

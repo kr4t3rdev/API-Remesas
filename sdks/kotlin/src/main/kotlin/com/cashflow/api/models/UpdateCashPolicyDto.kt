@@ -30,18 +30,20 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * @param safetyBuffer 
- * @param insuranceLimit 
+ * @param safetyBuffer Colchón de seguridad en decimal string
+ * @param insuranceLimit Límite de seguro en decimal string
  */
 
 
 data class UpdateCashPolicyDto (
 
+    /* Colchón de seguridad en decimal string */
     @Json(name = "safetyBuffer")
-    val safetyBuffer: java.math.BigDecimal,
+    val safetyBuffer: kotlin.String,
 
+    /* Límite de seguro en decimal string */
     @Json(name = "insuranceLimit")
-    val insuranceLimit: java.math.BigDecimal
+    val insuranceLimit: kotlin.String
 
 ) {
 
