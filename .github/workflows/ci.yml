@@ -88,6 +88,9 @@ jobs:
       - name: Lint contract (Spectral)
         run: npm run openapi:lint
 
+      - name: Runtime contract conformance (isolated controllers, no database)
+        run: npx jest --ci --runInBand src/contracts/openapi-runtime.spec.ts
+
       # TypeScript SDK: generate from the contract, prove it did not drift
       # from the committed types, and prove the result actually compiles.
       - name: Generate TypeScript SDK
@@ -106,3 +109,44 @@ jobs:
           base: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.base_ref }}/openapi.json
           revision: openapi.json
           fail-on-diff: true
+
+  native-sdks:
+    name: Generate & compile Swift/Kotlin SDKs
+    runs-on: macos-14
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      JWT_SECRET: ci-only-contract-secret
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prisma generate
+        run: npx prisma generate
+
+      - name: Verify OpenAPI contract drift
+        run: npm run openapi:check
+
+      - name: Generate and drift-check Swift/Kotlin SDKs
+        run: npm run sdk:native:check
+
+      - name: Compile Swift SDK
+        run: npm run sdk:swift:build
+
+      - name: Build Kotlin SDK
+        run: npm run sdk:kotlin:build
+
