@@ -102,13 +102,22 @@ jobs:
       - name: TypeScript SDK typecheck
         run: npm run sdk:ts:check
 
+      - name: Setup Go for pinned oasdiff CLI
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.1'
+
+      - name: Install pinned oasdiff
+        run: |
+          go install github.com/oasdiff/oasdiff@v1.34.1
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
       - name: Breaking-change check vs base branch (oasdiff)
         if: github.event_name == 'pull_request'
-        uses: oasdiff/oasdiff-action/breaking@main
-        with:
-          base: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.base_ref }}/openapi.json
-          revision: openapi.json
-          fail-on-diff: true
+        run: oasdiff breaking "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.base_ref }}/openapi.json" openapi.json --fail-on ERR --format githubactions
+
+      - name: Prove the breaking-change gate rejects a deliberate API removal
+        run: npm run openapi:breaking:control
 
   native-sdks:
     name: Generate & compile Swift/Kotlin SDKs
