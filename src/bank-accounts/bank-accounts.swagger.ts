@@ -95,16 +95,16 @@ export class BankTransferDto {
   @ApiProperty({ type: String, description: 'Decimal como string' })
   rate!: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, type: String })
   sourceType?: string | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, type: String })
   destinationType?: string | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, type: Number })
   sourceBankAccountId?: number | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, type: Number })
   destinationBankAccountId?: number | null;
 
   @ApiProperty({ format: 'date-time' })

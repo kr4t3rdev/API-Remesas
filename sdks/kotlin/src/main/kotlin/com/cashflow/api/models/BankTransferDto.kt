@@ -79,16 +79,16 @@ data class BankTransferDto (
     val rate: kotlin.String,
 
     @Json(name = "sourceType")
-    val sourceType: kotlin.Any?,
+    val sourceType: kotlin.String?,
 
     @Json(name = "destinationType")
-    val destinationType: kotlin.Any?,
+    val destinationType: kotlin.String?,
 
     @Json(name = "sourceBankAccountId")
-    val sourceBankAccountId: kotlin.Any?,
+    val sourceBankAccountId: java.math.BigDecimal?,
 
     @Json(name = "destinationBankAccountId")
-    val destinationBankAccountId: kotlin.Any?,
+    val destinationBankAccountId: java.math.BigDecimal?,
 
     @Json(name = "createdAt")
     val createdAt: java.time.OffsetDateTime

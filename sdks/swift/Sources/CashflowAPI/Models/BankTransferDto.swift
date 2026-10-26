@@ -37,13 +37,13 @@ public struct BankTransferDto: Codable, JSONEncodable, Hashable {
     public var currency: BankTransferCurrencyDto
     /** Decimal como string */
     public var rate: String
-    public var sourceType: AnyCodable?
-    public var destinationType: AnyCodable?
-    public var sourceBankAccountId: AnyCodable?
-    public var destinationBankAccountId: AnyCodable?
+    public var sourceType: String?
+    public var destinationType: String?
+    public var sourceBankAccountId: Double?
+    public var destinationBankAccountId: Double?
     public var createdAt: Date
 
-    public init(id: String, transactionId: Double, type: ModelType, operationKind: OperationKind?, direction: Direction, amount: String, currency: BankTransferCurrencyDto, rate: String, sourceType: AnyCodable?, destinationType: AnyCodable?, sourceBankAccountId: AnyCodable?, destinationBankAccountId: AnyCodable?, createdAt: Date) {
+    public init(id: String, transactionId: Double, type: ModelType, operationKind: OperationKind?, direction: Direction, amount: String, currency: BankTransferCurrencyDto, rate: String, sourceType: String?, destinationType: String?, sourceBankAccountId: Double?, destinationBankAccountId: Double?, createdAt: Date) {
         self.id = id
         self.transactionId = transactionId
         self.type = type

@@ -2621,10 +2621,10 @@ export interface components {
             currency: components["schemas"]["BankTransferCurrencyDto"];
             /** @description Decimal como string */
             rate: string;
-            sourceType: Record<string, never> | null;
-            destinationType: Record<string, never> | null;
-            sourceBankAccountId: Record<string, never> | null;
-            destinationBankAccountId: Record<string, never> | null;
+            sourceType: string | null;
+            destinationType: string | null;
+            sourceBankAccountId: number | null;
+            destinationBankAccountId: number | null;
             /** Format: date-time */
             createdAt: string;
         };

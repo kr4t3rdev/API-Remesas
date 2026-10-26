@@ -6897,19 +6897,19 @@
             "description": "Decimal como string"
           },
           "sourceType": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "destinationType": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "sourceBankAccountId": {
-            "type": "object",
+            "type": "number",
             "nullable": true
           },
           "destinationBankAccountId": {
-            "type": "object",
+            "type": "number",
             "nullable": true
           },
           "createdAt": {

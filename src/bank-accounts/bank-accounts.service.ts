@@ -88,6 +88,21 @@ export class BankAccountsService {
       orderBy: { createdAt: 'desc' },
     });
 
+    // La pierna CUP no tiene moneda propia (`currency.id = null`), pero el
+    // contrato (`BankTransferCurrencyDto`) exige name/symbol/isActive: se
+    // completa con la moneda CUP real para que la respuesta cumpla el
+    // esquema y los clientes puedan decodificarla.
+    const cupCurrency = await this.prisma.currency.findFirst({
+      where: { code: 'CUP' },
+    });
+    const cupLeg = {
+      id: null,
+      code: 'CUP',
+      name: cupCurrency?.name ?? 'Peso Cubano',
+      symbol: cupCurrency?.symbol ?? '$',
+      isActive: cupCurrency?.isActive ?? true,
+    };
+
     const serializedTransfers = transfers.map((transfer) => {
       const isSource = transfer.sourceBankAccountId === id;
       const amount = transfer.type === 'COMPRA'
@@ -101,7 +116,7 @@ export class BankAccountsService {
         direction: isSource ? 'OUT' as const : 'IN' as const,
         amount,
         currency: (isSource && transfer.type === 'COMPRA') || (!isSource && transfer.type === 'VENTA')
-          ? { code: 'CUP', id: null }
+          ? cupLeg
           : transfer.currency,
         rate: toDecimalString(transfer.rate),
         sourceType: transfer.sourceType,

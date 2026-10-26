@@ -8,6 +8,7 @@ import { AuthController } from '../auth/auth.controller';
 import { AuthService } from '../auth/auth.service';
 import { HealthController } from '../health/health.controller';
 import { PrismaService } from '../database/prisma/prisma.service';
+import { BankAccountsService } from '../bank-accounts/bank-accounts.service';
 
 type OpenApiDocument = {
   paths: Record<string, Record<string, {
@@ -94,5 +95,31 @@ describe('OpenAPI runtime contract conformance (isolated controllers)', () => {
     expect(validate(response.body)).toBe(true);
     expect(response.body).toEqual({ exists: false });
     expect(authServiceStub.checkEmailExists).toHaveBeenCalledWith('runtime-contract@example.test');
+  });
+
+  // El cuerpo real de un servicio debe cumplir el esquema publicado: la
+  // pierna CUP de las transferencias (`currency.id = null`) se serializaba
+  // sin name/symbol/isActive y el SDK generado no podía decodificarla.
+  it('the bank account transactions payload conforms to the published 200 schema', async () => {
+    const prisma = {
+      bankAccount: { findFirst: jest.fn().mockResolvedValue({ id: 4, userId: 7, currency: { id: 1, code: 'CUP' } }) },
+      expense: { findMany: jest.fn().mockResolvedValue([]) },
+      transaction: { findMany: jest.fn().mockResolvedValue([{
+        id: 11, type: 'VENTA', operationKind: 'TRANSFER',
+        amount: { toString: () => '10' }, totalCup: { toString: () => '2400' }, rate: { toString: () => '240' },
+        currency: { id: 2, code: 'USD' }, sourceType: 'CASH', sourceBankAccountId: null,
+        destinationType: 'BANK_ACCOUNT', destinationBankAccountId: 4, createdAt: new Date('2026-10-20T10:00:00.000Z'),
+      }]) },
+      currency: { findFirst: jest.fn().mockResolvedValue({ id: 1, code: 'CUP', name: 'Peso Cubano', symbol: '$', isActive: true }) },
+    };
+
+    const service = new BankAccountsService(prisma as unknown as PrismaService);
+    const payload = await service.getTransactions(7, 4);
+    // El cliente recibe el cuerpo serializado por NestJS: se replica ese
+    // round-trip para validar exactamente lo que viaja por la red.
+    const wire = JSON.parse(JSON.stringify(payload));
+    const validate = responseValidator('/api/bank-accounts/{id}/transactions', 'get', 200);
+
+    expect(validate(wire)).toBe(true);
   });
 });
