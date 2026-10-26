@@ -28,6 +28,7 @@ import okhttp3.Call
 import okhttp3.HttpUrl
 
 import com.cashflow.api.models.CreateFxTransferDto
+import com.cashflow.api.models.FxOpenPositionResultDto
 import com.cashflow.api.models.FxTransferResultDto
 import com.cashflow.api.models.OpenCurrencyPositionDto
 
@@ -138,7 +139,7 @@ open class FXOperationsApi(basePath: kotlin.String = defaultBasePath, client: Ca
      * 
      * 
      * @param openCurrencyPositionDto 
-     * @return FxTransferResultDto
+     * @return FxOpenPositionResultDto
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -147,11 +148,11 @@ open class FXOperationsApi(basePath: kotlin.String = defaultBasePath, client: Ca
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun fxOperationsOpenPosition(openCurrencyPositionDto: OpenCurrencyPositionDto) : FxTransferResultDto {
+    fun fxOperationsOpenPosition(openCurrencyPositionDto: OpenCurrencyPositionDto) : FxOpenPositionResultDto {
         val localVarResponse = fxOperationsOpenPositionWithHttpInfo(openCurrencyPositionDto = openCurrencyPositionDto)
 
         return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as FxTransferResultDto
+            ResponseType.Success -> (localVarResponse as Success<*>).data as FxOpenPositionResultDto
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -170,16 +171,16 @@ open class FXOperationsApi(basePath: kotlin.String = defaultBasePath, client: Ca
      * 
      * 
      * @param openCurrencyPositionDto 
-     * @return ApiResponse<FxTransferResultDto?>
+     * @return ApiResponse<FxOpenPositionResultDto?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun fxOperationsOpenPositionWithHttpInfo(openCurrencyPositionDto: OpenCurrencyPositionDto) : ApiResponse<FxTransferResultDto?> {
+    fun fxOperationsOpenPositionWithHttpInfo(openCurrencyPositionDto: OpenCurrencyPositionDto) : ApiResponse<FxOpenPositionResultDto?> {
         val localVariableConfig = fxOperationsOpenPositionRequestConfig(openCurrencyPositionDto = openCurrencyPositionDto)
 
-        return request<OpenCurrencyPositionDto, FxTransferResultDto>(
+        return request<OpenCurrencyPositionDto, FxOpenPositionResultDto>(
             localVariableConfig
         )
     }

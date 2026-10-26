@@ -1416,7 +1416,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FxTransferResultDto"
+                  "$ref": "#/components/schemas/FxOpenPositionResultDto"
                 }
               }
             }
@@ -2473,7 +2473,28 @@
     "/api/reports/period": {
       "get": {
         "operationId": "reports_getPeriodReport",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": true,
+            "in": "query",
+            "description": "Fecha inicial del período (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": true,
+            "in": "query",
+            "description": "Fecha final del período (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-12-31",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -2500,7 +2521,28 @@
     "/api/reports/profit": {
       "get": {
         "operationId": "reports_getProfitReport",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": true,
+            "in": "query",
+            "description": "Fecha inicial del período (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": true,
+            "in": "query",
+            "description": "Fecha final del período (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-12-31",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -2565,7 +2607,28 @@
     "/api/reports/fx-performance": {
       "get": {
         "operationId": "reports_getFxPerformanceReport",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": true,
+            "in": "query",
+            "description": "Fecha inicial del período (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": true,
+            "in": "query",
+            "description": "Fecha final del período (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-12-31",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -2673,7 +2736,28 @@
     "/api/reports/cash-flow": {
       "get": {
         "operationId": "reports_getCashFlowReport",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": true,
+            "in": "query",
+            "description": "Fecha inicial del período (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": true,
+            "in": "query",
+            "description": "Fecha final del período (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-12-31",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -6488,6 +6572,31 @@
         "required": [
           "currencyId",
           "openingCost"
+        ]
+      },
+      "FxOpenPositionResultDto": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "type": "object",
+            "description": "Posición abierta o actualizada",
+            "additionalProperties": true
+          },
+          "movement": {
+            "type": "object",
+            "description": "Movimiento de apertura generado",
+            "additionalProperties": true
+          },
+          "cashBalance": {
+            "type": "object",
+            "description": "Saldo de caja usado como saldo inicial",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "position",
+          "movement",
+          "cashBalance"
         ]
       },
       "CashBalanceDto": {

@@ -66,7 +66,7 @@ open class FXOperationsAPI {
      - parameter completion: completion handler to receive the data and the error objects
      */
     @discardableResult
-    open class func fxOperationsOpenPosition(openCurrencyPositionDto: OpenCurrencyPositionDto, apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: FxTransferResultDto?, _ error: Error?) -> Void)) -> RequestTask {
+    open class func fxOperationsOpenPosition(openCurrencyPositionDto: OpenCurrencyPositionDto, apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: FxOpenPositionResultDto?, _ error: Error?) -> Void)) -> RequestTask {
         return fxOperationsOpenPositionWithRequestBuilder(openCurrencyPositionDto: openCurrencyPositionDto).execute(apiResponseQueue) { result in
             switch result {
             case let .success(response):
@@ -83,9 +83,9 @@ open class FXOperationsAPI {
        - type: http
        - name: bearer
      - parameter openCurrencyPositionDto: (body)  
-     - returns: RequestBuilder<FxTransferResultDto> 
+     - returns: RequestBuilder<FxOpenPositionResultDto> 
      */
-    open class func fxOperationsOpenPositionWithRequestBuilder(openCurrencyPositionDto: OpenCurrencyPositionDto) -> RequestBuilder<FxTransferResultDto> {
+    open class func fxOperationsOpenPositionWithRequestBuilder(openCurrencyPositionDto: OpenCurrencyPositionDto) -> RequestBuilder<FxOpenPositionResultDto> {
         let localVariablePath = "/api/fx-operations/positions/open"
         let localVariableURLString = CashflowAPIAPI.basePath + localVariablePath
         let localVariableParameters = JSONEncodingHelper.encodingParameters(forEncodableObject: openCurrencyPositionDto)
@@ -98,7 +98,7 @@ open class FXOperationsAPI {
 
         let localVariableHeaderParameters = APIHelper.rejectNilHeaders(localVariableNillableHeaders)
 
-        let localVariableRequestBuilder: RequestBuilder<FxTransferResultDto>.Type = CashflowAPIAPI.requestBuilderFactory.getBuilder()
+        let localVariableRequestBuilder: RequestBuilder<FxOpenPositionResultDto>.Type = CashflowAPIAPI.requestBuilderFactory.getBuilder()
 
         return localVariableRequestBuilder.init(method: "POST", URLString: (localVariableUrlComponents?.string ?? localVariableURLString), parameters: localVariableParameters, headers: localVariableHeaderParameters, requiresAuthentication: true)
     }

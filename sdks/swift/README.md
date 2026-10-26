@@ -255,6 +255,7 @@ Class | Method | HTTP request | Description
  - [ExpenseListDto](docs/ExpenseListDto.md)
  - [ExpensesReportDto](docs/ExpensesReportDto.md)
  - [ForgotPasswordDto](docs/ForgotPasswordDto.md)
+ - [FxOpenPositionResultDto](docs/FxOpenPositionResultDto.md)
  - [FxPerformanceMovementDto](docs/FxPerformanceMovementDto.md)
  - [FxPerformancePositionDto](docs/FxPerformancePositionDto.md)
  - [FxPerformanceReportDto](docs/FxPerformanceReportDto.md)

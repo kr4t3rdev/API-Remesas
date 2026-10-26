@@ -7,7 +7,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CreateFxTransferDto } from './dto/create-fx-transfer.dto';
 import { OpenCurrencyPositionDto } from './dto/open-currency-position.dto';
 import { FxOperationsService } from './fx-operations.service';
-import { FxTransferResultDto } from '../common/swagger/shared-response.dto';
+import { FxOpenPositionResultDto, FxTransferResultDto } from '../common/swagger/shared-response.dto';
 import { FxDomainExceptionFilter } from './fx-domain-exception.filter';
 
 @ApiTags('FX Operations')
@@ -29,7 +29,7 @@ export class FxOperationsController {
   }
 
   @Post('positions/open')
-  @ApiResponse({ status: 201, description: 'Posición abierta', type: FxTransferResultDto })
+  @ApiResponse({ status: 201, description: 'Posición abierta', type: FxOpenPositionResultDto })
   openPosition(@CurrentUser('id') userId: number, @Body() dto: OpenCurrencyPositionDto) {
     return this.fxOperationsService.openPosition(userId, dto);
   }

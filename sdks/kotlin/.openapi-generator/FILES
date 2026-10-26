@@ -135,6 +135,7 @@ src/main/kotlin/com/cashflow/api/models/ExpenseItemReportItemDto.kt
 src/main/kotlin/com/cashflow/api/models/ExpenseListDto.kt
 src/main/kotlin/com/cashflow/api/models/ExpensesReportDto.kt
 src/main/kotlin/com/cashflow/api/models/ForgotPasswordDto.kt
+src/main/kotlin/com/cashflow/api/models/FxOpenPositionResultDto.kt
 src/main/kotlin/com/cashflow/api/models/FxPerformanceMovementDto.kt
 src/main/kotlin/com/cashflow/api/models/FxPerformancePositionDto.kt
 src/main/kotlin/com/cashflow/api/models/FxPerformanceReportDto.kt

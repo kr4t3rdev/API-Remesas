@@ -271,3 +271,23 @@ export class FxTransferResultDto {
   @ApiProperty({ type: String, nullable: true, description: 'Decimal como string; solo ventas desde posición' })
   realizedProfit?: string | null;
 }
+
+/**
+ * Respuesta de `POST /fx-operations/positions/open`.
+ *
+ * Abrir una posición histórica **no** crea una `Transaction` (crea un
+ * `CurrencyMovement` de tipo OPENING), así que la respuesta real no tiene
+ * `transaction`: declararla como `FxTransferResultDto` obligaba al cliente a
+ * decodificar un campo inexistente y el SDK generado fallaba al abrir la
+ * posición.
+ */
+export class FxOpenPositionResultDto {
+  @ApiProperty({ description: 'Posición abierta o actualizada', type: 'object', additionalProperties: true })
+  position!: Record<string, unknown>;
+
+  @ApiProperty({ description: 'Movimiento de apertura generado', type: 'object', additionalProperties: true })
+  movement!: Record<string, unknown>;
+
+  @ApiProperty({ description: 'Saldo de caja usado como saldo inicial', type: 'object', additionalProperties: true })
+  cashBalance!: Record<string, unknown>;
+}

@@ -125,6 +125,7 @@ Sources/CashflowAPI/Models/ExpenseItemReportItemDto.swift
 Sources/CashflowAPI/Models/ExpenseListDto.swift
 Sources/CashflowAPI/Models/ExpensesReportDto.swift
 Sources/CashflowAPI/Models/ForgotPasswordDto.swift
+Sources/CashflowAPI/Models/FxOpenPositionResultDto.swift
 Sources/CashflowAPI/Models/FxPerformanceMovementDto.swift
 Sources/CashflowAPI/Models/FxPerformancePositionDto.swift
 Sources/CashflowAPI/Models/FxPerformanceReportDto.swift

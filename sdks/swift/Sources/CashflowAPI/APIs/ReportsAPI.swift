@@ -103,12 +103,14 @@ open class ReportsAPI {
     /**
      Flujo de efectivo
      
+     - parameter startDate: (query) Fecha inicial del período (YYYY-MM-DD) 
+     - parameter endDate: (query) Fecha final del período (YYYY-MM-DD) 
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - parameter completion: completion handler to receive the data and the error objects
      */
     @discardableResult
-    open class func reportsGetCashFlowReport(apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: CashFlowReportDtoSwagger?, _ error: Error?) -> Void)) -> RequestTask {
-        return reportsGetCashFlowReportWithRequestBuilder().execute(apiResponseQueue) { result in
+    open class func reportsGetCashFlowReport(startDate: String, endDate: String, apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: CashFlowReportDtoSwagger?, _ error: Error?) -> Void)) -> RequestTask {
+        return reportsGetCashFlowReportWithRequestBuilder(startDate: startDate, endDate: endDate).execute(apiResponseQueue) { result in
             switch result {
             case let .success(response):
                 completion(response.body, nil)
@@ -124,14 +126,21 @@ open class ReportsAPI {
      - Bearer Token:
        - type: http
        - name: bearer
+     - parameter startDate: (query) Fecha inicial del período (YYYY-MM-DD) 
+     - parameter endDate: (query) Fecha final del período (YYYY-MM-DD) 
      - returns: RequestBuilder<CashFlowReportDtoSwagger> 
      */
-    open class func reportsGetCashFlowReportWithRequestBuilder() -> RequestBuilder<CashFlowReportDtoSwagger> {
+    open class func reportsGetCashFlowReportWithRequestBuilder(startDate: String, endDate: String) -> RequestBuilder<CashFlowReportDtoSwagger> {
         let localVariablePath = "/api/reports/cash-flow"
         let localVariableURLString = CashflowAPIAPI.basePath + localVariablePath
         let localVariableParameters: [String: Any]? = nil
 
-        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        var localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        let localVariableQueryParameters: [String: (wrappedValue: Any?, isExplode: Bool)] = [
+            "startDate": (wrappedValue: startDate.encodeToJSON(), isExplode: true),
+            "endDate": (wrappedValue: endDate.encodeToJSON(), isExplode: true),
+        ]
+        localVariableUrlComponents?.queryItems = APIHelper.mapValuesToQueryItems(localVariableQueryParameters)
 
         let localVariableNillableHeaders: [String: Any?] = [
             :
@@ -284,12 +293,14 @@ open class ReportsAPI {
     /**
      Rendimiento de operaciones FX
      
+     - parameter startDate: (query) Fecha inicial del período (YYYY-MM-DD) 
+     - parameter endDate: (query) Fecha final del período (YYYY-MM-DD) 
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - parameter completion: completion handler to receive the data and the error objects
      */
     @discardableResult
-    open class func reportsGetFxPerformanceReport(apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: FxPerformanceReportDto?, _ error: Error?) -> Void)) -> RequestTask {
-        return reportsGetFxPerformanceReportWithRequestBuilder().execute(apiResponseQueue) { result in
+    open class func reportsGetFxPerformanceReport(startDate: String, endDate: String, apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: FxPerformanceReportDto?, _ error: Error?) -> Void)) -> RequestTask {
+        return reportsGetFxPerformanceReportWithRequestBuilder(startDate: startDate, endDate: endDate).execute(apiResponseQueue) { result in
             switch result {
             case let .success(response):
                 completion(response.body, nil)
@@ -305,14 +316,21 @@ open class ReportsAPI {
      - Bearer Token:
        - type: http
        - name: bearer
+     - parameter startDate: (query) Fecha inicial del período (YYYY-MM-DD) 
+     - parameter endDate: (query) Fecha final del período (YYYY-MM-DD) 
      - returns: RequestBuilder<FxPerformanceReportDto> 
      */
-    open class func reportsGetFxPerformanceReportWithRequestBuilder() -> RequestBuilder<FxPerformanceReportDto> {
+    open class func reportsGetFxPerformanceReportWithRequestBuilder(startDate: String, endDate: String) -> RequestBuilder<FxPerformanceReportDto> {
         let localVariablePath = "/api/reports/fx-performance"
         let localVariableURLString = CashflowAPIAPI.basePath + localVariablePath
         let localVariableParameters: [String: Any]? = nil
 
-        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        var localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        let localVariableQueryParameters: [String: (wrappedValue: Any?, isExplode: Bool)] = [
+            "startDate": (wrappedValue: startDate.encodeToJSON(), isExplode: true),
+            "endDate": (wrappedValue: endDate.encodeToJSON(), isExplode: true),
+        ]
+        localVariableUrlComponents?.queryItems = APIHelper.mapValuesToQueryItems(localVariableQueryParameters)
 
         let localVariableNillableHeaders: [String: Any?] = [
             :
@@ -372,12 +390,14 @@ open class ReportsAPI {
     /**
      Reporte por período
      
+     - parameter startDate: (query) Fecha inicial del período (YYYY-MM-DD) 
+     - parameter endDate: (query) Fecha final del período (YYYY-MM-DD) 
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - parameter completion: completion handler to receive the data and the error objects
      */
     @discardableResult
-    open class func reportsGetPeriodReport(apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: PeriodReportDto?, _ error: Error?) -> Void)) -> RequestTask {
-        return reportsGetPeriodReportWithRequestBuilder().execute(apiResponseQueue) { result in
+    open class func reportsGetPeriodReport(startDate: String, endDate: String, apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: PeriodReportDto?, _ error: Error?) -> Void)) -> RequestTask {
+        return reportsGetPeriodReportWithRequestBuilder(startDate: startDate, endDate: endDate).execute(apiResponseQueue) { result in
             switch result {
             case let .success(response):
                 completion(response.body, nil)
@@ -393,14 +413,21 @@ open class ReportsAPI {
      - Bearer Token:
        - type: http
        - name: bearer
+     - parameter startDate: (query) Fecha inicial del período (YYYY-MM-DD) 
+     - parameter endDate: (query) Fecha final del período (YYYY-MM-DD) 
      - returns: RequestBuilder<PeriodReportDto> 
      */
-    open class func reportsGetPeriodReportWithRequestBuilder() -> RequestBuilder<PeriodReportDto> {
+    open class func reportsGetPeriodReportWithRequestBuilder(startDate: String, endDate: String) -> RequestBuilder<PeriodReportDto> {
         let localVariablePath = "/api/reports/period"
         let localVariableURLString = CashflowAPIAPI.basePath + localVariablePath
         let localVariableParameters: [String: Any]? = nil
 
-        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        var localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        let localVariableQueryParameters: [String: (wrappedValue: Any?, isExplode: Bool)] = [
+            "startDate": (wrappedValue: startDate.encodeToJSON(), isExplode: true),
+            "endDate": (wrappedValue: endDate.encodeToJSON(), isExplode: true),
+        ]
+        localVariableUrlComponents?.queryItems = APIHelper.mapValuesToQueryItems(localVariableQueryParameters)
 
         let localVariableNillableHeaders: [String: Any?] = [
             :
@@ -416,12 +443,14 @@ open class ReportsAPI {
     /**
      Reporte de ganancias
      
+     - parameter startDate: (query) Fecha inicial del período (YYYY-MM-DD) 
+     - parameter endDate: (query) Fecha final del período (YYYY-MM-DD) 
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - parameter completion: completion handler to receive the data and the error objects
      */
     @discardableResult
-    open class func reportsGetProfitReport(apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: ProfitReportDto?, _ error: Error?) -> Void)) -> RequestTask {
-        return reportsGetProfitReportWithRequestBuilder().execute(apiResponseQueue) { result in
+    open class func reportsGetProfitReport(startDate: String, endDate: String, apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: ProfitReportDto?, _ error: Error?) -> Void)) -> RequestTask {
+        return reportsGetProfitReportWithRequestBuilder(startDate: startDate, endDate: endDate).execute(apiResponseQueue) { result in
             switch result {
             case let .success(response):
                 completion(response.body, nil)
@@ -437,14 +466,21 @@ open class ReportsAPI {
      - Bearer Token:
        - type: http
        - name: bearer
+     - parameter startDate: (query) Fecha inicial del período (YYYY-MM-DD) 
+     - parameter endDate: (query) Fecha final del período (YYYY-MM-DD) 
      - returns: RequestBuilder<ProfitReportDto> 
      */
-    open class func reportsGetProfitReportWithRequestBuilder() -> RequestBuilder<ProfitReportDto> {
+    open class func reportsGetProfitReportWithRequestBuilder(startDate: String, endDate: String) -> RequestBuilder<ProfitReportDto> {
         let localVariablePath = "/api/reports/profit"
         let localVariableURLString = CashflowAPIAPI.basePath + localVariablePath
         let localVariableParameters: [String: Any]? = nil
 
-        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        var localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        let localVariableQueryParameters: [String: (wrappedValue: Any?, isExplode: Bool)] = [
+            "startDate": (wrappedValue: startDate.encodeToJSON(), isExplode: true),
+            "endDate": (wrappedValue: endDate.encodeToJSON(), isExplode: true),
+        ]
+        localVariableUrlComponents?.queryItems = APIHelper.mapValuesToQueryItems(localVariableQueryParameters)
 
         let localVariableNillableHeaders: [String: Any?] = [
             :

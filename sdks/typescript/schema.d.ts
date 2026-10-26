@@ -2455,6 +2455,20 @@ export interface components {
              */
             openingCost: string;
         };
+        FxOpenPositionResultDto: {
+            /** @description Posición abierta o actualizada */
+            position: {
+                [key: string]: unknown;
+            };
+            /** @description Movimiento de apertura generado */
+            movement: {
+                [key: string]: unknown;
+            };
+            /** @description Saldo de caja usado como saldo inicial */
+            cashBalance: {
+                [key: string]: unknown;
+            };
+        };
         CashBalanceDto: {
             /** @example 1 */
             id: number;
@@ -5188,7 +5202,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["FxTransferResultDto"];
+                    "application/json": components["schemas"]["FxOpenPositionResultDto"];
                 };
             };
         };
@@ -5820,7 +5834,12 @@ export interface operations {
     };
     reports_getPeriodReport: {
         parameters: {
-            query?: never;
+            query: {
+                /** @description Fecha inicial del período (YYYY-MM-DD) */
+                startDate: string;
+                /** @description Fecha final del período (YYYY-MM-DD) */
+                endDate: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -5839,7 +5858,12 @@ export interface operations {
     };
     reports_getProfitReport: {
         parameters: {
-            query?: never;
+            query: {
+                /** @description Fecha inicial del período (YYYY-MM-DD) */
+                startDate: string;
+                /** @description Fecha final del período (YYYY-MM-DD) */
+                endDate: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -5879,7 +5903,12 @@ export interface operations {
     };
     reports_getFxPerformanceReport: {
         parameters: {
-            query?: never;
+            query: {
+                /** @description Fecha inicial del período (YYYY-MM-DD) */
+                startDate: string;
+                /** @description Fecha final del período (YYYY-MM-DD) */
+                endDate: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -5955,7 +5984,12 @@ export interface operations {
     };
     reports_getCashFlowReport: {
         parameters: {
-            query?: never;
+            query: {
+                /** @description Fecha inicial del período (YYYY-MM-DD) */
+                startDate: string;
+                /** @description Fecha final del período (YYYY-MM-DD) */
+                endDate: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;

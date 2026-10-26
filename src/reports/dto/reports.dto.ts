@@ -34,6 +34,11 @@ export class GetDailyReportDto {
 }
 
 export class GetPeriodReportDto {
+  @ApiProperty({
+    type: String,
+    example: '2026-01-01',
+    description: 'Fecha inicial del período (YYYY-MM-DD)',
+  })
   @IsDateString(
     { strict: false },
     { message: `startDate debe ser ${DATE_FORMAT_HINT}` },
@@ -41,6 +46,11 @@ export class GetPeriodReportDto {
   @Transform(toIsoDateOrNull)
   startDate!: string;
 
+  @ApiProperty({
+    type: String,
+    example: '2026-12-31',
+    description: 'Fecha final del período (YYYY-MM-DD)',
+  })
   @IsDateString(
     { strict: false },
     { message: `endDate debe ser ${DATE_FORMAT_HINT}` },
