@@ -1,0 +1,3292 @@
+{
+  "jest.config.js": {
+    "mtime": 1784896049.0,
+    "ast_hash": "094ceae69a60a82d78ac19597d6d3adc",
+    "semantic_hash": ""
+  },
+  "nest-cli.json": {
+    "mtime": 1771657705.0,
+    "ast_hash": "b6c9c4b64b7092bea720263a47b574cf",
+    "semantic_hash": ""
+  },
+  "package.json": {
+    "mtime": 1792909031.0,
+    "ast_hash": "8f27adb3da027177e3f4eb89153a71e3",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260317124204_init/migration.sql": {
+    "mtime": 1773751324.0,
+    "ast_hash": "bd8fb00089ecacba7350b98cc4b22995",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260317235931_add_email_verification_fields/migration.sql": {
+    "mtime": 1773791971.0,
+    "ast_hash": "0c09dc963f1d0c0c13e4868ed3384685",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260318123450_worker_payments/migration.sql": {
+    "mtime": 1773837290.0,
+    "ast_hash": "18aa9e223863b564717677c87a962257",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260319103000_add_password_reset_fields/migration.sql": {
+    "mtime": 1773926621.0,
+    "ast_hash": "f94893bd53f7f5f76b08644f7565f547",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260320215753_add_expense_items/migration.sql": {
+    "mtime": 1774043873.0,
+    "ast_hash": "29c02c25e46fbaf92f38e7963c405087",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260711170000_fx_trading_foundation/migration.sql": {
+    "mtime": 1783802485.0,
+    "ast_hash": "aeccbaa7ea2336a53b1b60b74a502011",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260712120000_cash_policies_closings/migration.sql": {
+    "mtime": 1783871442.0,
+    "ast_hash": "5191aeeac968c6f076659540c1d8404c",
+    "semantic_hash": ""
+  },
+  "prisma/seed.ts": {
+    "mtime": 1786668211.0,
+    "ast_hash": "625c6efd8bbb1dc96d80f70b35d5d574",
+    "semantic_hash": ""
+  },
+  "scripts/phase6-checks.ts": {
+    "mtime": 1792961034.0,
+    "ast_hash": "2b4913b427ad33c8c745009b7fb28c27",
+    "semantic_hash": ""
+  },
+  "scripts/test-smtp.ts": {
+    "mtime": 1773787567.0,
+    "ast_hash": "10036724f5a65854fcd51160cc99e8e7",
+    "semantic_hash": ""
+  },
+  "src/admin/admin.controller.ts": {
+    "mtime": 1792736285.0,
+    "ast_hash": "231cef15bd284ebedeff89d2bb6bb98c",
+    "semantic_hash": ""
+  },
+  "src/admin/admin.create-user.integration.spec.ts": {
+    "mtime": 1773750920.0,
+    "ast_hash": "13605a221348b50af0dfc747bf09fdcd",
+    "semantic_hash": ""
+  },
+  "src/admin/admin.module.ts": {
+    "mtime": 1773789216.0,
+    "ast_hash": "2a11ece850f9a64b2585589c3a63c0c6",
+    "semantic_hash": ""
+  },
+  "src/admin/admin.rbac.spec.ts": {
+    "mtime": 1772656944.0,
+    "ast_hash": "edbc00c5c03c106450a10fd4bb7ef76d",
+    "semantic_hash": ""
+  },
+  "src/admin/admin.service.spec.ts": {
+    "mtime": 1784779959.0,
+    "ast_hash": "deba7a490eaea3d26d5111cf46a61959",
+    "semantic_hash": ""
+  },
+  "src/admin/admin.service.ts": {
+    "mtime": 1792735767.0,
+    "ast_hash": "bdab3ae5bd3c7e1bd113c1639c269bf1",
+    "semantic_hash": ""
+  },
+  "src/admin/admin.user-controls.integration.spec.ts": {
+    "mtime": 1777151783.0,
+    "ast_hash": "6da62b8a5f36760121520978b8bc044d",
+    "semantic_hash": ""
+  },
+  "src/admin/dto/admin-user-action.dto.ts": {
+    "mtime": 1777151536.0,
+    "ast_hash": "e1f55c6789dc84d5d9cd0599cde37347",
+    "semantic_hash": ""
+  },
+  "src/admin/dto/create-admin-user.dto.ts": {
+    "mtime": 1772706953.0,
+    "ast_hash": "3da248ba3355ccd020b01ecb92d4832f",
+    "semantic_hash": ""
+  },
+  "src/admin/dto/update-admin-user.dto.ts": {
+    "mtime": 1772655327.0,
+    "ast_hash": "f648e388b007fa10e099f269c29a7823",
+    "semantic_hash": ""
+  },
+  "src/app.module.ts": {
+    "mtime": 1784213980.0,
+    "ast_hash": "553d3003fc88a2372ed579c8d248b8e7",
+    "semantic_hash": ""
+  },
+  "src/auth/auth.controller.ts": {
+    "mtime": 1792764086.0,
+    "ast_hash": "a15f9323c2a3334a9d6bd4134e6a4411",
+    "semantic_hash": ""
+  },
+  "src/auth/auth.module.ts": {
+    "mtime": 1784404064.0,
+    "ast_hash": "fecfc69e0977c1c6b254bfedb4ff792c",
+    "semantic_hash": ""
+  },
+  "src/auth/auth.service.spec.ts": {
+    "mtime": 1792508340.0,
+    "ast_hash": "5e0077c14ff85c356818844ce4245e77",
+    "semantic_hash": ""
+  },
+  "src/auth/auth.service.ts": {
+    "mtime": 1792508318.0,
+    "ast_hash": "89ed624af2719257ca5ae79d8626486f",
+    "semantic_hash": ""
+  },
+  "src/auth/dto/activate-user.dto.ts": {
+    "mtime": 1773844114.0,
+    "ast_hash": "3c8998de6b362c97042f02ce3791a2bf",
+    "semantic_hash": ""
+  },
+  "src/auth/dto/change-password.dto.ts": {
+    "mtime": 1773749782.0,
+    "ast_hash": "022af1dfaad19755506f766e76c9f1ca",
+    "semantic_hash": ""
+  },
+  "src/auth/dto/create-user.dto.ts": {
+    "mtime": 1771762928.0,
+    "ast_hash": "19e216281db1067e8bfd925d36fe0745",
+    "semantic_hash": ""
+  },
+  "src/auth/dto/forgot-password.dto.ts": {
+    "mtime": 1773926641.0,
+    "ast_hash": "02e95c4fdc9ce4bfd4cc3ff61db69527",
+    "semantic_hash": ""
+  },
+  "src/auth/dto/login.dto.ts": {
+    "mtime": 1771677170.0,
+    "ast_hash": "ccdae18ebe2f70d6103f0318d5efad24",
+    "semantic_hash": ""
+  },
+  "src/auth/dto/register.dto.ts": {
+    "mtime": 1773837175.0,
+    "ast_hash": "8afb03b6c15fd4cd2b35acbd00b60844",
+    "semantic_hash": ""
+  },
+  "src/auth/dto/resend-verification.dto.ts": {
+    "mtime": 1773787612.0,
+    "ast_hash": "14b0090fb956b1ca12cd41f6dd51ea2c",
+    "semantic_hash": ""
+  },
+  "src/auth/dto/reset-password.dto.ts": {
+    "mtime": 1773926641.0,
+    "ast_hash": "290e062839e03a748f4d0289bdada510",
+    "semantic_hash": ""
+  },
+  "src/auth/dto/set-primary-currency.dto.ts": {
+    "mtime": 1772173929.0,
+    "ast_hash": "1f8f5850a3e990e85c1c95a5e237360a",
+    "semantic_hash": ""
+  },
+  "src/auth/dto/verify-email.dto.ts": {
+    "mtime": 1773787606.0,
+    "ast_hash": "6d16681414ff2ceeea05580d39f6926c",
+    "semantic_hash": ""
+  },
+  "src/auth/jwt.strategy.ts": {
+    "mtime": 1784223051.0,
+    "ast_hash": "cb1bb3f007b1c709d56b34f53a960819",
+    "semantic_hash": ""
+  },
+  "src/auth/verification-token.service.ts": {
+    "mtime": 1773926641.0,
+    "ast_hash": "687a330defed8e04e5942d705f9faa77",
+    "semantic_hash": ""
+  },
+  "src/bank-accounts/bank-accounts.controller.ts": {
+    "mtime": 1792708523.0,
+    "ast_hash": "0670be108b6728d8c2d39f262a7a9403",
+    "semantic_hash": ""
+  },
+  "src/bank-accounts/bank-accounts.module.ts": {
+    "mtime": 1771659296.0,
+    "ast_hash": "882b1ff1fd62376d55c108f33f54a806",
+    "semantic_hash": ""
+  },
+  "src/bank-accounts/bank-accounts.service.ts": {
+    "mtime": 1792697445.0,
+    "ast_hash": "bc2322ddf6ae7afb8dfb73d2db3526ae",
+    "semantic_hash": ""
+  },
+  "src/bank-accounts/dto/create-bank-account.dto.ts": {
+    "mtime": 1792959768.0,
+    "ast_hash": "5750350066df2af25c6243e8fe356f75",
+    "semantic_hash": ""
+  },
+  "src/bank-accounts/dto/update-bank-account.dto.ts": {
+    "mtime": 1771659266.0,
+    "ast_hash": "998f2d27bbb84d3df67eedad1e395f99",
+    "semantic_hash": ""
+  },
+  "src/cash-adjustments/cash-adjustments.controller.ts": {
+    "mtime": 1792707225.0,
+    "ast_hash": "23585eba3b9238748c19bf8202da184c",
+    "semantic_hash": ""
+  },
+  "src/cash-adjustments/cash-adjustments.module.ts": {
+    "mtime": 1771659231.0,
+    "ast_hash": "a89a90b086968c1e11427ae3541a46a7",
+    "semantic_hash": ""
+  },
+  "src/cash-adjustments/cash-adjustments.service.ts": {
+    "mtime": 1771762105.0,
+    "ast_hash": "195eb8d8fab360a452914b8eb854c0a2",
+    "semantic_hash": ""
+  },
+  "src/cash-adjustments/dto/create-cash-adjustment.dto.ts": {
+    "mtime": 1792959270.0,
+    "ast_hash": "f5b12a3750f0166bbe1389c45d8483b9",
+    "semantic_hash": ""
+  },
+  "src/cash-audits/cash-audits.controller.ts": {
+    "mtime": 1792707225.0,
+    "ast_hash": "92d87e0a79f15487c0ee819f57b1c8f4",
+    "semantic_hash": ""
+  },
+  "src/cash-audits/cash-audits.module.ts": {
+    "mtime": 1771659209.0,
+    "ast_hash": "399a931e845b50b9ce417e1be9d9cba8",
+    "semantic_hash": ""
+  },
+  "src/cash-audits/cash-audits.service.ts": {
+    "mtime": 1771762118.0,
+    "ast_hash": "a3598d0866ea7ee1cfd80ffc2e055c47",
+    "semantic_hash": ""
+  },
+  "src/cash-audits/dto/create-cash-audit.dto.ts": {
+    "mtime": 1792959786.0,
+    "ast_hash": "32181556d83cf772e42747375612d5eb",
+    "semantic_hash": ""
+  },
+  "src/cash-balances/cash-balances.controller.ts": {
+    "mtime": 1792707202.0,
+    "ast_hash": "7efcd7c02501764c0dae8ed48ff7f074",
+    "semantic_hash": ""
+  },
+  "src/cash-balances/cash-balances.module.ts": {
+    "mtime": 1771658979.0,
+    "ast_hash": "4f77580fd8cfd9e3c01e3e733f5eeff5",
+    "semantic_hash": ""
+  },
+  "src/cash-balances/cash-balances.service.ts": {
+    "mtime": 1792685693.0,
+    "ast_hash": "bf2dc9462e0f269374936a41bf88d4f1",
+    "semantic_hash": ""
+  },
+  "src/cash/cash.controller.ts": {
+    "mtime": 1792707092.0,
+    "ast_hash": "3062cdee2b26c2b1484e2c93afd38f6d",
+    "semantic_hash": ""
+  },
+  "src/cash/cash.module.ts": {
+    "mtime": 1783817446.0,
+    "ast_hash": "34847947bcae086891cb1ab2797c66ee",
+    "semantic_hash": ""
+  },
+  "src/cash/cash.service.spec.ts": {
+    "mtime": 1792961167.0,
+    "ast_hash": "0e4d71da25bad032fa69841a7d50669f",
+    "semantic_hash": ""
+  },
+  "src/cash/cash.service.ts": {
+    "mtime": 1792684907.0,
+    "ast_hash": "ac1fccc8b01af6f5c6b474b450c1847a",
+    "semantic_hash": ""
+  },
+  "src/cash/dto/create-cash-closing.dto.ts": {
+    "mtime": 1792959800.0,
+    "ast_hash": "2b4459ad8e09b57ab573ac21050691da",
+    "semantic_hash": ""
+  },
+  "src/cash/dto/update-cash-policy.dto.ts": {
+    "mtime": 1792959818.0,
+    "ast_hash": "0720755571efc02fea4e672706446d7a",
+    "semantic_hash": ""
+  },
+  "src/common/decorators/current-user.decorator.ts": {
+    "mtime": 1771761543.0,
+    "ast_hash": "54a29eef87ec126b3f0c4db4b1090883",
+    "semantic_hash": ""
+  },
+  "src/common/decorators/roles.decorator.ts": {
+    "mtime": 1771762975.0,
+    "ast_hash": "2d3d078e83a86eec8862531b417f39f9",
+    "semantic_hash": ""
+  },
+  "src/common/guards/jwt-auth.guard.ts": {
+    "mtime": 1777121313.0,
+    "ast_hash": "b5526a383872c34c316da901fe74ab7a",
+    "semantic_hash": ""
+  },
+  "src/common/guards/roles.guard.ts": {
+    "mtime": 1771762952.0,
+    "ast_hash": "3c4bba5bdebcb06da68f10ce835c1fd5",
+    "semantic_hash": ""
+  },
+  "src/currencies/currencies.controller.ts": {
+    "mtime": 1792764086.0,
+    "ast_hash": "1671b2bdb810451928028ac65f6f2e43",
+    "semantic_hash": ""
+  },
+  "src/currencies/currencies.module.ts": {
+    "mtime": 1771658942.0,
+    "ast_hash": "e586ceec26ed398b8ee79461f0a2feae",
+    "semantic_hash": ""
+  },
+  "src/currencies/currencies.service.ts": {
+    "mtime": 1777251369.0,
+    "ast_hash": "95bd1ff25e0bd2c10b32c1156d3ec6ed",
+    "semantic_hash": ""
+  },
+  "src/currencies/dto/create-currency.dto.ts": {
+    "mtime": 1771677626.0,
+    "ast_hash": "265a3df175f0feaffa1b79f50afdfa86",
+    "semantic_hash": ""
+  },
+  "src/currencies/dto/update-currency.dto.ts": {
+    "mtime": 1771658924.0,
+    "ast_hash": "911a04664e95a4f3bc840eff414fe69d",
+    "semantic_hash": ""
+  },
+  "src/database/database.module.ts": {
+    "mtime": 1771657817.0,
+    "ast_hash": "c9782e5d0f633dbf65df8de65a27480f",
+    "semantic_hash": ""
+  },
+  "src/database/prisma/prisma.service.ts": {
+    "mtime": 1771657801.0,
+    "ast_hash": "f3eee7e045708ad54099bf275985a1a3",
+    "semantic_hash": ""
+  },
+  "src/email/dto/email.dto.ts": {
+    "mtime": 1773757026.0,
+    "ast_hash": "f74b647ba3c9a3b08bf52492f92b30e7",
+    "semantic_hash": ""
+  },
+  "src/email/email-templates.ts": {
+    "mtime": 1773926665.0,
+    "ast_hash": "ed450d24a6b247a0bee31382c01de809",
+    "semantic_hash": ""
+  },
+  "src/email/email.module.ts": {
+    "mtime": 1773757096.0,
+    "ast_hash": "3be49e42cc79fae8d789162b8730a012",
+    "semantic_hash": ""
+  },
+  "src/email/email.service.spec.ts": {
+    "mtime": 1773761266.0,
+    "ast_hash": "767f848cfd43dff38dbf5cef134bafd1",
+    "semantic_hash": ""
+  },
+  "src/email/email.service.ts": {
+    "mtime": 1773761324.0,
+    "ast_hash": "1950332b14dc51d36e581a6e7cd85de9",
+    "semantic_hash": ""
+  },
+  "src/exchange-rates/dto/update-exchange-rate.dto.ts": {
+    "mtime": 1792959610.0,
+    "ast_hash": "be34ff1af0e134cd7f4c143f0c9b8add",
+    "semantic_hash": ""
+  },
+  "src/exchange-rates/exchange-rates.controller.ts": {
+    "mtime": 1792664964.0,
+    "ast_hash": "360a5ec827762884bba73bae45b490e6",
+    "semantic_hash": ""
+  },
+  "src/exchange-rates/exchange-rates.module.ts": {
+    "mtime": 1771658980.0,
+    "ast_hash": "1bf00e4f5a80d4c51d00a4356b65a1c9",
+    "semantic_hash": ""
+  },
+  "src/exchange-rates/exchange-rates.service.ts": {
+    "mtime": 1792669880.0,
+    "ast_hash": "e58fdd0dd39c7538f34acf1372885c48",
+    "semantic_hash": ""
+  },
+  "src/expense-items/dto/create-expense-item.dto.ts": {
+    "mtime": 1792959094.0,
+    "ast_hash": "856d48c76838f2c75a4cf1d0999d756c",
+    "semantic_hash": ""
+  },
+  "src/expense-items/dto/query-expense-item.dto.ts": {
+    "mtime": 1774043916.0,
+    "ast_hash": "40f0ea067671b30b1c3de6534f073418",
+    "semantic_hash": ""
+  },
+  "src/expense-items/dto/update-expense-item.dto.ts": {
+    "mtime": 1792959143.0,
+    "ast_hash": "07f074a03fcf0809167a5c32f168a66b",
+    "semantic_hash": ""
+  },
+  "src/expense-items/expense-items.controller.ts": {
+    "mtime": 1792838074.0,
+    "ast_hash": "27c6742f580ed41d145c0e71e2049016",
+    "semantic_hash": ""
+  },
+  "src/expense-items/expense-items.module.ts": {
+    "mtime": 1774043979.0,
+    "ast_hash": "bc528072a4fe8d773f745a16ccaaf1ca",
+    "semantic_hash": ""
+  },
+  "src/expense-items/expense-items.service.spec.ts": {
+    "mtime": 1792960903.0,
+    "ast_hash": "115643f4fb6acb4c682ab77e8d2495fb",
+    "semantic_hash": ""
+  },
+  "src/expense-items/expense-items.service.ts": {
+    "mtime": 1792960007.0,
+    "ast_hash": "1081970dd1aeb5e16165bcd7e4677866",
+    "semantic_hash": ""
+  },
+  "src/expenses/dto/create-expense.dto.ts": {
+    "mtime": 1792959059.0,
+    "ast_hash": "fe1a16ead77855cf99b420423a2e9f9e",
+    "semantic_hash": ""
+  },
+  "src/expenses/dto/query-expense.dto.ts": {
+    "mtime": 1785465686.0,
+    "ast_hash": "172b94a7bf1715a9756191dedde2a68c",
+    "semantic_hash": ""
+  },
+  "src/expenses/dto/update-expense.dto.ts": {
+    "mtime": 1771659288.0,
+    "ast_hash": "a8b62b8c628d7da81d4ad78019e15e19",
+    "semantic_hash": ""
+  },
+  "src/expenses/expenses.controller.ts": {
+    "mtime": 1792749178.0,
+    "ast_hash": "221e32ed56b640fdb93df384016f2ac9",
+    "semantic_hash": ""
+  },
+  "src/expenses/expenses.module.ts": {
+    "mtime": 1771659338.0,
+    "ast_hash": "007590d07758cb1406c4389ef144b04d",
+    "semantic_hash": ""
+  },
+  "src/expenses/expenses.service.ts": {
+    "mtime": 1785465686.0,
+    "ast_hash": "a8c6e6c83d8c75828a6d8a6c4f076d3c",
+    "semantic_hash": ""
+  },
+  "src/fx-operations/domain/domain-errors.ts": {
+    "mtime": 1783803446.0,
+    "ast_hash": "8905ea8c1b2a486d87a13693426cd2bc",
+    "semantic_hash": ""
+  },
+  "src/fx-operations/domain/movement-mapper.ts": {
+    "mtime": 1783886120.0,
+    "ast_hash": "1328d4d7fc53fedc4e40eb589ed4c02c",
+    "semantic_hash": ""
+  },
+  "src/fx-operations/domain/position-calculator.ts": {
+    "mtime": 1783803446.0,
+    "ast_hash": "ea473597335965b2fd9c98f62988af9f",
+    "semantic_hash": ""
+  },
+  "src/fx-operations/dto/create-fx-transfer.dto.ts": {
+    "mtime": 1792959378.0,
+    "ast_hash": "509657cf2caf60b5d814c84ead6ffcc6",
+    "semantic_hash": ""
+  },
+  "src/fx-operations/fx-domain-exception.filter.ts": {
+    "mtime": 1783803446.0,
+    "ast_hash": "1319f20554d54031fead3f10b6db5057",
+    "semantic_hash": ""
+  },
+  "src/fx-operations/fx-operations.controller.ts": {
+    "mtime": 1792749178.0,
+    "ast_hash": "1c679ce60b053700e7cba7bf64e6fd44",
+    "semantic_hash": ""
+  },
+  "src/fx-operations/fx-operations.module.ts": {
+    "mtime": 1783886120.0,
+    "ast_hash": "50623b9f0b565940aae1a33796b34d19",
+    "semantic_hash": ""
+  },
+  "src/fx-operations/fx-operations.service.spec.ts": {
+    "mtime": 1792960792.0,
+    "ast_hash": "fb49a56578d83353432f63ef0c25f0db",
+    "semantic_hash": ""
+  },
+  "src/fx-operations/fx-operations.service.ts": {
+    "mtime": 1792960461.0,
+    "ast_hash": "54ad0d35898ec688b83a2a38f645df40",
+    "semantic_hash": ""
+  },
+  "src/fx-operations/rate-validator.ts": {
+    "mtime": 1792960120.0,
+    "ast_hash": "34ec4e464a3f4e9f25c8d12008ecf744",
+    "semantic_hash": ""
+  },
+  "src/main.ts": {
+    "mtime": 1792592511.0,
+    "ast_hash": "e115e67191dd1cabe1bb31aa27331174",
+    "semantic_hash": ""
+  },
+  "src/notifications/notifications.module.ts": {
+    "mtime": 1784895949.0,
+    "ast_hash": "d7263dad21b9f2cf252c384b5d82b97a",
+    "semantic_hash": ""
+  },
+  "src/notifications/notifications.service.spec.ts": {
+    "mtime": 1785032245.0,
+    "ast_hash": "09e826283c9b1ff9fb8fa541de38a003",
+    "semantic_hash": ""
+  },
+  "src/notifications/notifications.service.ts": {
+    "mtime": 1785032354.0,
+    "ast_hash": "83cfe6b0d0cf01801bbce1e78443aa89",
+    "semantic_hash": ""
+  },
+  "src/objectives/dto/create-objective.dto.ts": {
+    "mtime": 1792959572.0,
+    "ast_hash": "088a77e5b61dc0a20210eaa2f59c3d6d",
+    "semantic_hash": ""
+  },
+  "src/objectives/dto/update-objective.dto.ts": {
+    "mtime": 1771659658.0,
+    "ast_hash": "52ff5513d24915dc881f99a692417dae",
+    "semantic_hash": ""
+  },
+  "src/objectives/dto/update-status.dto.ts": {
+    "mtime": 1771659660.0,
+    "ast_hash": "a716178c3a025badeb9d7934dc93cf84",
+    "semantic_hash": ""
+  },
+  "src/objectives/objectives.controller.ts": {
+    "mtime": 1792740280.0,
+    "ast_hash": "f179992b0cc79ce7b19bc457c46f6f13",
+    "semantic_hash": ""
+  },
+  "src/objectives/objectives.module.ts": {
+    "mtime": 1771659700.0,
+    "ast_hash": "b389da5acd59ffbfa44592b01905a16f",
+    "semantic_hash": ""
+  },
+  "src/objectives/objectives.service.ts": {
+    "mtime": 1792738214.0,
+    "ast_hash": "c41e7f016decd6c334afae83c3e81cd2",
+    "semantic_hash": ""
+  },
+  "src/plans/dto/create-plan.dto.ts": {
+    "mtime": 1792959872.0,
+    "ast_hash": "648d8b63a80af359795d11c3d46c8bf5",
+    "semantic_hash": ""
+  },
+  "src/plans/dto/update-plan.dto.ts": {
+    "mtime": 1772277180.0,
+    "ast_hash": "94634122183423a955cfee8d1cf0a831",
+    "semantic_hash": ""
+  },
+  "src/plans/plans.controller.ts": {
+    "mtime": 1792764086.0,
+    "ast_hash": "b6cc906b3cea719cc5dbce4355090170",
+    "semantic_hash": ""
+  },
+  "src/plans/plans.module.ts": {
+    "mtime": 1772277180.0,
+    "ast_hash": "0ac1c9fd70b8ada79b13df1f058f7726",
+    "semantic_hash": ""
+  },
+  "src/plans/plans.service.ts": {
+    "mtime": 1792960282.0,
+    "ast_hash": "2cabc1fd7862a91a3de360d428989c4d",
+    "semantic_hash": ""
+  },
+  "src/rate-history/dto/create-rate-history.dto.ts": {
+    "mtime": 1792959498.0,
+    "ast_hash": "b44b58aa3914a40033cfa593ab3044c1",
+    "semantic_hash": ""
+  },
+  "src/rate-history/rate-history.controller.ts": {
+    "mtime": 1792838074.0,
+    "ast_hash": "ba9a0482e9d0da86139db64340d007ca",
+    "semantic_hash": ""
+  },
+  "src/rate-history/rate-history.module.ts": {
+    "mtime": 1771846746.0,
+    "ast_hash": "4403a1980c12c78db32e803a31469f7e",
+    "semantic_hash": ""
+  },
+  "src/rate-history/rate-history.service.ts": {
+    "mtime": 1792739625.0,
+    "ast_hash": "023ff52fa1a0678248679156163e8728",
+    "semantic_hash": ""
+  },
+  "src/remittances/dto/remittance-event.dto.ts": {
+    "mtime": 1792959406.0,
+    "ast_hash": "2936bdd54bb4579fc39ba93f4e35bccd",
+    "semantic_hash": ""
+  },
+  "src/remittances/remittances.controller.ts": {
+    "mtime": 1792749178.0,
+    "ast_hash": "1a74e5d7099a86cb5994bbe4645c99fa",
+    "semantic_hash": ""
+  },
+  "src/remittances/remittances.module.ts": {
+    "mtime": 1783864557.0,
+    "ast_hash": "4eac61e0f669ae69f94f36f3a17da714",
+    "semantic_hash": ""
+  },
+  "src/remittances/remittances.service.spec.ts": {
+    "mtime": 1792750890.0,
+    "ast_hash": "d47376de463290b734d9c5a9507a9f62",
+    "semantic_hash": ""
+  },
+  "src/remittances/remittances.service.ts": {
+    "mtime": 1792960310.0,
+    "ast_hash": "0e1bb04b2098070c586161adadb25bdf",
+    "semantic_hash": ""
+  },
+  "src/reports/reports.controller.ts": {
+    "mtime": 1784718388.0,
+    "ast_hash": "21117503ef9dfda2a68072bd608cc437",
+    "semantic_hash": ""
+  },
+  "src/reports/reports.module.ts": {
+    "mtime": 1771659751.0,
+    "ast_hash": "d12630716354d36a13afbf125b43f0a9",
+    "semantic_hash": ""
+  },
+  "src/reports/reports.service.fx.spec.ts": {
+    "mtime": 1792704976.0,
+    "ast_hash": "e59d7e29050296bdd9db60c3c7ddac9c",
+    "semantic_hash": ""
+  },
+  "src/reports/reports.service.ts": {
+    "mtime": 1792704355.0,
+    "ast_hash": "681e004b1b10c21a9145b5dc54b97941",
+    "semantic_hash": ""
+  },
+  "src/subscriptions/dto/assign-license.dto.ts": {
+    "mtime": 1772277241.0,
+    "ast_hash": "e605054ffc1797a0fafe8cdb7173050d",
+    "semantic_hash": ""
+  },
+  "src/subscriptions/dto/register-payment.dto.ts": {
+    "mtime": 1792959441.0,
+    "ast_hash": "e6eedac8032f39e41703f0b0220a6f9a",
+    "semantic_hash": ""
+  },
+  "src/subscriptions/dto/renew-license.dto.ts": {
+    "mtime": 1772277241.0,
+    "ast_hash": "fbe893107b1ea98d6a0b74ad1125e37e",
+    "semantic_hash": ""
+  },
+  "src/subscriptions/dto/suspend-license.dto.ts": {
+    "mtime": 1772277241.0,
+    "ast_hash": "ad9b552edec8ddbe70dd5fc303d2ca74",
+    "semantic_hash": ""
+  },
+  "src/subscriptions/subscriptions.controller.ts": {
+    "mtime": 1792743152.0,
+    "ast_hash": "51a17eddac3d60c86dbb5908a46e4f0b",
+    "semantic_hash": ""
+  },
+  "src/subscriptions/subscriptions.module.ts": {
+    "mtime": 1772277241.0,
+    "ast_hash": "b4f8d6a1e09a3832bdbc3750bdfa6498",
+    "semantic_hash": ""
+  },
+  "src/subscriptions/subscriptions.service.spec.ts": {
+    "mtime": 1792961269.0,
+    "ast_hash": "4076063420f904b6786f6bb020d2aa0b",
+    "semantic_hash": ""
+  },
+  "src/subscriptions/subscriptions.service.ts": {
+    "mtime": 1792960582.0,
+    "ast_hash": "c01364c3c7b70507b544f7720f8ce97f",
+    "semantic_hash": ""
+  },
+  "src/transactions/dto/create-transaction.dto.ts": {
+    "mtime": 1792959031.0,
+    "ast_hash": "a5db32a2f8784303c5e60ec46f4e107f",
+    "semantic_hash": ""
+  },
+  "src/transactions/dto/query-transaction.dto.ts": {
+    "mtime": 1784235437.0,
+    "ast_hash": "41a7f03c362e3c2f3a5ff40f4609ec05",
+    "semantic_hash": ""
+  },
+  "src/transactions/transactions.controller.ts": {
+    "mtime": 1792749178.0,
+    "ast_hash": "c208f567e791d3ec5a86390144f93f2e",
+    "semantic_hash": ""
+  },
+  "src/transactions/transactions.module.ts": {
+    "mtime": 1784214040.0,
+    "ast_hash": "d56cf7588f65341245ae8ec363a80d27",
+    "semantic_hash": ""
+  },
+  "src/transactions/transactions.service.ts": {
+    "mtime": 1785502878.0,
+    "ast_hash": "78bd850d08c429910796d2f3b4a48a07",
+    "semantic_hash": ""
+  },
+  "src/upload/upload.controller.ts": {
+    "mtime": 1792749178.0,
+    "ast_hash": "ed38c130cfd20980240add764bcb7a92",
+    "semantic_hash": ""
+  },
+  "src/upload/upload.module.ts": {
+    "mtime": 1784026615.0,
+    "ast_hash": "beaf2e344a2b5e70dd3d275ab938670c",
+    "semantic_hash": ""
+  },
+  "src/upload/upload.service.ts": {
+    "mtime": 1772987601.0,
+    "ast_hash": "06a08d0e967e14ec39163cb014946088",
+    "semantic_hash": ""
+  },
+  "src/worker-payments/dto/add-balance.dto.ts": {
+    "mtime": 1792959197.0,
+    "ast_hash": "5e57e182ae6300f37c733b6a3efd44dd",
+    "semantic_hash": ""
+  },
+  "src/worker-payments/dto/create-transaction.dto.ts": {
+    "mtime": 1792959252.0,
+    "ast_hash": "af26e3d547064b49164a80cfb7d27e31",
+    "semantic_hash": ""
+  },
+  "src/worker-payments/dto/create-worker.dto.ts": {
+    "mtime": 1773835749.0,
+    "ast_hash": "7436782484bcd2dfe34de42ced7e7171",
+    "semantic_hash": ""
+  },
+  "src/worker-payments/dto/index.ts": {
+    "mtime": 1784654031.0,
+    "ast_hash": "c43bdda210f34b627482122541fb749f",
+    "semantic_hash": ""
+  },
+  "src/worker-payments/dto/update-worker.dto.ts": {
+    "mtime": 1773835785.0,
+    "ast_hash": "a25285b5f8bbfb3a8c1369cb593e235c",
+    "semantic_hash": ""
+  },
+  "src/worker-payments/worker-payments.controller.ts": {
+    "mtime": 1792838074.0,
+    "ast_hash": "431c418bd7f8a1d77aebd097f8dc05b6",
+    "semantic_hash": ""
+  },
+  "src/worker-payments/worker-payments.module.ts": {
+    "mtime": 1773835844.0,
+    "ast_hash": "1910a64c4fecc23779e8a8efc613fc53",
+    "semantic_hash": ""
+  },
+  "src/worker-payments/worker-payments.service.ts": {
+    "mtime": 1792960446.0,
+    "ast_hash": "493d1f7f6c7446f71bb6e81bc006192c",
+    "semantic_hash": ""
+  },
+  "tsconfig.json": {
+    "mtime": 1771698041.0,
+    "ast_hash": "b8a95b44f6c5df548e31476b15f382e0",
+    "semantic_hash": ""
+  },
+  "docs/design.md": {
+    "mtime": 1771657115.0,
+    "ast_hash": "cfae4a57eeb47c7efe506077e3ead85b",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260712130000_remove_redundant_cash_policy_index/migration.sql": {
+    "mtime": 1783872786.0,
+    "ast_hash": "5e22390dc74cc3d1d90fe3cb31f00493",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260712140000_add_fx_transfer_idempotency/migration.sql": {
+    "mtime": 1783892341.0,
+    "ast_hash": "d90f6decb88620a5d2c39742f2da7d3e",
+    "semantic_hash": ""
+  },
+  "src/fx-operations/fx-operations.controller.spec.ts": {
+    "mtime": 1792960954.0,
+    "ast_hash": "b9b03470699958c0c47abd262d734309",
+    "semantic_hash": ""
+  },
+  "src/config/environment.spec.ts": {
+    "mtime": 1784026531.0,
+    "ast_hash": "d74dabe2bb7ed7cfb0dabef4b7f3a3bb",
+    "semantic_hash": ""
+  },
+  "src/config/environment.ts": {
+    "mtime": 1784026615.0,
+    "ast_hash": "43c19e0754917fda77677bc071aa9d1f",
+    "semantic_hash": ""
+  },
+  "src/health/health.controller.spec.ts": {
+    "mtime": 1784026531.0,
+    "ast_hash": "93343adba799157081f0b941bf453601",
+    "semantic_hash": ""
+  },
+  "src/health/health.controller.ts": {
+    "mtime": 1792658460.0,
+    "ast_hash": "4fef0b131e4c34bdfc07c62c143485b1",
+    "semantic_hash": ""
+  },
+  "src/health/health.module.ts": {
+    "mtime": 1784026615.0,
+    "ast_hash": "80ff2139b50cd63d9b8d993cc830c817",
+    "semantic_hash": ""
+  },
+  "src/upload/upload.module.spec.ts": {
+    "mtime": 1784026531.0,
+    "ast_hash": "6574dd8536b6871809915287a13c439d",
+    "semantic_hash": ""
+  },
+  "src/config/environment-example.spec.ts": {
+    "mtime": 1784026898.0,
+    "ast_hash": "0276a939140c9397b89d490b3908c82d",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260715115017_add_transfer_accounts/migration.sql": {
+    "mtime": 1784116217.0,
+    "ast_hash": "d6292877e9e54273993494b78c61eb10",
+    "semantic_hash": ""
+  },
+  "src/bank-accounts/bank-accounts.service.spec.ts": {
+    "mtime": 1792698367.0,
+    "ast_hash": "5014a39eb75c44eb04fa1e978fbb0e66",
+    "semantic_hash": ""
+  },
+  ".eslintrc.js": {
+    "mtime": 1784118329.0,
+    "ast_hash": "83df7c4dd70a6a7a6fa31f9c3709fe57",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260716110000_add_fx_operation_kind_and_rate_persistence/migration.sql": {
+    "mtime": 1784213332.0,
+    "ast_hash": "ee3b169390620ed06fc0e2435af9c887",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260716133000_audit_requested_fx_rate/migration.sql": {
+    "mtime": 1784214635.0,
+    "ast_hash": "92aeacf163557e520f98ecf65abc7801",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260716150000_remove_reconciliation_add_expense_source/migration.sql": {
+    "mtime": 1784215631.0,
+    "ast_hash": "cd82972cb4e16b01567f3956cd122806",
+    "semantic_hash": ""
+  },
+  "src/expenses/expenses.service.spec.ts": {
+    "mtime": 1792960935.0,
+    "ast_hash": "20769ebddfbe7891c71c6e2a4d2bc0d3",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260716170000_scope_remittance_idempotency_by_user/migration.sql": {
+    "mtime": 1784215731.0,
+    "ast_hash": "a6c4eab83df138d487d4ae65a1b07638",
+    "semantic_hash": ""
+  },
+  "src/remittances/remittances.controller.spec.ts": {
+    "mtime": 1785491594.0,
+    "ast_hash": "45e3f2784e37662a052764d1f91d33c6",
+    "semantic_hash": ""
+  },
+  "src/auth/jwt.strategy.spec.ts": {
+    "mtime": 1784223051.0,
+    "ast_hash": "64ec22cccf6c8bb9faedc73c9c0b854c",
+    "semantic_hash": ""
+  },
+  "src/bank-accounts/bank-accounts.tenant-isolation.spec.ts": {
+    "mtime": 1792960792.0,
+    "ast_hash": "ad543bde7affefede03bfb82a4303a16",
+    "semantic_hash": ""
+  },
+  "src/cash/cash.tenant-isolation.spec.ts": {
+    "mtime": 1792960792.0,
+    "ast_hash": "edfe263feeab55af885ee81b2093fbbe",
+    "semantic_hash": ""
+  },
+  "src/expenses/expenses.tenant-isolation.spec.ts": {
+    "mtime": 1792960792.0,
+    "ast_hash": "8dc70db5f0f3f0c76bf99bd55660d952",
+    "semantic_hash": ""
+  },
+  "src/objectives/objectives.service.spec.ts": {
+    "mtime": 1792960990.0,
+    "ast_hash": "51c3f06f7e88364aeae2bf9ef392d5e4",
+    "semantic_hash": ""
+  },
+  "src/transactions/transactions.service.spec.ts": {
+    "mtime": 1785502771.0,
+    "ast_hash": "486536c3073a036cbb1b3e2c307c2cad",
+    "semantic_hash": ""
+  },
+  "src/transactions/dto/query-transaction.dto.spec.ts": {
+    "mtime": 1784235057.0,
+    "ast_hash": "320ce75853607a44b37d9ad2f236e3fd",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260716190000_add_worker_balances/migration.sql": {
+    "mtime": 1784267287.0,
+    "ast_hash": "5a892ebb83878296d3962957183f0a81",
+    "semantic_hash": ""
+  },
+  "src/worker-payments/dto/deposit.dto.ts": {
+    "mtime": 1792959210.0,
+    "ast_hash": "defb9c4c3bfa254cf06684f0324f5220",
+    "semantic_hash": ""
+  },
+  "src/worker-payments/worker-payments.service.spec.ts": {
+    "mtime": 1792960792.0,
+    "ast_hash": "c60eb0b8df9c161142328dccb3961eb0",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260716200000_add_worker_transaction_currency/migration.sql": {
+    "mtime": 1784258531.0,
+    "ast_hash": "c180cba69c23d93e45a2d81fdbb225e5",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260717100000_persist_fx_worker_context/migration.sql": {
+    "mtime": 1784266061.0,
+    "ast_hash": "25efa893187b3b3be710b6d56d4265ad",
+    "semantic_hash": ""
+  },
+  "railway.json": {
+    "mtime": 1786314262.0,
+    "ast_hash": "8b65b124686e30294e9f6bb19f47e94e",
+    "semantic_hash": ""
+  },
+  "src/reports/dto/reports.dto.ts": {
+    "mtime": 1792596329.0,
+    "ast_hash": "291ff9022b4fe60fd1b47a8e25631b11",
+    "semantic_hash": ""
+  },
+  "src/reports/reports.swagger.ts": {
+    "mtime": 1792705518.0,
+    "ast_hash": "94837dfa0083cec2e5caeebc30f56a9b",
+    "semantic_hash": ""
+  },
+  "src/reports/reports.types.ts": {
+    "mtime": 1792704421.0,
+    "ast_hash": "3f60c2b08260005255981c274cae9634",
+    "semantic_hash": ""
+  },
+  "src/notifications/dto/query-notifications.dto.ts": {
+    "mtime": 1784721728.0,
+    "ast_hash": "7bcf590445c7eae36549f72810a506e7",
+    "semantic_hash": ""
+  },
+  "src/notifications/notifications.controller.ts": {
+    "mtime": 1792708616.0,
+    "ast_hash": "51a764a44fec91d6489870f83730d528",
+    "semantic_hash": ""
+  },
+  "src/admin/dto/platform-series-query.dto.spec.ts": {
+    "mtime": 1784778917.0,
+    "ast_hash": "d0d0f0670159c7a2dd9c1ff0d97ae763",
+    "semantic_hash": ""
+  },
+  "src/admin/dto/platform-series-query.dto.ts": {
+    "mtime": 1784778019.0,
+    "ast_hash": "f59b76ff1123a459cd3d142ba94699c8",
+    "semantic_hash": ""
+  },
+  "src/reports/reports.service.cash-flow.spec.ts": {
+    "mtime": 1792704976.0,
+    "ast_hash": "31a4d9d9bc2fd49556932d0728f3b857",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260724121758_add_push_device/migration.sql": {
+    "mtime": 1784895478.0,
+    "ast_hash": "8de378afc9e2698c32e46af01f943e09",
+    "semantic_hash": ""
+  },
+  "src/notifications/__mocks__/expo-server-sdk.ts": {
+    "mtime": 1785033928.0,
+    "ast_hash": "56a755d8642f1feac861b278c5eaeb62",
+    "semantic_hash": ""
+  },
+  "src/notifications/dto/register-push-token.dto.ts": {
+    "mtime": 1785032754.0,
+    "ast_hash": "eada067d1f3393cf7648e94ca91fadc4",
+    "semantic_hash": ""
+  },
+  "src/notifications/push-notifications.service.ts": {
+    "mtime": 1785178545.0,
+    "ast_hash": "83542a418488233a54b81a364dda7d27",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260726022500_remove_redundant_push_device_user_token_index/migration.sql": {
+    "mtime": 1785032295.0,
+    "ast_hash": "56fae117ed76c4a55f6de8d14f5c30be",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260726024500_add_push_receipt_tracking/migration.sql": {
+    "mtime": 1785033928.0,
+    "ast_hash": "6893a57004356d4cf90f56bb0fce60a6",
+    "semantic_hash": ""
+  },
+  "src/notifications/push-notifications.service.spec.ts": {
+    "mtime": 1785178437.0,
+    "ast_hash": "414421fadb31da88e4258b036a166b07",
+    "semantic_hash": ""
+  },
+  "src/notifications/dto/unregister-push-token.dto.ts": {
+    "mtime": 1785130780.0,
+    "ast_hash": "cdd2e66927cbc2b4caa0cda0a3cadd5b",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260727145836_push_device_compound_unique/migration.sql": {
+    "mtime": 1785178821.0,
+    "ast_hash": "8e38b0f80e9a8392dd5c13598e386de9",
+    "semantic_hash": ""
+  },
+  "src/common/transactions/serializable-transaction.ts": {
+    "mtime": 1785448633.0,
+    "ast_hash": "543d0e1208a21138d6fec6ea4d77658c",
+    "semantic_hash": ""
+  },
+  "src/common/transactions/serializable-transaction.spec.ts": {
+    "mtime": 1785465108.0,
+    "ast_hash": "2250a56b1b4cc56cb9cf2e1914879b63",
+    "semantic_hash": ""
+  },
+  "src/expenses/dto/create-expense.dto.spec.ts": {
+    "mtime": 1792961154.0,
+    "ast_hash": "9817cb36bb23400a6a11b60c81e817dd",
+    "semantic_hash": ""
+  },
+  "src/fx-operations/dto/open-currency-position.dto.ts": {
+    "mtime": 1792959835.0,
+    "ast_hash": "8a02fb6bb0e1c249c4f5e53e64d22b3c",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1785460631.0,
+    "ast_hash": "1347d054d3a0bad34ce7f72d660d8218",
+    "semantic_hash": ""
+  },
+  "src/remittances/dto/remittance-event.dto.spec.ts": {
+    "mtime": 1792961146.0,
+    "ast_hash": "94e23d1004a22b5f39bee278888e728d",
+    "semantic_hash": ""
+  },
+  "src/transactions/dto/create-transaction.dto.spec.ts": {
+    "mtime": 1792961125.0,
+    "ast_hash": "bfda9eba037f68a8c8b750d685537ad1",
+    "semantic_hash": ""
+  },
+  "src/transactions/transactions.controller.spec.ts": {
+    "mtime": 1785518899.0,
+    "ast_hash": "685eb3d8b8f94e702129305d828b9e88",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260809090000_worker_custody_performance/migration.sql": {
+    "mtime": 1786262013.0,
+    "ast_hash": "304f592c851303f7b272ae35a4c36314",
+    "semantic_hash": ""
+  },
+  "prisma/migrations/20260813120000_add_zelle_currency/migration.sql": {
+    "mtime": 1786668275.0,
+    "ast_hash": "0d6f1afbb55874a06f953c8ec13cc8d5",
+    "semantic_hash": ""
+  },
+  "src/auth/dto/check-email.dto.ts": {
+    "mtime": 1792508310.0,
+    "ast_hash": "4e232f6f334c8f5d326ff6fcee1ce822",
+    "semantic_hash": ""
+  },
+  "src/auth/dto/check-nickname.dto.ts": {
+    "mtime": 1792508310.0,
+    "ast_hash": "78063c1fae64d352c34f5c4775a907f2",
+    "semantic_hash": ""
+  },
+  ".commandcode/taste/taste.md": {
+    "mtime": 1787398072.0,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  ".github/workflows/ci.yml": {
+    "mtime": 1792908849.0,
+    "ast_hash": "7f9b924c7864ac45bbec9f6bf05c5bd8",
+    "semantic_hash": ""
+  },
+  "openapi.json": {
+    "mtime": 1792961496.0,
+    "ast_hash": "24a29f462c80abcc5129a9f087cbacda",
+    "semantic_hash": ""
+  },
+  "scripts/check-openapi-drift.sh": {
+    "mtime": 1792627959.0,
+    "ast_hash": "1b1a074820e861abe44da97f92411a8e",
+    "semantic_hash": ""
+  },
+  "scripts/export-openapi.ts": {
+    "mtime": 1792592500.0,
+    "ast_hash": "888b2d6982025125979e88e57c40609b",
+    "semantic_hash": ""
+  },
+  "src/swagger.ts": {
+    "mtime": 1792592491.0,
+    "ast_hash": "70ac8ad58d15afd61e4e0c0943669820",
+    "semantic_hash": ""
+  },
+  ".spectral.yaml": {
+    "mtime": 1792592515.0,
+    "ast_hash": "33edd3c2601958a23ee8f00e95f4f302",
+    "semantic_hash": ""
+  },
+  "sdks/typescript/schema.d.ts": {
+    "mtime": 1792961405.0,
+    "ast_hash": "ff104e7b9ce547e43e2f07c6f9a4bc8b",
+    "semantic_hash": ""
+  },
+  "sdks/typescript/smoke.ts": {
+    "mtime": 1792662241.0,
+    "ast_hash": "7f49a9a96b451bb4b85b3873c0f760e9",
+    "semantic_hash": ""
+  },
+  "sdks/typescript/tsconfig.json": {
+    "mtime": 1792656217.0,
+    "ast_hash": "f5843aa23e2aa61adc1e512b23aa60a4",
+    "semantic_hash": ""
+  },
+  "src/auth/auth.swagger.ts": {
+    "mtime": 1792838739.0,
+    "ast_hash": "12787c2b91187c12d3c9880a30f2bbfc",
+    "semantic_hash": ""
+  },
+  "src/common/swagger/message-response.dto.ts": {
+    "mtime": 1792663545.0,
+    "ast_hash": "bb2514853e731ed2e53804df122f8a0d",
+    "semantic_hash": ""
+  },
+  "src/currencies/currencies.swagger.ts": {
+    "mtime": 1792764086.0,
+    "ast_hash": "30688d016c4ccd1a7968f609313276b9",
+    "semantic_hash": ""
+  },
+  "src/exchange-rates/exchange-rates.swagger.ts": {
+    "mtime": 1792670044.0,
+    "ast_hash": "a77b5fe1f1eee70af8fba943dbd695f6",
+    "semantic_hash": ""
+  },
+  "src/common/utils/decimal-serialization.ts": {
+    "mtime": 1792691510.0,
+    "ast_hash": "7edb12fb8688953a008d9d0a26b41a5b",
+    "semantic_hash": ""
+  },
+  "src/cash/cash.swagger.ts": {
+    "mtime": 1792707178.0,
+    "ast_hash": "52b139c0690fae035a44089ff82ce669",
+    "semantic_hash": ""
+  },
+  "src/bank-accounts/bank-accounts.swagger.ts": {
+    "mtime": 1792838739.0,
+    "ast_hash": "999777d15ae2aa8cfc5779bfe7a75c69",
+    "semantic_hash": ""
+  },
+  "src/notifications/notifications.swagger.ts": {
+    "mtime": 1792838739.0,
+    "ast_hash": "82601a2ee4fc345b8ded562df2bf7fec",
+    "semantic_hash": ""
+  },
+  "src/admin/admin.swagger.ts": {
+    "mtime": 1792838739.0,
+    "ast_hash": "3ef98aa6094dcac05cd30b0202cab6de",
+    "semantic_hash": ""
+  },
+  "src/expense-items/expense-items.swagger.ts": {
+    "mtime": 1792838739.0,
+    "ast_hash": "8ec78e84aa712eaededcb7747870f7d8",
+    "semantic_hash": ""
+  },
+  "src/objectives/objectives.swagger.ts": {
+    "mtime": 1792838739.0,
+    "ast_hash": "3d7ced08038c937ba7ab24ea46229083",
+    "semantic_hash": ""
+  },
+  "src/rate-history/rate-history.swagger.ts": {
+    "mtime": 1792838739.0,
+    "ast_hash": "d1fe2b23605087541216bcfaf6c1b0a3",
+    "semantic_hash": ""
+  },
+  "src/subscriptions/subscriptions.swagger.ts": {
+    "mtime": 1792838739.0,
+    "ast_hash": "4182003f246d7a794bdafd83dcb2ef95",
+    "semantic_hash": ""
+  },
+  "src/common/swagger/shared-response.dto.ts": {
+    "mtime": 1792838739.0,
+    "ast_hash": "f62e68a7b682556b91055cc2379d8aef",
+    "semantic_hash": ""
+  },
+  "src/worker-payments/worker-payments.swagger.ts": {
+    "mtime": 1792838739.0,
+    "ast_hash": "8b06ce91974ef5558951e70a649f050d",
+    "semantic_hash": ""
+  },
+  "openapitools.json": {
+    "mtime": 1792901283.0,
+    "ast_hash": "b5f2de1fe1c2c20372031008b58545ee",
+    "semantic_hash": ""
+  },
+  "scripts/check-native-sdk-drift.sh": {
+    "mtime": 1792902865.0,
+    "ast_hash": "ca095d2fffd6b615ae44dace46e56c03",
+    "semantic_hash": ""
+  },
+  "scripts/generate-native-sdks.sh": {
+    "mtime": 1792906141.0,
+    "ast_hash": "06a09cbad3deb5cb9d518be1ca40c53d",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/build.gradle": {
+    "mtime": 1792961394.0,
+    "ast_hash": "1307c6f393f6e8632c41d9a5df418f1d",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/gradlew": {
+    "mtime": 1792961394.0,
+    "ast_hash": "2920137f744bd58bf93224448dcb583e",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/settings.gradle": {
+    "mtime": 1792961394.0,
+    "ast_hash": "59cb7839d0121d37664188221fffbdf6",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/AdminApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "1da551d83ca0cb4ab11cd27b518e518e",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/AuthApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "724f25abc45249900dd4ad51dd847062",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/BankAccountsApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "6b8cb2deab93d6e113a0e0802df66082",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/CashAdjustmentsApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "d0b890a22026a5cd92257b52705c4dbc",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/CashApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "c1427231eb78b8a7b2b7f60343f50335",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/CashAuditsApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "3b24412fe282e38a7623dbbcf52e0de1",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/CashBalancesApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "754c351eb9513a47947a8fa47cc73c0a",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/CurrenciesApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "95da3d01e520b0a93cd20052cd011717",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/ExchangeRatesApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "f99b9e6a8421376c2911d171d4040582",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/ExpenseItemsApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "5a455af3641a524ccfe2c9e05a9c0650",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/ExpensesApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "4b6c974b0176e1aa7aa366e805d46bbf",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/FXOperationsApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "9bf5135f0f7e3dc3a38e97dd9586356d",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/HealthApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "fa517d6bd0872a279a2d12a2601c9105",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/NotificationsApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "ac65fcb0af35ed0a306b777bda287551",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/ObjectivesApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "c0a40f42839ee7a4301453c14bc13683",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/PlansApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "bae4ab494eb07a4be781d66931826cd1",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/RateHistoryApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "c850c3920284cf93417c8a4c2b273d31",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/RemittancesApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "5604cee582a9e42768a2d4798fd7d32a",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/ReportsApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "a6983497fa3a657c052251043071d55e",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/SubscriptionsApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "dbb4fe644985dded9184ce4f196e2271",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/TransactionsApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "652da9997708049823994873c1b5a3b1",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/UploadApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "8ff54217534aa192c052b84013dd2687",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/apis/WorkerPaymentsApi.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "97edc2955658ca4d209a6d30082aa27a",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/ApiAbstractions.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "4dda8edd858b2a15f0d9c52f818bec18",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/ApiClient.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "f875f4862904e998ff689dabe4e5df0f",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/ApiResponse.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "ec123d44544e870ed851405f1e3dbe41",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/BigDecimalAdapter.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "6fd7e8cb11eed294adabef9b63df536c",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/BigIntegerAdapter.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "d0cabb9f634be739ddae6069301de56a",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/ByteArrayAdapter.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "c36ddb690a0179d49f4c68e1ea7a42ba",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/Errors.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "8f5f4f6b6817e4a2f3db033a11ef22ec",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/LocalDateAdapter.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "68bf91e923dd1c2d4b1e61a5aa4ab3dd",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/LocalDateTimeAdapter.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "dd12be483951f643433e9ffa6b8b7479",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/OffsetDateTimeAdapter.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "0b2c7c230c037c5ef04e09185878daf5",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/PartConfig.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "6b54351e3d215883ae65d3fe46dabadd",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/RequestConfig.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "ed6366ee3c645a8881584daedfa259a4",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/RequestMethod.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "cc539c21e040a5dd28967d29d8212272",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/ResponseExtensions.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "f7b86adcd1a4618fb49cd6b8f601c028",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/Serializer.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "5f0ee6ed7cc2da9a7af9a946bd0f24b4",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/URIAdapter.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "94ee40cc743a2495268653075d48bb2d",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/infrastructure/UUIDAdapter.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "54d710b64a069119297354cec404e7b5",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AccountReportItemDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "7b3de63b8c8ee1f143b579bc14f186db",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AccountsReportDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "bd0c6cd8928c1fef380532c2e7f11733",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ActivateUserDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "fe6268f1f900c0e7351e676b89264583",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ActivateUserResponseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "7e1bddbf93516515a1a5f4f523068c33",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AddBalanceDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "b96cc000e241daffdc2a32e02fb0db7a",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminAuditLogDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "f994d2560af31e2a417b83848126d72f",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminExpiringLicenseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "e4cec3fc286c1ab784054ae093fdaa54",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminKpisDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "36c683173e69c5437d61005a24a1754a",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminLicenseActionDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "2e155ae6b221389d1da1a6986165fdb0",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminPlatformSeriesBucketDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "630c7b75f69a92b93b15076e7d2ccf65",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminPlatformSeriesDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "6ace9e16878dcc3c62469f49f4bc4ff3",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminProfileStatsDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "fc72c0e1c9857970e320dea50266b561",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminServiceMetricsDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "ccd2eb643594c69f2080fb2ab3bbc129",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminUserActionDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "d41285e177613d580c76423efa1073e1",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminUserActionPayloadDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "3755910a43c81c30f7e08c1133c49688",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminUserActionResultDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "6f653cd48f31d56f6ff17c502e50c558",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminUserDetailDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "fdfbd15fcf069451d4f0375c7a878631",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminUserDetailLicenseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "4fc20b5db1e3f5267e2d584e21b1242c",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminUserDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "d88a20f2e4bfdfbbe804dff2d325ec46",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminUserListItemDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "ffd79b8ba1d4494a7073813d82df9d62",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AdminUserRecentActionDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "3fc5054d1b01cddb898e4be4ba625e95",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AssignLicenseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "888e013841aad8d0cb73ec9c9defb858",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AuditSummaryReportDtoSwagger.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "d93d8a78ec42d1baf9a258367ed5d7e5",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AuthUserDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "6acedd7449bb265387af516acbd1e089",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AvailabilityResponseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "81c0f33945ab2949aef7e10dbcc9f2b3",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AvatarUploadResponseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "2eb1974b25f9dfc0ec9442e6554b977b",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/AvatarUserDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "e1aa6513d3cd63c9b26a715fec67180d",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/BankAccountBalanceDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "39dd83424c846da65ec65ab41c1329a5",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/BankAccountDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "1b08e682cb9c5596430b3129d52ae996",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/BankAccountTransactionsDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "fd1ebae806b74d5236c283043b68368f",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/BankTransferCurrencyDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "c0142abda9f536172602e37029019103",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/BankTransferDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "c7603e5daaf3e152d6eff2bead244d13",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CashAdjustmentDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "dba2eefcfb2696d7f37e064305ff5adc",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CashAuditDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "9cc7279a3874bfa0d1e7b3bba29dbc59",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CashAuditorDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "5ed00123936376360ac665e2a6cbfe64",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CashBalanceDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "0306818288c9ce8df77f5d1b1e4bc6d9",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CashClosingDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "78264be28e6901a5d96a0339813b1ec4",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CashFlowReportDtoSwagger.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "cd1d07f37476c43fc21248c1d48ff093",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CashMovementDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "ccda7c6687a1419b2973be037b8a8f68",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CashOverviewDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "00b4610f0b975cb3794687e416ef062c",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CashPolicyDetailDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "e3276b89cb37d21aaeb896baa8a6d77c",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CashPolicyDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "a0b0f605502d857f771730473b96de7d",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CashValuationBreakdownDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "2b1cdd5cb238365de4c38b8a5c47df0a",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CashValuationDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "48aed9c18248f85cd8669fae5cc6b4ce",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ChangePasswordDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "17ded27a02665b3d605ad130de9b227f",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateAdminUserAccessDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "b8a4408aa9316274a45beb82a546ad5c",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateAdminUserContactDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "3098b6c4149dd05fa8c76d07a1cfc71f",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateAdminUserDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "529b725e3cd5652a11c063b82654e487",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateAdminUserLicenseSetupDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "bdc2732a96c573dc894f602fa8553f9e",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateAdminUserPreferencesDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "804c3869739f4183edbed8d1b4b332ad",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateAdminUserProfileDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "5001c461bcbe4642e971f98b681ab4c1",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateAdminUserSecurityDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "d53c4828a1dd77419f3b565df6e22462",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateBankAccountDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "7e6f46b7ed3348a21966aa199e013f7e",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateCashAdjustmentDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "5e2ddbde3c1e20a71d24a38c7c60c198",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateCashAuditDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "83b811a04827fa17f1df963919d83e8d",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateCashClosingDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "c09d4ea6c56e201297c137a7c226a193",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateCurrencyDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "33e1a564590bf0bf7008f5885a86a12d",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateExpenseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "87c556fe827364175eb2a68c4a8a9106",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateExpenseItemDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "821f72fd71477eca5dbf31ad49c16d42",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateFxTransferDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "dac8755f24097be7b19750d0220cabec",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateObjectiveDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "c2268b76ac0b87d1833a8344c1896178",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreatePlanDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "8f3f4828857c0677f2b61670182a11e2",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateRateHistoryDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "78c8006056311922d0d85ee4313bb6b0",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateTransactionDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "2d4515f4e9540a10388889a471b1d3ed",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateUserDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "f95a7be0e6a5f15692602d8c006070a8",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateUserResponseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "aacd8acec117c7941b85c0d82f58fab5",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CreateWorkerDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "7558d0d15cea2e8d4466b2b62476c9f6",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CurrenciesWithPrimaryResponseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "d8ba60fb656680544404330378bb6b6f",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CurrencyDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "4a4a8ae9fd7f6938743138ff354246ec",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CurrencyReportDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "e2b0086455b15efead72d69ec5fb5594",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/CurrentUserDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "5e9d6807f79f5024b405edcdacd55254",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/DailyBreakdownItemDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "f8b23de58c8dfc8a58e4e9af1dfc4f5f",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/DailyExpenseByCategoryDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "56963ee24603e66d0482bd6bfb482b44",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/DailyReportDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "e955ff4fa45d4bbf8c43d7f4be7e4699",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/DailyReportExpenseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "98ed170e2e9319ae97e9b793163afef9",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/DailyReportProfitDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "78bedb090fe48a8a3d6e91cd56c88e34",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/DailyReportTransactionDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "eba3bdc7c2754956f226065dbb69f6d8",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/DepositDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "8fb9683b8d1da01259dbdebd4dee7a6c",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ExchangeRateComputedDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "3d9d92e3a4fd0444c0d5dbafbdc6088c",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ExchangeRateDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "3fb8f71f2632b72d36eb6d37ba25915c",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ExchangeRateUpdateResponseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "e764d11b25682445c2cab1d9a2978bcc",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ExchangeRateWithCurrencyDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "fff9558ca0694edd60a823e091c44fc1",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ExchangeRatesCurrentResponseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "e92a63363fd2cb95df74288e6d311aa6",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ExpenseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "5f6a8f026c6bd1335d7bfff0d9d0fb2c",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ExpenseItemDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "b28602260f71e6524b92acec0160a1df",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ExpenseItemReportDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "6fa6f99284103cafa30a113fd9af01b4",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ExpenseItemReportItemDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "b0a0718d8ee9565ba0ab3c8c51bb1085",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ExpenseListDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "89c30169b6d1ace9559d8cd98035299d",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ExpensesReportDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "b97633c1267faf889addb59ef26c335d",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ForgotPasswordDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "c2b6b248fcaa106b0548b67a33deb541",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/FxPerformanceMovementDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "111cc3568ac9ba237a56384bd777d894",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/FxPerformancePositionDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "af521d193f5357d26f429381967b9a56",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/FxPerformanceReportDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "f9d06964e46e96d14aeded890e583e7b",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/FxTransferResultDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "9265c2c318bea36f97623a0f612457e9",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/HealthCheck200Response.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "031ca1b2b6d79997ed370bd7978ed096",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/LoginDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "a8e5cebe0ce918661bcbe9ade3cb88cc",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/LoginResponseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "4bc9d2a5eb1d80155bc49bbe002c6ea6",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/MessageResponseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "53920cc5423f8fad7da6387a4b378398",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/NotificationCountDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "1018bfe0992a1204a83919304fefe4fb",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/NotificationDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "d9071cdb53a74cd64dd9df7c52656d15",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/NotificationListDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "acac4c437a763c2bca9c3bf211236747",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/NotificationListMetaDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "019a2d582854544ecfb992356158de29",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/NotificationOkDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "a8512fac58da1ed66177557b9195978e",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ObjectiveDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "7290e24b38050b4f2014400294edbf67",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ObjectiveProgressDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "af1c0a367e20df668f897a3738f86308",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ObjectiveReportItemDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "f4bb3d564474be64a09d876d2a1db951",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ObjectivesReportDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "c5c00890ac547a2e4196f3a57272391d",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/OpenCurrencyPositionDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "28e97690d32e6307f5556fdfc4d3f099",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/PeriodReportDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "a8832ca664cf23aa46b579ed124cdeb6",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/PeriodReportPeriodDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "6c279530fba70d1be4eaa7a880127167",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/PeriodReportSummaryDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "4e0b13448068a3ba160ebaf8d1422183",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/PlanDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "bde738bdbc3aee3cf6c861cc7b048862",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ProfitReportDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "d6a4ea8d52a0c8686c3c73b4420b8158",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ProfitReportTransactionDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "757ab2a7f23beae6ad7e54dfae6b90de",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/PushDeviceDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "ed8085b1a4aedf9e99db39cad8acde0b",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/RateHistoryEntryDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "787500c57e8fb9ba3f97accdf92c1c1a",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/RateHistoryResetDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "ef41ecee8db9a05b6d3c19a6d0761074",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/RateHistoryStatsDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "502b868c043334869114b549fd084df9",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ReconcileIssueDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "e0ae4514c42fcb546a0f1111e3fd10bf",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ReconcilePositionDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "ca3e500c7730c926986935bf019aed29",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/RegisterDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "c86e737f2b36badbfda420861c11fbe3",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/RegisterPaymentDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "7a3aa5c1565fb9130b85865882832794",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/RegisterPushTokenDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "7696d79b1376738a8e685fc5c59d0a8f",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/RegisterResponseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "4afd7435ad3bb66c79b1108c5327ecec",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/RemittanceDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "238ecc117e423f53a3b8e8e662c99951",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/RemittanceEventDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "4398c34e8eff8f9bce3a2f0a70fa9e89",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/RemittanceReconcileDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "d82e8e8e501b8acc7542cc4b1631ee3d",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/RemoveExchangeRateResponseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "888e16b070b80bf8ebd8ad3c8093454c",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/RenewLicenseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "b9953c3b932c23ec24034bc521205ebf",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ResendVerificationDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "43480dfab5832b432de54eafd7d68c7d",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/ResetPasswordDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "926473dc6e0c2468ce5e015d379105af",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/SetPrimaryCurrencyDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "bd71b6629972306f803e7e0fd8ef5d64",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/SetPrimaryCurrencyResponseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "4e74e4faa72904c9820ea8354d84b4d7",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/SubscriptionLicenseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "27c5d40af176577b1922c6401a6a9f28",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/SubscriptionPaymentDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "bd649b1e8cb48c44e96ed2397f224c73",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/SuspendLicenseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "7a268dc61b2d1ffe7609af50acf547f1",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/TransactionDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "26ac30081f8221d3901622a07f48bb9f",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/UnregisterPushTokenDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "17a55617b4c3125c366eeef8e85dbdce",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/UpdateAdminUserDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "d32c15d5ce43bfef593cc9adeae7398e",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/UpdateBankAccountDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "7182f7f525ab5b4ac11e2321893c019f",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/UpdateCashPolicyDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "911bb74e2b8d44ad8112ff4a0b3e845a",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/UpdateCurrencyDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "e901219a182e862b5ed1180be66d1c55",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/UpdateExchangeRateDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "d16a7e0a3d4e5bb60e0fb9c7bfa1da2c",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/UpdateExpenseDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "87add8d51cc33d3495fd92f71bfc31c5",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/UpdateExpenseItemDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "85b1f35f27289dd67403076559b3b108",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/UpdateObjectiveDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "a0b32ef9fc49304f2109329d27f3589a",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/UpdatePlanDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "0ba2056142df326f8ae2b4318da7dece",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/UpdateStatusDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "c2d056d9a0fa7c3788195eced06e80c1",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/UpdateWorkerDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "b26e970c5f4b2fe4e01d4f9e2f330fbe",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/VerifyEmailDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "a9853b6d7ab45f02bbac8f01337747f2",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/WorkerBalanceDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "c709f2e26d4c4221c918b59720164a48",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/WorkerDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "09738d375966c32fbb3101161cdf6d0c",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/WorkerMutationResultDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "a90a72588c2831e7f4c90efbcd01a43e",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/src/main/kotlin/com/cashflow/api/models/WorkerTransactionDto.kt": {
+    "mtime": 1792961394.0,
+    "ast_hash": "a58d2ca9017f438e4b0c9dc8ac0d195a",
+    "semantic_hash": ""
+  },
+  "sdks/swift/.build/checkouts/AnyCodable/AnyCodable.playground/Contents.swift": {
+    "mtime": 1792902960.0,
+    "ast_hash": "9fd8c83cfeaa51ad74fdc04345154ce4",
+    "semantic_hash": ""
+  },
+  "sdks/swift/.build/checkouts/AnyCodable/Package.swift": {
+    "mtime": 1792902960.0,
+    "ast_hash": "a77b6e32b8c1b7c85532d419f21742f9",
+    "semantic_hash": ""
+  },
+  "sdks/swift/.build/checkouts/AnyCodable/Sources/AnyCodable/AnyCodable.swift": {
+    "mtime": 1792902960.0,
+    "ast_hash": "d494755e54a8e5fa4b237974c59f1ec6",
+    "semantic_hash": ""
+  },
+  "sdks/swift/.build/checkouts/AnyCodable/Sources/AnyCodable/AnyDecodable.swift": {
+    "mtime": 1792902960.0,
+    "ast_hash": "a4c7b09aca32c84fed53170a0c38613c",
+    "semantic_hash": ""
+  },
+  "sdks/swift/.build/checkouts/AnyCodable/Sources/AnyCodable/AnyEncodable.swift": {
+    "mtime": 1792902960.0,
+    "ast_hash": "03b33f5043a7e7d61b4081ce8014c4e6",
+    "semantic_hash": ""
+  },
+  "sdks/swift/.build/checkouts/AnyCodable/Tests/AnyCodableTests/AnyCodableTests.swift": {
+    "mtime": 1792902960.0,
+    "ast_hash": "5649047f4674d217a2b7c20aa1df4c79",
+    "semantic_hash": ""
+  },
+  "sdks/swift/.build/checkouts/AnyCodable/Tests/AnyCodableTests/AnyDecodableTests.swift": {
+    "mtime": 1792902960.0,
+    "ast_hash": "3e6c186e718f5c7a95e79e6f103944b5",
+    "semantic_hash": ""
+  },
+  "sdks/swift/.build/checkouts/AnyCodable/Tests/AnyCodableTests/AnyEncodableTests.swift": {
+    "mtime": 1792902960.0,
+    "ast_hash": "33878d4992b9e2dd749e7909a1c8a28c",
+    "semantic_hash": ""
+  },
+  "sdks/swift/.build/workspace-state.json": {
+    "mtime": 1792902960.0,
+    "ast_hash": "bbeababea8d4be8b8f02e73dd8ff3e7c",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Package.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "aa22eb2e6f588217383213b5d0a6e110",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIHelper.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "6ba65e7361cceb71bbf4a28bee2faedc",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "5a0481ea40310ff37a7d2c8860db762d",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/AdminAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "3ca6498c8ba876f22eaf3d967b99b795",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/AuthAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "7fbcee5f212a9d47cc3f20251f24892d",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/BankAccountsAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "b3541d304ff502e54a70da262663e04f",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/CashAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "d3d15ac105b911c284c05ea867988ecb",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/CashAdjustmentsAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "1282238a913546ab35b6aad2215c9443",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/CashAuditsAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "b988e6ccfb5571757eb90a519e44f363",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/CashBalancesAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "4f0aad838cfd1ff452a64ea9453bc726",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/CurrenciesAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "24bbad107f8752478cbef005dc004384",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/ExchangeRatesAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "411e606d5a603c6295a7240df65d4fa5",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/ExpenseItemsAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "6e431bffefb28d1aa12fd679821f4870",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/ExpensesAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "10dd635f6cdd1b54943447015d7c4e9f",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/FXOperationsAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "723a6bb7b97607ff371be7f2b2d07b55",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/HealthAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "86bfbfa7372990e5a6ca4ba4d5d82690",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/NotificationsAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "0345029050ee3ced257d619440d62cc9",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/ObjectivesAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "40c23619c195c465390e5b543c638103",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/PlansAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "a1b61fe109051e16902a2aaa31582aad",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/RateHistoryAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "b555369011f216f1e13e18b197bd3b71",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/RemittancesAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "b4924e6be25962fa8a5c6d9ee1790e28",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/ReportsAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "6af06a515e1fcf24367e5f1894c98a89",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/SubscriptionsAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "9146a17fbffe6f2c7e9ecfa2a221e29a",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/TransactionsAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "83482f4b79562ee6958394925f457ccb",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/UploadAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "e04d57532d7164d5e5380c51159337c0",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/APIs/WorkerPaymentsAPI.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "bdcabf8fee8f5364acd7c8d43a7b7ae5",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/CodableHelper.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "c0ef80eb13f7fa54151fb93c31b44db7",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Configuration.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "b94c65ecb9df6065df05f1d5e92ed6d8",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Extensions.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "c0fd7a2c142d35b0ade8f3edbdb552a9",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/JSONDataEncoding.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "ff288c20a3707ef52b3adb09bd5fa23f",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/JSONEncodingHelper.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "814677f993a431a355255f5038c0c394",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "256a135b493146f8643e393e09f8ba9a",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AccountReportItemDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "c07e9ec8016e753e6ef31aeae904c3fc",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AccountsReportDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "7b90ae56caf55b3d5bf82a4bcab43c9c",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ActivateUserDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "7dbd6d66c23ce277d1ba8fa79f5c6fd1",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ActivateUserResponseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "7d279d8123e10073c651de00bff9ab29",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AddBalanceDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "f760c70bcdfbae98650712086f3438a2",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminAuditLogDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "9473dfe9536a09495fa639b32db491ec",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminExpiringLicenseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "1003ae646c6f93a31379a396154955dc",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminKpisDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "428c94c0ebaf9babb60a01fc7cedf9bd",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminLicenseActionDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "ac711c1b8b7a2be53dee1545228a3f3f",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminPlatformSeriesBucketDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "195d6929401e6be96f420c06ac49559f",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminPlatformSeriesDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "73312a92b6d284e1139d88b0c62e28fd",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminProfileStatsDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "04786606911530f2d171aedcc5990a98",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminServiceMetricsDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "7a76047525e0ae732bf776927b8253c1",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminUserActionDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "348b7297efadf53ba535ca93474adb04",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminUserActionPayloadDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "def7777b28958049fea91e505c9f3255",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminUserActionResultDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "10a1b4454be51f17e8cf55607ecace8a",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminUserDetailDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "068edddf9eaf51b94917f8107e141336",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminUserDetailLicenseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "d5c475ec6069cd32cb96740ffa836a31",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminUserDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "d1e78af58d548b8313e3f85d0fbceb0c",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminUserListItemDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "ed2ca2aa2e168c3d4dd13e81cb6d29e8",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AdminUserRecentActionDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "4182fc14005260d9632e7b5381731ff8",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AssignLicenseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "eff85eaa47d1ac5d2ae97a05508a0527",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AuditSummaryReportDtoSwagger.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "3a3994826401b30fd381e1da0da41fe8",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AuthUserDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "87fa08fbe4fb07240326001eaf982f68",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AvailabilityResponseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "b2e5506c8258ac00b786cd8c96b3b6f7",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AvatarUploadResponseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "d11eaf863d9d11a19ba3a75e1fd43263",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/AvatarUserDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "b4b7935b909eb27a952198b396bda53f",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/BankAccountBalanceDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "56a35b31292b491b09efe126a299c036",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/BankAccountDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "1a8132fee087ab749dbf30430297bd02",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/BankAccountTransactionsDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "b7361df64802852edfed6d0b654bab39",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/BankTransferCurrencyDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "2aac659c670c6b12869bfdd91d56b89f",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/BankTransferDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "3121653f81e60f46c9b3294eb81e6ada",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CashAdjustmentDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "0c8ea763448b5e2a6a6c47c3c2562aae",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CashAuditDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "853dc6b298a318ac4e7374ce23e2c164",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CashAuditorDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "d9753b211ef15a4547594af3ace3e99a",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CashBalanceDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "abd9c462dd0718cb12f9ec2377c4a124",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CashClosingDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "84ff6ac5bef4968a9ebfe55b5f9cfc93",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CashFlowReportDtoSwagger.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "a5ee97a0651576c96596a1095ea9a192",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CashMovementDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "107fda51981b5127b78a50aa5df1a659",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CashOverviewDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "af3e01b0b99a74370d1c2765ddb0ecd3",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CashPolicyDetailDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "ca9f2e37ddd87a16f033ab760b7bcc36",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CashPolicyDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "8703978e69185d1e8cefe6c12193cab1",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CashValuationBreakdownDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "b847f0533b758b768938d683d69cd102",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CashValuationDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "9fe3dc64e68f2b6d48d7e3b7313c7d48",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ChangePasswordDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "a586c0c6cafd87b3df5233f29fa0d5e8",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateAdminUserAccessDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "d34f9b0921bb0c2efad73bf3a6833c17",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateAdminUserContactDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "329ece7b560733eb893f813dfaa6dd38",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateAdminUserDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "eec6d7bd8e14cf0d74df9f41944cef6d",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateAdminUserLicenseSetupDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "9e99037d30b2e03fe0e78bce01775875",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateAdminUserPreferencesDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "154d21591762fa755dd3d254605d1ab9",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateAdminUserProfileDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "09d0c368ff699b04b80b57002224039d",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateAdminUserSecurityDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "5b9fe32a95bd46ffe35a69e5df535d47",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateBankAccountDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "f94247567848e922ff6371f7b496147d",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateCashAdjustmentDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "d1deab684ee2d5a4a6a3a676ce5b7030",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateCashAuditDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "d784652c79e96e168b7ed3fed1b49993",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateCashClosingDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "0aed555fe72e1da8bf6c171c188234ee",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateCurrencyDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "ae9a4117c78c4bff045f3d60e3e99d61",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateExpenseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "7a248e116474df296dffe194c766d6aa",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateExpenseItemDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "aa7c709ea2ae13b50fe056e8a0a037c2",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateFxTransferDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "dcac753889b65f7d4f5a38e9f75c79ee",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateObjectiveDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "97de81ae0e93fc9e7640e4eacb9e2c0a",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreatePlanDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "37af6d9a5aa15cf3110c93d757dbf649",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateRateHistoryDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "3d39f524c08002310a15b2021696974a",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateTransactionDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "4a893696479f9c7a8f88b232566aada7",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateUserDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "2667e38b07fab12e355efe4ada529fbe",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateUserResponseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "af64e081257cea3879d07e0e006fb76f",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CreateWorkerDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "37e9b2b9a39d3bc8481a94a4e8710108",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CurrenciesWithPrimaryResponseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "2b29a6c4121790de1cb55b4a4bb0c2b6",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CurrencyDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "667ff4e1ceac336399e19621c10dc941",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CurrencyReportDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "74fd55e00f9fd66c8544cb57ea6ffe79",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/CurrentUserDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "bf7477fcc81385709fdf7d93cf4b4800",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/DailyBreakdownItemDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "60701d0863fabf04855e925eee7b66e2",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/DailyExpenseByCategoryDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "f8c87e138a41a33e6e8792bce4a5a96a",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/DailyReportDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "45b0bf1ef8d96eb7d0de4ff96a1c6c4b",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/DailyReportExpenseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "49d3e9ebe7f8de0fff037454d8cd42bf",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/DailyReportProfitDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "7854c79cd405098db6adde5d3887466e",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/DailyReportTransactionDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "27ae9513dc569873f42e4593559a48f0",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/DepositDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "9abb3d5008e5b36e10f477e80d1d97fe",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ExchangeRateComputedDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "60b567805369fef73d46fb0f2de6379c",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ExchangeRateDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "b2783fe8b54c3a853ff7641358b0f733",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ExchangeRateUpdateResponseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "01eceb794c08ac134e81d4d2a521dfdc",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ExchangeRateWithCurrencyDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "ae6f15442ae0009b35b26499e9122a27",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ExchangeRatesCurrentResponseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "cc7e1e2874575a3e787f1ce75d5f16ac",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ExpenseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "68b761bc9dd9780f14daa1728466756d",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ExpenseItemDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "f74e361b233dff240147c20471591ee7",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ExpenseItemReportDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "f661cb4e761a4e9ea9b2eb10623117c8",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ExpenseItemReportItemDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "b56547115306991d6aeaef59013f52d5",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ExpenseListDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "48206645fa130be320bc030566007c2b",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ExpensesReportDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "6ad9648db0d5114d7958cb28f472ba4c",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ForgotPasswordDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "ab418dc3b94720ad44c5b509618bcf4e",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/FxPerformanceMovementDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "c7f2462bafc0eb6974656434e950611e",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/FxPerformancePositionDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "2d41de5a6f793c446d846cccd23ef17c",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/FxPerformanceReportDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "e7eb1743c3ff09a1a29a86dea6ed8b17",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/FxTransferResultDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "a4dae20759ff5fdde43dde06774c2b8e",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/HealthCheck200Response.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "c492d04baf79028c7a69c4b01729c94b",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/LoginDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "9f107a8f065814cb2c3b0250e68a6b00",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/LoginResponseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "4bcf1fefe9b9784fca652d1ba76e6b1e",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/MessageResponseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "cd14e819b110d9ce3ac535bfc963fd88",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/NotificationCountDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "29305e2e18809769db14bc74bddb5031",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/NotificationDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "c3186209fba3fba4696f6949c28c14e7",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/NotificationListDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "9efbb44ec1b932c31584a15caec2004f",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/NotificationListMetaDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "17930d84ffa4f9d22385fade874fdc5a",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/NotificationOkDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "874710b48142ce391e3f74c1b225f608",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ObjectiveDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "cfbd45488b7a136e4c5366468ac34ca6",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ObjectiveProgressDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "a3d6c13652031b5894c2380b70531b0f",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ObjectiveReportItemDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "c2488389c1d75e9512c470201ae80cf6",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ObjectivesReportDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "29b9cb1de6fd2ae5a3a33e1b26213890",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/OpenCurrencyPositionDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "24b79b8fd4c49e918d77d0726e408525",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/PeriodReportDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "abf5fe65bf35737e4993c1d31429f6ff",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/PeriodReportPeriodDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "f34dd0886333b383779031e03b50bbfd",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/PeriodReportSummaryDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "aa2441d4c194c70dd6f581c91152c54c",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/PlanDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "9034d991b383d1bec201a9f03a9e23ec",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ProfitReportDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "e3cf50d5086337c522d6c30f4bbd1e8c",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ProfitReportTransactionDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "229b37323e49853b687e2f50535c60a6",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/PushDeviceDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "00abbd7ad36dc448c40b06e43437bbbd",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/RateHistoryEntryDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "82f192c563d69a7cd9abff0869fa8480",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/RateHistoryResetDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "94e038ba691e380ca332b10dd4be0da5",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/RateHistoryStatsDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "55c4419944715ffe12d4bb4f4a1c536b",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ReconcileIssueDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "eed6d32dec3d9e2f005fb3fdf2009d9c",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ReconcilePositionDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "e3f384a9cb343dc664714d7ba73e9586",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/RegisterDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "383e8f63cc1321fa6184a4a076f788b6",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/RegisterPaymentDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "7f11fb56f7e81594eb3a5107f2a5ea51",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/RegisterPushTokenDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "3b10ac6c67f0adad1760087d75b92b47",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/RegisterResponseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "84208e263d62d26079d301d447ae7242",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/RemittanceDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "224cb918f7f4da0820f1513f81852eb1",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/RemittanceEventDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "456cec32b22760e0b6cdb2026f464aac",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/RemittanceReconcileDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "ea0609b1bc37f2c18f6e8186ff77776c",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/RemoveExchangeRateResponseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "0af178578905cb92737d7f1a502725c6",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/RenewLicenseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "21ca91f6f94c081138076f9a07aa3b36",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ResendVerificationDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "14a9e9f418008a6076b8c2f2fab0bdff",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/ResetPasswordDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "f7f2deff76f25970947db32858468f46",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/SetPrimaryCurrencyDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "32f3f9f291e224e230acc24bcf0e30a9",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/SetPrimaryCurrencyResponseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "a05733bda681005372afc1405fcafd04",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/SubscriptionLicenseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "05a10fb2ba5afe4616caec74a9cf4b31",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/SubscriptionPaymentDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "ccef086ead99989c1a7df3340f6948dd",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/SuspendLicenseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "79bceedd3c4f744fdbf6b5c018bd28b5",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/TransactionDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "8ecb3f16c7a0dc44f2a88f90cc6d0f8c",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/UnregisterPushTokenDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "b65b3c2c86c97ff3490e37f22ed41c06",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/UpdateAdminUserDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "fd3b0e7117872c20d166ee012753b999",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/UpdateBankAccountDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "dbda0a814ff7eb0171550ce393306add",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/UpdateCashPolicyDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "9db352366254f5e115dbfffb4e24ee95",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/UpdateCurrencyDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "d4877a26724030f4e5ae2a6b217b014f",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/UpdateExchangeRateDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "59aeb2cde71272847e872cf62503a0ec",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/UpdateExpenseDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "6c9245320d42a92783b65b898fb03aba",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/UpdateExpenseItemDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "9e1bc13a437357f4cd8b43997822d150",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/UpdateObjectiveDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "4e8abbed927fbb205aee0713f9b2066e",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/UpdatePlanDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "2de2668be30760e9b926e36faa38badb",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/UpdateStatusDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "9c6c779fb1977ffadcf3098447493b4b",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/UpdateWorkerDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "d739edff33012445f0621f4acd8dde13",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/VerifyEmailDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "0b1d209ebb6c5bb69d02163f1048bbf8",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/WorkerBalanceDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "42a26651dba929d6587a479beda70643",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/WorkerDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "e546a023f03ae3ade49d94949d430a73",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/WorkerMutationResultDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "41173b81ca4ff0180bc8ca3d8caf332a",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Models/WorkerTransactionDto.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "089d6dfe77555f96f2563d6c9bb475c2",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/OpenISO8601DateFormatter.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "19a4021423728ff4f48de0daea5f1ce8",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/SynchronizedDictionary.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "3329c638efdfc77aa68bcdc620147661",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/URLSessionImplementations.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "797cdcbb8ef5f2da6156c56357bb3720",
+    "semantic_hash": ""
+  },
+  "sdks/swift/Sources/CashflowAPI/Validation.swift": {
+    "mtime": 1792961391.0,
+    "ast_hash": "e3f2e451a09dc675112c2b51785930f8",
+    "semantic_hash": ""
+  },
+  "sdks/swift/git_push.sh": {
+    "mtime": 1792961391.0,
+    "ast_hash": "999a429cb9fbfdba4c172760cb3b9b64",
+    "semantic_hash": ""
+  },
+  "src/contracts/openapi-runtime.spec.ts": {
+    "mtime": 1792907066.0,
+    "ast_hash": "91b0994dcdbd1fc5d7cbe10888237ccb",
+    "semantic_hash": ""
+  },
+  "sdks/kotlin/README.md": {
+    "mtime": 1792961394.0,
+    "ast_hash": "f390d5caca249ee66e6b13f28078d36c",
+    "semantic_hash": ""
+  },
+  "sdks/swift/.build/checkouts/AnyCodable/.github/FUNDING.yml": {
+    "mtime": 1792902960.0,
+    "ast_hash": "4654c7b41efb1be2b44fc120ab7385b6",
+    "semantic_hash": ""
+  },
+  "sdks/swift/.build/checkouts/AnyCodable/.github/workflows/ci.yml": {
+    "mtime": 1792902960.0,
+    "ast_hash": "7907ceb7e53b58e36608f2e8cf06a2f8",
+    "semantic_hash": ""
+  },
+  "sdks/swift/.build/checkouts/AnyCodable/.github/workflows/release.yml": {
+    "mtime": 1792902960.0,
+    "ast_hash": "8c28a6601c42dd14c533c5940b0aa8f9",
+    "semantic_hash": ""
+  },
+  "sdks/swift/.build/checkouts/AnyCodable/LICENSE.md": {
+    "mtime": 1792902960.0,
+    "ast_hash": "9570b32cd0fb9622c90ea92e667edc58",
+    "semantic_hash": ""
+  },
+  "sdks/swift/.build/checkouts/AnyCodable/README.md": {
+    "mtime": 1792902960.0,
+    "ast_hash": "b107703cdb11c0e10f81392914f9360a",
+    "semantic_hash": ""
+  },
+  "sdks/swift/README.md": {
+    "mtime": 1792961391.0,
+    "ast_hash": "8357b0d70095489d44b6119b44006d9f",
+    "semantic_hash": ""
+  },
+  "sdks/swift/project.yml": {
+    "mtime": 1792961391.0,
+    "ast_hash": "9eeef4cd644fbd3eac567ff368000c26",
+    "semantic_hash": ""
+  },
+  "scripts/verify-oasdiff-negative-control.sh": {
+    "mtime": 1792908687.0,
+    "ast_hash": "7c6daa160802fd8a15b9d8382f320ba6",
+    "semantic_hash": ""
+  },
+  "test/fixtures/openapi-breaking-empty.json": {
+    "mtime": 1792908617.0,
+    "ast_hash": "00b280c964cf78ca6580890a38d7889a",
+    "semantic_hash": ""
+  },
+  "src/common/decorators/is-decimal-string.decorator.spec.ts": {
+    "mtime": 1792958945.0,
+    "ast_hash": "b712149ce6f57153e1c8ff16d6d5038f",
+    "semantic_hash": ""
+  },
+  "src/common/decorators/is-decimal-string.decorator.ts": {
+    "mtime": 1792958888.0,
+    "ast_hash": "4c501c51b35a2d281f6e50f6e1cb4664",
+    "semantic_hash": ""
+  }
+}
