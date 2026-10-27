@@ -62,6 +62,9 @@ open class NotificationsApi(basePath: kotlin.String = defaultBasePath, client: C
      * GET /api/notifications
      * Listar notificaciones del usuario autenticado
      * 
+     * @param page Página del listado (1 por defecto). (optional, default to 1)
+     * @param limit Cantidad de notificaciones por página (20 por defecto, máximo 50). (optional, default to 20)
+     * @param unreadOnly Traer solo las notificaciones no leídas. (optional, default to false)
      * @return NotificationListDto
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -71,8 +74,8 @@ open class NotificationsApi(basePath: kotlin.String = defaultBasePath, client: C
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun notificationsList() : NotificationListDto {
-        val localVarResponse = notificationsListWithHttpInfo()
+    fun notificationsList(page: java.math.BigDecimal? = java.math.BigDecimal("1"), limit: java.math.BigDecimal? = java.math.BigDecimal("20"), unreadOnly: kotlin.Boolean? = false) : NotificationListDto {
+        val localVarResponse = notificationsListWithHttpInfo(page = page, limit = limit, unreadOnly = unreadOnly)
 
         return when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as NotificationListDto
@@ -93,14 +96,17 @@ open class NotificationsApi(basePath: kotlin.String = defaultBasePath, client: C
      * GET /api/notifications
      * Listar notificaciones del usuario autenticado
      * 
+     * @param page Página del listado (1 por defecto). (optional, default to 1)
+     * @param limit Cantidad de notificaciones por página (20 por defecto, máximo 50). (optional, default to 20)
+     * @param unreadOnly Traer solo las notificaciones no leídas. (optional, default to false)
      * @return ApiResponse<NotificationListDto?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun notificationsListWithHttpInfo() : ApiResponse<NotificationListDto?> {
-        val localVariableConfig = notificationsListRequestConfig()
+    fun notificationsListWithHttpInfo(page: java.math.BigDecimal?, limit: java.math.BigDecimal?, unreadOnly: kotlin.Boolean?) : ApiResponse<NotificationListDto?> {
+        val localVariableConfig = notificationsListRequestConfig(page = page, limit = limit, unreadOnly = unreadOnly)
 
         return request<Unit, NotificationListDto>(
             localVariableConfig
@@ -110,11 +116,25 @@ open class NotificationsApi(basePath: kotlin.String = defaultBasePath, client: C
     /**
      * To obtain the request config of the operation notificationsList
      *
+     * @param page Página del listado (1 por defecto). (optional, default to 1)
+     * @param limit Cantidad de notificaciones por página (20 por defecto, máximo 50). (optional, default to 20)
+     * @param unreadOnly Traer solo las notificaciones no leídas. (optional, default to false)
      * @return RequestConfig
      */
-    fun notificationsListRequestConfig() : RequestConfig<Unit> {
+    fun notificationsListRequestConfig(page: java.math.BigDecimal?, limit: java.math.BigDecimal?, unreadOnly: kotlin.Boolean?) : RequestConfig<Unit> {
         val localVariableBody = null
-        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
+            .apply {
+                if (page != null) {
+                    put("page", listOf(page.toString()))
+                }
+                if (limit != null) {
+                    put("limit", listOf(limit.toString()))
+                }
+                if (unreadOnly != null) {
+                    put("unreadOnly", listOf(unreadOnly.toString()))
+                }
+            }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Accept"] = "application/json"
 

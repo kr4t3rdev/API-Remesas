@@ -4725,7 +4725,14 @@ export interface operations {
     };
     notifications_list: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Página del listado (1 por defecto). */
+                page?: number;
+                /** @description Cantidad de notificaciones por página (20 por defecto, máximo 50). */
+                limit?: number;
+                /** @description Traer solo las notificaciones no leídas. */
+                unreadOnly?: boolean;
+            };
             header?: never;
             path?: never;
             cookie?: never;

@@ -15,12 +15,15 @@ open class NotificationsAPI {
     /**
      Listar notificaciones del usuario autenticado
      
+     - parameter page: (query) Página del listado (1 por defecto). (optional, default to 1)
+     - parameter limit: (query) Cantidad de notificaciones por página (20 por defecto, máximo 50). (optional, default to 20)
+     - parameter unreadOnly: (query) Traer solo las notificaciones no leídas. (optional, default to false)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - parameter completion: completion handler to receive the data and the error objects
      */
     @discardableResult
-    open class func notificationsList(apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: NotificationListDto?, _ error: Error?) -> Void)) -> RequestTask {
-        return notificationsListWithRequestBuilder().execute(apiResponseQueue) { result in
+    open class func notificationsList(page: Double? = nil, limit: Double? = nil, unreadOnly: Bool? = nil, apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: NotificationListDto?, _ error: Error?) -> Void)) -> RequestTask {
+        return notificationsListWithRequestBuilder(page: page, limit: limit, unreadOnly: unreadOnly).execute(apiResponseQueue) { result in
             switch result {
             case let .success(response):
                 completion(response.body, nil)
@@ -36,14 +39,23 @@ open class NotificationsAPI {
      - Bearer Token:
        - type: http
        - name: bearer
+     - parameter page: (query) Página del listado (1 por defecto). (optional, default to 1)
+     - parameter limit: (query) Cantidad de notificaciones por página (20 por defecto, máximo 50). (optional, default to 20)
+     - parameter unreadOnly: (query) Traer solo las notificaciones no leídas. (optional, default to false)
      - returns: RequestBuilder<NotificationListDto> 
      */
-    open class func notificationsListWithRequestBuilder() -> RequestBuilder<NotificationListDto> {
+    open class func notificationsListWithRequestBuilder(page: Double? = nil, limit: Double? = nil, unreadOnly: Bool? = nil) -> RequestBuilder<NotificationListDto> {
         let localVariablePath = "/api/notifications"
         let localVariableURLString = CashflowAPIAPI.basePath + localVariablePath
         let localVariableParameters: [String: Any]? = nil
 
-        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        var localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        let localVariableQueryParameters: [String: (wrappedValue: Any?, isExplode: Bool)] = [
+            "page": (wrappedValue: page?.encodeToJSON(), isExplode: true),
+            "limit": (wrappedValue: limit?.encodeToJSON(), isExplode: true),
+            "unreadOnly": (wrappedValue: unreadOnly?.encodeToJSON(), isExplode: true),
+        ]
+        localVariableUrlComponents?.queryItems = APIHelper.mapValuesToQueryItems(localVariableQueryParameters)
 
         let localVariableNillableHeaders: [String: Any?] = [
             :
