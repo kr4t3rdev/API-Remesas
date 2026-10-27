@@ -26,6 +26,12 @@ const toIsoDateOrNull = ({ value }: { value: unknown }) => {
 };
 
 export class GetDailyReportDto {
+  @ApiProperty({
+    type: String,
+    required: false,
+    example: '2026-01-31',
+    description: 'Fecha del reporte (YYYY-MM-DD). Por defecto: hoy.',
+  })
   @IsOptional()
   @IsString()
   @IsDateString({ strict: false }, { message: `date debe ser ${DATE_FORMAT_HINT}` })
@@ -60,6 +66,12 @@ export class GetPeriodReportDto {
 }
 
 export class GetCurrencyReportDto {
+  @ApiProperty({
+    type: String,
+    required: false,
+    example: '2026-01-01',
+    description: 'Fecha inicial del período (YYYY-MM-DD)',
+  })
   @IsOptional()
   @IsDateString(
     { strict: false },
@@ -68,6 +80,12 @@ export class GetCurrencyReportDto {
   @Transform(toIsoDateOrNull)
   startDate?: string;
 
+  @ApiProperty({
+    type: String,
+    required: false,
+    example: '2026-12-31',
+    description: 'Fecha final del período (YYYY-MM-DD)',
+  })
   @IsOptional()
   @IsDateString(
     { strict: false },
@@ -78,6 +96,12 @@ export class GetCurrencyReportDto {
 }
 
 export class GetExpensesReportDto {
+  @ApiProperty({
+    type: String,
+    required: false,
+    example: '2026-01-01',
+    description: 'Fecha inicial del período (YYYY-MM-DD)',
+  })
   @IsOptional()
   @IsDateString(
     { strict: false },
@@ -86,6 +110,12 @@ export class GetExpensesReportDto {
   @Transform(toIsoDateOrNull)
   startDate?: string;
 
+  @ApiProperty({
+    type: String,
+    required: false,
+    example: '2026-12-31',
+    description: 'Fecha final del período (YYYY-MM-DD)',
+  })
   @IsOptional()
   @IsDateString(
     { strict: false },
@@ -94,6 +124,12 @@ export class GetExpensesReportDto {
   @Transform(toIsoDateOrNull)
   endDate?: string;
 
+  @ApiProperty({
+    type: String,
+    required: false,
+    example: 'RENTA',
+    description: 'Categoría de gasto a filtrar',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(80)
@@ -105,6 +141,12 @@ export class GetProfitReportDto extends GetPeriodReportDto {}
 export class GetCashFlowReportDto extends GetPeriodReportDto {}
 
 export class GetFxPerformanceReportDto extends GetPeriodReportDto {
+  @ApiProperty({
+    type: String,
+    required: false,
+    example: 'USD',
+    description: 'Código de moneda a filtrar (opcional)',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(8)
@@ -112,6 +154,12 @@ export class GetFxPerformanceReportDto extends GetPeriodReportDto {
 }
 
 export class GetAuditSummaryDto {
+  @ApiProperty({
+    type: String,
+    required: false,
+    example: '2026-01-01',
+    description: 'Fecha inicial del período (YYYY-MM-DD)',
+  })
   @IsOptional()
   @IsDateString(
     { strict: false },
@@ -120,6 +168,12 @@ export class GetAuditSummaryDto {
   @Transform(toIsoDateOrNull)
   startDate?: string;
 
+  @ApiProperty({
+    type: String,
+    required: false,
+    example: '2026-12-31',
+    description: 'Fecha final del período (YYYY-MM-DD)',
+  })
   @IsOptional()
   @IsDateString(
     { strict: false },

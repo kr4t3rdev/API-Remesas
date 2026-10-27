@@ -136,6 +136,8 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      * GET /api/reports/audit-summary
      * Resumen de arqueos
      * 
+     * @param startDate Fecha inicial del período (YYYY-MM-DD) (optional)
+     * @param endDate Fecha final del período (YYYY-MM-DD) (optional)
      * @return AuditSummaryReportDtoSwagger
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -145,8 +147,8 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun reportsGetAuditSummary() : AuditSummaryReportDtoSwagger {
-        val localVarResponse = reportsGetAuditSummaryWithHttpInfo()
+    fun reportsGetAuditSummary(startDate: kotlin.String? = null, endDate: kotlin.String? = null) : AuditSummaryReportDtoSwagger {
+        val localVarResponse = reportsGetAuditSummaryWithHttpInfo(startDate = startDate, endDate = endDate)
 
         return when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as AuditSummaryReportDtoSwagger
@@ -167,14 +169,16 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      * GET /api/reports/audit-summary
      * Resumen de arqueos
      * 
+     * @param startDate Fecha inicial del período (YYYY-MM-DD) (optional)
+     * @param endDate Fecha final del período (YYYY-MM-DD) (optional)
      * @return ApiResponse<AuditSummaryReportDtoSwagger?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun reportsGetAuditSummaryWithHttpInfo() : ApiResponse<AuditSummaryReportDtoSwagger?> {
-        val localVariableConfig = reportsGetAuditSummaryRequestConfig()
+    fun reportsGetAuditSummaryWithHttpInfo(startDate: kotlin.String?, endDate: kotlin.String?) : ApiResponse<AuditSummaryReportDtoSwagger?> {
+        val localVariableConfig = reportsGetAuditSummaryRequestConfig(startDate = startDate, endDate = endDate)
 
         return request<Unit, AuditSummaryReportDtoSwagger>(
             localVariableConfig
@@ -184,11 +188,21 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
     /**
      * To obtain the request config of the operation reportsGetAuditSummary
      *
+     * @param startDate Fecha inicial del período (YYYY-MM-DD) (optional)
+     * @param endDate Fecha final del período (YYYY-MM-DD) (optional)
      * @return RequestConfig
      */
-    fun reportsGetAuditSummaryRequestConfig() : RequestConfig<Unit> {
+    fun reportsGetAuditSummaryRequestConfig(startDate: kotlin.String?, endDate: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
-        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
+            .apply {
+                if (startDate != null) {
+                    put("startDate", listOf(startDate.toString()))
+                }
+                if (endDate != null) {
+                    put("endDate", listOf(endDate.toString()))
+                }
+            }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Accept"] = "application/json"
 
@@ -287,6 +301,8 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      * Reporte por moneda
      * 
      * @param id 
+     * @param startDate Fecha inicial del período (YYYY-MM-DD) (optional)
+     * @param endDate Fecha final del período (YYYY-MM-DD) (optional)
      * @return CurrencyReportDto
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -296,8 +312,8 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun reportsGetCurrencyReport(id: kotlin.Int) : CurrencyReportDto {
-        val localVarResponse = reportsGetCurrencyReportWithHttpInfo(id = id)
+    fun reportsGetCurrencyReport(id: kotlin.Int, startDate: kotlin.String? = null, endDate: kotlin.String? = null) : CurrencyReportDto {
+        val localVarResponse = reportsGetCurrencyReportWithHttpInfo(id = id, startDate = startDate, endDate = endDate)
 
         return when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as CurrencyReportDto
@@ -319,14 +335,16 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      * Reporte por moneda
      * 
      * @param id 
+     * @param startDate Fecha inicial del período (YYYY-MM-DD) (optional)
+     * @param endDate Fecha final del período (YYYY-MM-DD) (optional)
      * @return ApiResponse<CurrencyReportDto?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun reportsGetCurrencyReportWithHttpInfo(id: kotlin.Int) : ApiResponse<CurrencyReportDto?> {
-        val localVariableConfig = reportsGetCurrencyReportRequestConfig(id = id)
+    fun reportsGetCurrencyReportWithHttpInfo(id: kotlin.Int, startDate: kotlin.String?, endDate: kotlin.String?) : ApiResponse<CurrencyReportDto?> {
+        val localVariableConfig = reportsGetCurrencyReportRequestConfig(id = id, startDate = startDate, endDate = endDate)
 
         return request<Unit, CurrencyReportDto>(
             localVariableConfig
@@ -337,11 +355,21 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      * To obtain the request config of the operation reportsGetCurrencyReport
      *
      * @param id 
+     * @param startDate Fecha inicial del período (YYYY-MM-DD) (optional)
+     * @param endDate Fecha final del período (YYYY-MM-DD) (optional)
      * @return RequestConfig
      */
-    fun reportsGetCurrencyReportRequestConfig(id: kotlin.Int) : RequestConfig<Unit> {
+    fun reportsGetCurrencyReportRequestConfig(id: kotlin.Int, startDate: kotlin.String?, endDate: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
-        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
+            .apply {
+                if (startDate != null) {
+                    put("startDate", listOf(startDate.toString()))
+                }
+                if (endDate != null) {
+                    put("endDate", listOf(endDate.toString()))
+                }
+            }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Accept"] = "application/json"
 
@@ -359,6 +387,7 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      * GET /api/reports/daily
      * Resumen del día
      * 
+     * @param date Fecha del reporte (YYYY-MM-DD). Por defecto: hoy. (optional)
      * @return DailyReportDto
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -368,8 +397,8 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun reportsGetDailyReport() : DailyReportDto {
-        val localVarResponse = reportsGetDailyReportWithHttpInfo()
+    fun reportsGetDailyReport(date: kotlin.String? = null) : DailyReportDto {
+        val localVarResponse = reportsGetDailyReportWithHttpInfo(date = date)
 
         return when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as DailyReportDto
@@ -390,14 +419,15 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      * GET /api/reports/daily
      * Resumen del día
      * 
+     * @param date Fecha del reporte (YYYY-MM-DD). Por defecto: hoy. (optional)
      * @return ApiResponse<DailyReportDto?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun reportsGetDailyReportWithHttpInfo() : ApiResponse<DailyReportDto?> {
-        val localVariableConfig = reportsGetDailyReportRequestConfig()
+    fun reportsGetDailyReportWithHttpInfo(date: kotlin.String?) : ApiResponse<DailyReportDto?> {
+        val localVariableConfig = reportsGetDailyReportRequestConfig(date = date)
 
         return request<Unit, DailyReportDto>(
             localVariableConfig
@@ -407,11 +437,17 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
     /**
      * To obtain the request config of the operation reportsGetDailyReport
      *
+     * @param date Fecha del reporte (YYYY-MM-DD). Por defecto: hoy. (optional)
      * @return RequestConfig
      */
-    fun reportsGetDailyReportRequestConfig() : RequestConfig<Unit> {
+    fun reportsGetDailyReportRequestConfig(date: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
-        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
+            .apply {
+                if (date != null) {
+                    put("date", listOf(date.toString()))
+                }
+            }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Accept"] = "application/json"
 
@@ -429,6 +465,9 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      * GET /api/reports/expenses
      * Reporte de gastos
      * 
+     * @param startDate Fecha inicial del período (YYYY-MM-DD) (optional)
+     * @param endDate Fecha final del período (YYYY-MM-DD) (optional)
+     * @param category Categoría de gasto a filtrar (optional)
      * @return ExpensesReportDto
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -438,8 +477,8 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun reportsGetExpensesReport() : ExpensesReportDto {
-        val localVarResponse = reportsGetExpensesReportWithHttpInfo()
+    fun reportsGetExpensesReport(startDate: kotlin.String? = null, endDate: kotlin.String? = null, category: kotlin.String? = null) : ExpensesReportDto {
+        val localVarResponse = reportsGetExpensesReportWithHttpInfo(startDate = startDate, endDate = endDate, category = category)
 
         return when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as ExpensesReportDto
@@ -460,14 +499,17 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      * GET /api/reports/expenses
      * Reporte de gastos
      * 
+     * @param startDate Fecha inicial del período (YYYY-MM-DD) (optional)
+     * @param endDate Fecha final del período (YYYY-MM-DD) (optional)
+     * @param category Categoría de gasto a filtrar (optional)
      * @return ApiResponse<ExpensesReportDto?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun reportsGetExpensesReportWithHttpInfo() : ApiResponse<ExpensesReportDto?> {
-        val localVariableConfig = reportsGetExpensesReportRequestConfig()
+    fun reportsGetExpensesReportWithHttpInfo(startDate: kotlin.String?, endDate: kotlin.String?, category: kotlin.String?) : ApiResponse<ExpensesReportDto?> {
+        val localVariableConfig = reportsGetExpensesReportRequestConfig(startDate = startDate, endDate = endDate, category = category)
 
         return request<Unit, ExpensesReportDto>(
             localVariableConfig
@@ -477,11 +519,25 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
     /**
      * To obtain the request config of the operation reportsGetExpensesReport
      *
+     * @param startDate Fecha inicial del período (YYYY-MM-DD) (optional)
+     * @param endDate Fecha final del período (YYYY-MM-DD) (optional)
+     * @param category Categoría de gasto a filtrar (optional)
      * @return RequestConfig
      */
-    fun reportsGetExpensesReportRequestConfig() : RequestConfig<Unit> {
+    fun reportsGetExpensesReportRequestConfig(startDate: kotlin.String?, endDate: kotlin.String?, category: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
-        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
+            .apply {
+                if (startDate != null) {
+                    put("startDate", listOf(startDate.toString()))
+                }
+                if (endDate != null) {
+                    put("endDate", listOf(endDate.toString()))
+                }
+                if (category != null) {
+                    put("category", listOf(category.toString()))
+                }
+            }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Accept"] = "application/json"
 
@@ -501,6 +557,7 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      * 
      * @param startDate Fecha inicial del período (YYYY-MM-DD)
      * @param endDate Fecha final del período (YYYY-MM-DD)
+     * @param currency Código de moneda a filtrar (opcional) (optional)
      * @return FxPerformanceReportDto
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -510,8 +567,8 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun reportsGetFxPerformanceReport(startDate: kotlin.String, endDate: kotlin.String) : FxPerformanceReportDto {
-        val localVarResponse = reportsGetFxPerformanceReportWithHttpInfo(startDate = startDate, endDate = endDate)
+    fun reportsGetFxPerformanceReport(startDate: kotlin.String, endDate: kotlin.String, currency: kotlin.String? = null) : FxPerformanceReportDto {
+        val localVarResponse = reportsGetFxPerformanceReportWithHttpInfo(startDate = startDate, endDate = endDate, currency = currency)
 
         return when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as FxPerformanceReportDto
@@ -534,14 +591,15 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      * 
      * @param startDate Fecha inicial del período (YYYY-MM-DD)
      * @param endDate Fecha final del período (YYYY-MM-DD)
+     * @param currency Código de moneda a filtrar (opcional) (optional)
      * @return ApiResponse<FxPerformanceReportDto?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun reportsGetFxPerformanceReportWithHttpInfo(startDate: kotlin.String, endDate: kotlin.String) : ApiResponse<FxPerformanceReportDto?> {
-        val localVariableConfig = reportsGetFxPerformanceReportRequestConfig(startDate = startDate, endDate = endDate)
+    fun reportsGetFxPerformanceReportWithHttpInfo(startDate: kotlin.String, endDate: kotlin.String, currency: kotlin.String?) : ApiResponse<FxPerformanceReportDto?> {
+        val localVariableConfig = reportsGetFxPerformanceReportRequestConfig(startDate = startDate, endDate = endDate, currency = currency)
 
         return request<Unit, FxPerformanceReportDto>(
             localVariableConfig
@@ -553,14 +611,18 @@ open class ReportsApi(basePath: kotlin.String = defaultBasePath, client: Call.Fa
      *
      * @param startDate Fecha inicial del período (YYYY-MM-DD)
      * @param endDate Fecha final del período (YYYY-MM-DD)
+     * @param currency Código de moneda a filtrar (opcional) (optional)
      * @return RequestConfig
      */
-    fun reportsGetFxPerformanceReportRequestConfig(startDate: kotlin.String, endDate: kotlin.String) : RequestConfig<Unit> {
+    fun reportsGetFxPerformanceReportRequestConfig(startDate: kotlin.String, endDate: kotlin.String, currency: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
             .apply {
                 put("startDate", listOf(startDate.toString()))
                 put("endDate", listOf(endDate.toString()))
+                if (currency != null) {
+                    put("currency", listOf(currency.toString()))
+                }
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Accept"] = "application/json"

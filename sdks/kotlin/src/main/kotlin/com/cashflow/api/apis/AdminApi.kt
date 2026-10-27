@@ -359,6 +359,7 @@ open class AdminApi(basePath: kotlin.String = defaultBasePath, client: Call.Fact
      * GET /api/admin/licenses/expiring
      * Licencias por vencer
      * 
+     * @param windowDays Ventana en días para contar licencias por vencer. Por defecto: 7. (optional)
      * @return kotlin.collections.List<AdminExpiringLicenseDto>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -368,8 +369,8 @@ open class AdminApi(basePath: kotlin.String = defaultBasePath, client: Call.Fact
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun adminGetExpiringLicenses() : kotlin.collections.List<AdminExpiringLicenseDto> {
-        val localVarResponse = adminGetExpiringLicensesWithHttpInfo()
+    fun adminGetExpiringLicenses(windowDays: kotlin.String? = null) : kotlin.collections.List<AdminExpiringLicenseDto> {
+        val localVarResponse = adminGetExpiringLicensesWithHttpInfo(windowDays = windowDays)
 
         return when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as kotlin.collections.List<AdminExpiringLicenseDto>
@@ -390,14 +391,15 @@ open class AdminApi(basePath: kotlin.String = defaultBasePath, client: Call.Fact
      * GET /api/admin/licenses/expiring
      * Licencias por vencer
      * 
+     * @param windowDays Ventana en días para contar licencias por vencer. Por defecto: 7. (optional)
      * @return ApiResponse<kotlin.collections.List<AdminExpiringLicenseDto>?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun adminGetExpiringLicensesWithHttpInfo() : ApiResponse<kotlin.collections.List<AdminExpiringLicenseDto>?> {
-        val localVariableConfig = adminGetExpiringLicensesRequestConfig()
+    fun adminGetExpiringLicensesWithHttpInfo(windowDays: kotlin.String?) : ApiResponse<kotlin.collections.List<AdminExpiringLicenseDto>?> {
+        val localVariableConfig = adminGetExpiringLicensesRequestConfig(windowDays = windowDays)
 
         return request<Unit, kotlin.collections.List<AdminExpiringLicenseDto>>(
             localVariableConfig
@@ -407,11 +409,17 @@ open class AdminApi(basePath: kotlin.String = defaultBasePath, client: Call.Fact
     /**
      * To obtain the request config of the operation adminGetExpiringLicenses
      *
+     * @param windowDays Ventana en días para contar licencias por vencer. Por defecto: 7. (optional)
      * @return RequestConfig
      */
-    fun adminGetExpiringLicensesRequestConfig() : RequestConfig<Unit> {
+    fun adminGetExpiringLicensesRequestConfig(windowDays: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
-        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
+            .apply {
+                if (windowDays != null) {
+                    put("windowDays", listOf(windowDays.toString()))
+                }
+            }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Accept"] = "application/json"
 
@@ -429,9 +437,9 @@ open class AdminApi(basePath: kotlin.String = defaultBasePath, client: Call.Fact
      * GET /api/admin/kpis
      * KPIs de administración
      * 
-     * @param dateFrom 
-     * @param dateTo 
-     * @param planId 
+     * @param dateFrom Fecha inicial del rango (YYYY-MM-DD). Por defecto: hace 30 días. (optional)
+     * @param dateTo Fecha final del rango (YYYY-MM-DD). Por defecto: hoy. (optional)
+     * @param planId Id de plan para filtrar las licencias contadas. (optional)
      * @return AdminKpisDto
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -441,7 +449,7 @@ open class AdminApi(basePath: kotlin.String = defaultBasePath, client: Call.Fact
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun adminGetKpis(dateFrom: kotlin.String, dateTo: kotlin.String, planId: kotlin.String) : AdminKpisDto {
+    fun adminGetKpis(dateFrom: kotlin.String? = null, dateTo: kotlin.String? = null, planId: kotlin.String? = null) : AdminKpisDto {
         val localVarResponse = adminGetKpisWithHttpInfo(dateFrom = dateFrom, dateTo = dateTo, planId = planId)
 
         return when (localVarResponse.responseType) {
@@ -463,16 +471,16 @@ open class AdminApi(basePath: kotlin.String = defaultBasePath, client: Call.Fact
      * GET /api/admin/kpis
      * KPIs de administración
      * 
-     * @param dateFrom 
-     * @param dateTo 
-     * @param planId 
+     * @param dateFrom Fecha inicial del rango (YYYY-MM-DD). Por defecto: hace 30 días. (optional)
+     * @param dateTo Fecha final del rango (YYYY-MM-DD). Por defecto: hoy. (optional)
+     * @param planId Id de plan para filtrar las licencias contadas. (optional)
      * @return ApiResponse<AdminKpisDto?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun adminGetKpisWithHttpInfo(dateFrom: kotlin.String, dateTo: kotlin.String, planId: kotlin.String) : ApiResponse<AdminKpisDto?> {
+    fun adminGetKpisWithHttpInfo(dateFrom: kotlin.String?, dateTo: kotlin.String?, planId: kotlin.String?) : ApiResponse<AdminKpisDto?> {
         val localVariableConfig = adminGetKpisRequestConfig(dateFrom = dateFrom, dateTo = dateTo, planId = planId)
 
         return request<Unit, AdminKpisDto>(
@@ -483,18 +491,24 @@ open class AdminApi(basePath: kotlin.String = defaultBasePath, client: Call.Fact
     /**
      * To obtain the request config of the operation adminGetKpis
      *
-     * @param dateFrom 
-     * @param dateTo 
-     * @param planId 
+     * @param dateFrom Fecha inicial del rango (YYYY-MM-DD). Por defecto: hace 30 días. (optional)
+     * @param dateTo Fecha final del rango (YYYY-MM-DD). Por defecto: hoy. (optional)
+     * @param planId Id de plan para filtrar las licencias contadas. (optional)
      * @return RequestConfig
      */
-    fun adminGetKpisRequestConfig(dateFrom: kotlin.String, dateTo: kotlin.String, planId: kotlin.String) : RequestConfig<Unit> {
+    fun adminGetKpisRequestConfig(dateFrom: kotlin.String?, dateTo: kotlin.String?, planId: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
             .apply {
-                put("dateFrom", listOf(dateFrom.toString()))
-                put("dateTo", listOf(dateTo.toString()))
-                put("planId", listOf(planId.toString()))
+                if (dateFrom != null) {
+                    put("dateFrom", listOf(dateFrom.toString()))
+                }
+                if (dateTo != null) {
+                    put("dateTo", listOf(dateTo.toString()))
+                }
+                if (planId != null) {
+                    put("planId", listOf(planId.toString()))
+                }
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Accept"] = "application/json"
@@ -513,6 +527,7 @@ open class AdminApi(basePath: kotlin.String = defaultBasePath, client: Call.Fact
      * GET /api/admin/reports/platform-series
      * Series temporales de plataforma (billing, newUsers, churn por mes)
      * 
+     * @param monthsBack Meses hacia atrás a incluir en la serie. Por defecto: 6. (optional)
      * @return AdminPlatformSeriesDto
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -522,8 +537,8 @@ open class AdminApi(basePath: kotlin.String = defaultBasePath, client: Call.Fact
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun adminGetPlatformSeries() : AdminPlatformSeriesDto {
-        val localVarResponse = adminGetPlatformSeriesWithHttpInfo()
+    fun adminGetPlatformSeries(monthsBack: java.math.BigDecimal? = null) : AdminPlatformSeriesDto {
+        val localVarResponse = adminGetPlatformSeriesWithHttpInfo(monthsBack = monthsBack)
 
         return when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as AdminPlatformSeriesDto
@@ -544,14 +559,15 @@ open class AdminApi(basePath: kotlin.String = defaultBasePath, client: Call.Fact
      * GET /api/admin/reports/platform-series
      * Series temporales de plataforma (billing, newUsers, churn por mes)
      * 
+     * @param monthsBack Meses hacia atrás a incluir en la serie. Por defecto: 6. (optional)
      * @return ApiResponse<AdminPlatformSeriesDto?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun adminGetPlatformSeriesWithHttpInfo() : ApiResponse<AdminPlatformSeriesDto?> {
-        val localVariableConfig = adminGetPlatformSeriesRequestConfig()
+    fun adminGetPlatformSeriesWithHttpInfo(monthsBack: java.math.BigDecimal?) : ApiResponse<AdminPlatformSeriesDto?> {
+        val localVariableConfig = adminGetPlatformSeriesRequestConfig(monthsBack = monthsBack)
 
         return request<Unit, AdminPlatformSeriesDto>(
             localVariableConfig
@@ -561,11 +577,17 @@ open class AdminApi(basePath: kotlin.String = defaultBasePath, client: Call.Fact
     /**
      * To obtain the request config of the operation adminGetPlatformSeries
      *
+     * @param monthsBack Meses hacia atrás a incluir en la serie. Por defecto: 6. (optional)
      * @return RequestConfig
      */
-    fun adminGetPlatformSeriesRequestConfig() : RequestConfig<Unit> {
+    fun adminGetPlatformSeriesRequestConfig(monthsBack: java.math.BigDecimal?) : RequestConfig<Unit> {
         val localVariableBody = null
-        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
+            .apply {
+                if (monthsBack != null) {
+                    put("monthsBack", listOf(monthsBack.toString()))
+                }
+            }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Accept"] = "application/json"
 

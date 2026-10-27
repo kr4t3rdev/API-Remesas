@@ -110,12 +110,12 @@ open class SubscriptionsAPI {
     /**
      Listar licencias
      
-     - parameter userId: (query)  
+     - parameter userId: (query) Id de usuario para filtrar las licencias asignadas. (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - parameter completion: completion handler to receive the data and the error objects
      */
     @discardableResult
-    open class func subscriptionsListLicenses(userId: String, apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: [SubscriptionLicenseDto]?, _ error: Error?) -> Void)) -> RequestTask {
+    open class func subscriptionsListLicenses(userId: String? = nil, apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: [SubscriptionLicenseDto]?, _ error: Error?) -> Void)) -> RequestTask {
         return subscriptionsListLicensesWithRequestBuilder(userId: userId).execute(apiResponseQueue) { result in
             switch result {
             case let .success(response):
@@ -132,17 +132,17 @@ open class SubscriptionsAPI {
      - Bearer Token:
        - type: http
        - name: bearer
-     - parameter userId: (query)  
+     - parameter userId: (query) Id de usuario para filtrar las licencias asignadas. (optional)
      - returns: RequestBuilder<[SubscriptionLicenseDto]> 
      */
-    open class func subscriptionsListLicensesWithRequestBuilder(userId: String) -> RequestBuilder<[SubscriptionLicenseDto]> {
+    open class func subscriptionsListLicensesWithRequestBuilder(userId: String? = nil) -> RequestBuilder<[SubscriptionLicenseDto]> {
         let localVariablePath = "/api/subscriptions/licenses"
         let localVariableURLString = CashflowAPIAPI.basePath + localVariablePath
         let localVariableParameters: [String: Any]? = nil
 
         var localVariableUrlComponents = URLComponents(string: localVariableURLString)
         let localVariableQueryParameters: [String: (wrappedValue: Any?, isExplode: Bool)] = [
-            "userId": (wrappedValue: userId.encodeToJSON(), isExplode: true),
+            "userId": (wrappedValue: userId?.encodeToJSON(), isExplode: true),
         ]
         localVariableUrlComponents?.queryItems = APIHelper.mapValuesToQueryItems(localVariableQueryParameters)
 

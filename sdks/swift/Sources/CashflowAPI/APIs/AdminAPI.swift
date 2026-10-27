@@ -200,12 +200,13 @@ open class AdminAPI {
     /**
      Licencias por vencer
      
+     - parameter windowDays: (query) Ventana en días para contar licencias por vencer. Por defecto: 7. (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - parameter completion: completion handler to receive the data and the error objects
      */
     @discardableResult
-    open class func adminGetExpiringLicenses(apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: [AdminExpiringLicenseDto]?, _ error: Error?) -> Void)) -> RequestTask {
-        return adminGetExpiringLicensesWithRequestBuilder().execute(apiResponseQueue) { result in
+    open class func adminGetExpiringLicenses(windowDays: String? = nil, apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: [AdminExpiringLicenseDto]?, _ error: Error?) -> Void)) -> RequestTask {
+        return adminGetExpiringLicensesWithRequestBuilder(windowDays: windowDays).execute(apiResponseQueue) { result in
             switch result {
             case let .success(response):
                 completion(response.body, nil)
@@ -221,14 +222,19 @@ open class AdminAPI {
      - Bearer Token:
        - type: http
        - name: bearer
+     - parameter windowDays: (query) Ventana en días para contar licencias por vencer. Por defecto: 7. (optional)
      - returns: RequestBuilder<[AdminExpiringLicenseDto]> 
      */
-    open class func adminGetExpiringLicensesWithRequestBuilder() -> RequestBuilder<[AdminExpiringLicenseDto]> {
+    open class func adminGetExpiringLicensesWithRequestBuilder(windowDays: String? = nil) -> RequestBuilder<[AdminExpiringLicenseDto]> {
         let localVariablePath = "/api/admin/licenses/expiring"
         let localVariableURLString = CashflowAPIAPI.basePath + localVariablePath
         let localVariableParameters: [String: Any]? = nil
 
-        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        var localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        let localVariableQueryParameters: [String: (wrappedValue: Any?, isExplode: Bool)] = [
+            "windowDays": (wrappedValue: windowDays?.encodeToJSON(), isExplode: true),
+        ]
+        localVariableUrlComponents?.queryItems = APIHelper.mapValuesToQueryItems(localVariableQueryParameters)
 
         let localVariableNillableHeaders: [String: Any?] = [
             :
@@ -244,14 +250,14 @@ open class AdminAPI {
     /**
      KPIs de administración
      
-     - parameter dateFrom: (query)  
-     - parameter dateTo: (query)  
-     - parameter planId: (query)  
+     - parameter dateFrom: (query) Fecha inicial del rango (YYYY-MM-DD). Por defecto: hace 30 días. (optional)
+     - parameter dateTo: (query) Fecha final del rango (YYYY-MM-DD). Por defecto: hoy. (optional)
+     - parameter planId: (query) Id de plan para filtrar las licencias contadas. (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - parameter completion: completion handler to receive the data and the error objects
      */
     @discardableResult
-    open class func adminGetKpis(dateFrom: String, dateTo: String, planId: String, apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: AdminKpisDto?, _ error: Error?) -> Void)) -> RequestTask {
+    open class func adminGetKpis(dateFrom: String? = nil, dateTo: String? = nil, planId: String? = nil, apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: AdminKpisDto?, _ error: Error?) -> Void)) -> RequestTask {
         return adminGetKpisWithRequestBuilder(dateFrom: dateFrom, dateTo: dateTo, planId: planId).execute(apiResponseQueue) { result in
             switch result {
             case let .success(response):
@@ -268,21 +274,21 @@ open class AdminAPI {
      - Bearer Token:
        - type: http
        - name: bearer
-     - parameter dateFrom: (query)  
-     - parameter dateTo: (query)  
-     - parameter planId: (query)  
+     - parameter dateFrom: (query) Fecha inicial del rango (YYYY-MM-DD). Por defecto: hace 30 días. (optional)
+     - parameter dateTo: (query) Fecha final del rango (YYYY-MM-DD). Por defecto: hoy. (optional)
+     - parameter planId: (query) Id de plan para filtrar las licencias contadas. (optional)
      - returns: RequestBuilder<AdminKpisDto> 
      */
-    open class func adminGetKpisWithRequestBuilder(dateFrom: String, dateTo: String, planId: String) -> RequestBuilder<AdminKpisDto> {
+    open class func adminGetKpisWithRequestBuilder(dateFrom: String? = nil, dateTo: String? = nil, planId: String? = nil) -> RequestBuilder<AdminKpisDto> {
         let localVariablePath = "/api/admin/kpis"
         let localVariableURLString = CashflowAPIAPI.basePath + localVariablePath
         let localVariableParameters: [String: Any]? = nil
 
         var localVariableUrlComponents = URLComponents(string: localVariableURLString)
         let localVariableQueryParameters: [String: (wrappedValue: Any?, isExplode: Bool)] = [
-            "dateFrom": (wrappedValue: dateFrom.encodeToJSON(), isExplode: true),
-            "dateTo": (wrappedValue: dateTo.encodeToJSON(), isExplode: true),
-            "planId": (wrappedValue: planId.encodeToJSON(), isExplode: true),
+            "dateFrom": (wrappedValue: dateFrom?.encodeToJSON(), isExplode: true),
+            "dateTo": (wrappedValue: dateTo?.encodeToJSON(), isExplode: true),
+            "planId": (wrappedValue: planId?.encodeToJSON(), isExplode: true),
         ]
         localVariableUrlComponents?.queryItems = APIHelper.mapValuesToQueryItems(localVariableQueryParameters)
 
@@ -300,12 +306,13 @@ open class AdminAPI {
     /**
      Series temporales de plataforma (billing, newUsers, churn por mes)
      
+     - parameter monthsBack: (query) Meses hacia atrás a incluir en la serie. Por defecto: 6. (optional)
      - parameter apiResponseQueue: The queue on which api response is dispatched.
      - parameter completion: completion handler to receive the data and the error objects
      */
     @discardableResult
-    open class func adminGetPlatformSeries(apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: AdminPlatformSeriesDto?, _ error: Error?) -> Void)) -> RequestTask {
-        return adminGetPlatformSeriesWithRequestBuilder().execute(apiResponseQueue) { result in
+    open class func adminGetPlatformSeries(monthsBack: Double? = nil, apiResponseQueue: DispatchQueue = CashflowAPIAPI.apiResponseQueue, completion: @escaping ((_ data: AdminPlatformSeriesDto?, _ error: Error?) -> Void)) -> RequestTask {
+        return adminGetPlatformSeriesWithRequestBuilder(monthsBack: monthsBack).execute(apiResponseQueue) { result in
             switch result {
             case let .success(response):
                 completion(response.body, nil)
@@ -321,14 +328,19 @@ open class AdminAPI {
      - Bearer Token:
        - type: http
        - name: bearer
+     - parameter monthsBack: (query) Meses hacia atrás a incluir en la serie. Por defecto: 6. (optional)
      - returns: RequestBuilder<AdminPlatformSeriesDto> 
      */
-    open class func adminGetPlatformSeriesWithRequestBuilder() -> RequestBuilder<AdminPlatformSeriesDto> {
+    open class func adminGetPlatformSeriesWithRequestBuilder(monthsBack: Double? = nil) -> RequestBuilder<AdminPlatformSeriesDto> {
         let localVariablePath = "/api/admin/reports/platform-series"
         let localVariableURLString = CashflowAPIAPI.basePath + localVariablePath
         let localVariableParameters: [String: Any]? = nil
 
-        let localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        var localVariableUrlComponents = URLComponents(string: localVariableURLString)
+        let localVariableQueryParameters: [String: (wrappedValue: Any?, isExplode: Bool)] = [
+            "monthsBack": (wrappedValue: monthsBack?.encodeToJSON(), isExplode: true),
+        ]
+        localVariableUrlComponents?.queryItems = APIHelper.mapValuesToQueryItems(localVariableQueryParameters)
 
         let localVariableNillableHeaders: [String: Any?] = [
             :

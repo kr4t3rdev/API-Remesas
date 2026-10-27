@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags,
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags,
   ApiResponse,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -22,6 +22,12 @@ export class SubscriptionsController {
 
   @Get('licenses')
   @ApiOperation({ summary: 'Listar licencias' })
+  @ApiQuery({
+    name: 'userId',
+    required: false,
+    type: String,
+    description: 'Id de usuario para filtrar las licencias asignadas.',
+  })
   @ApiResponse({ status: 200, type: SubscriptionLicenseDto, isArray: true })
   listLicenses(@Query('userId') userId?: string) {
     return this.subscriptionsService.listLicenses(userId ? Number(userId) : undefined);

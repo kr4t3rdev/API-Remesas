@@ -5815,7 +5815,10 @@ export interface operations {
     };
     reports_getDailyReport: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Fecha del reporte (YYYY-MM-DD). Por defecto: hoy. */
+                date?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -5882,7 +5885,12 @@ export interface operations {
     };
     reports_getCurrencyReport: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Fecha inicial del período (YYYY-MM-DD) */
+                startDate?: string;
+                /** @description Fecha final del período (YYYY-MM-DD) */
+                endDate?: string;
+            };
             header?: never;
             path: {
                 id: number;
@@ -5908,6 +5916,8 @@ export interface operations {
                 startDate: string;
                 /** @description Fecha final del período (YYYY-MM-DD) */
                 endDate: string;
+                /** @description Código de moneda a filtrar (opcional) */
+                currency?: string;
             };
             header?: never;
             path?: never;
@@ -5927,7 +5937,14 @@ export interface operations {
     };
     reports_getExpensesReport: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Fecha inicial del período (YYYY-MM-DD) */
+                startDate?: string;
+                /** @description Fecha final del período (YYYY-MM-DD) */
+                endDate?: string;
+                /** @description Categoría de gasto a filtrar */
+                category?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -6008,7 +6025,12 @@ export interface operations {
     };
     reports_getAuditSummary: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Fecha inicial del período (YYYY-MM-DD) */
+                startDate?: string;
+                /** @description Fecha final del período (YYYY-MM-DD) */
+                endDate?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -6299,8 +6321,9 @@ export interface operations {
     };
     subscriptions_listLicenses: {
         parameters: {
-            query: {
-                userId: string;
+            query?: {
+                /** @description Id de usuario para filtrar las licencias asignadas. */
+                userId?: string;
             };
             header?: never;
             path?: never;
@@ -6462,10 +6485,13 @@ export interface operations {
     };
     admin_getKpis: {
         parameters: {
-            query: {
-                dateFrom: string;
-                dateTo: string;
-                planId: string;
+            query?: {
+                /** @description Fecha inicial del rango (YYYY-MM-DD). Por defecto: hace 30 días. */
+                dateFrom?: string;
+                /** @description Fecha final del rango (YYYY-MM-DD). Por defecto: hoy. */
+                dateTo?: string;
+                /** @description Id de plan para filtrar las licencias contadas. */
+                planId?: string;
             };
             header?: never;
             path?: never;
@@ -6485,7 +6511,10 @@ export interface operations {
     };
     admin_getPlatformSeries: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Meses hacia atrás a incluir en la serie. Por defecto: 6. */
+                monthsBack?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -6656,7 +6685,10 @@ export interface operations {
     };
     admin_getExpiringLicenses: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Ventana en días para contar licencias por vencer. Por defecto: 7. */
+                windowDays?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;

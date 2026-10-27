@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags,
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags,
   ApiResponse,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -33,6 +33,24 @@ export class AdminController {
 
   @Get('kpis')
   @ApiOperation({ summary: 'KPIs de administración' })
+  @ApiQuery({
+    name: 'dateFrom',
+    required: false,
+    type: String,
+    description: 'Fecha inicial del rango (YYYY-MM-DD). Por defecto: hace 30 días.',
+  })
+  @ApiQuery({
+    name: 'dateTo',
+    required: false,
+    type: String,
+    description: 'Fecha final del rango (YYYY-MM-DD). Por defecto: hoy.',
+  })
+  @ApiQuery({
+    name: 'planId',
+    required: false,
+    type: String,
+    description: 'Id de plan para filtrar las licencias contadas.',
+  })
   @ApiResponse({ status: 200, type: AdminKpisDto })
   getKpis(
     @Query('dateFrom') dateFrom?: string,
@@ -111,6 +129,12 @@ export class AdminController {
 
   @Get('licenses/expiring')
   @ApiOperation({ summary: 'Licencias por vencer' })
+  @ApiQuery({
+    name: 'windowDays',
+    required: false,
+    type: String,
+    description: 'Ventana en días para contar licencias por vencer. Por defecto: 7.',
+  })
   @ApiResponse({ status: 200, type: AdminExpiringLicenseDto, isArray: true })
   getExpiringLicenses(@Query('windowDays') windowDays = '7') {
     return this.adminService.getExpiringLicenses(Number(windowDays));

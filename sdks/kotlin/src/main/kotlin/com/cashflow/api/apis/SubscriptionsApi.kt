@@ -209,7 +209,7 @@ open class SubscriptionsApi(basePath: kotlin.String = defaultBasePath, client: C
      * GET /api/subscriptions/licenses
      * Listar licencias
      * 
-     * @param userId 
+     * @param userId Id de usuario para filtrar las licencias asignadas. (optional)
      * @return kotlin.collections.List<SubscriptionLicenseDto>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
@@ -219,7 +219,7 @@ open class SubscriptionsApi(basePath: kotlin.String = defaultBasePath, client: C
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun subscriptionsListLicenses(userId: kotlin.String) : kotlin.collections.List<SubscriptionLicenseDto> {
+    fun subscriptionsListLicenses(userId: kotlin.String? = null) : kotlin.collections.List<SubscriptionLicenseDto> {
         val localVarResponse = subscriptionsListLicensesWithHttpInfo(userId = userId)
 
         return when (localVarResponse.responseType) {
@@ -241,14 +241,14 @@ open class SubscriptionsApi(basePath: kotlin.String = defaultBasePath, client: C
      * GET /api/subscriptions/licenses
      * Listar licencias
      * 
-     * @param userId 
+     * @param userId Id de usuario para filtrar las licencias asignadas. (optional)
      * @return ApiResponse<kotlin.collections.List<SubscriptionLicenseDto>?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun subscriptionsListLicensesWithHttpInfo(userId: kotlin.String) : ApiResponse<kotlin.collections.List<SubscriptionLicenseDto>?> {
+    fun subscriptionsListLicensesWithHttpInfo(userId: kotlin.String?) : ApiResponse<kotlin.collections.List<SubscriptionLicenseDto>?> {
         val localVariableConfig = subscriptionsListLicensesRequestConfig(userId = userId)
 
         return request<Unit, kotlin.collections.List<SubscriptionLicenseDto>>(
@@ -259,14 +259,16 @@ open class SubscriptionsApi(basePath: kotlin.String = defaultBasePath, client: C
     /**
      * To obtain the request config of the operation subscriptionsListLicenses
      *
-     * @param userId 
+     * @param userId Id de usuario para filtrar las licencias asignadas. (optional)
      * @return RequestConfig
      */
-    fun subscriptionsListLicensesRequestConfig(userId: kotlin.String) : RequestConfig<Unit> {
+    fun subscriptionsListLicensesRequestConfig(userId: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, kotlin.collections.List<kotlin.String>>()
             .apply {
-                put("userId", listOf(userId.toString()))
+                if (userId != null) {
+                    put("userId", listOf(userId.toString()))
+                }
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Accept"] = "application/json"

@@ -2446,7 +2446,18 @@
     "/api/reports/daily": {
       "get": {
         "operationId": "reports_getDailyReport",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "description": "Fecha del reporte (YYYY-MM-DD). Por defecto: hoy.",
+            "schema": {
+              "example": "2026-01-31",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -2579,6 +2590,26 @@
               "example": 1,
               "type": "integer"
             }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Fecha inicial del período (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Fecha final del período (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-12-31",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -2627,6 +2658,16 @@
               "example": "2026-12-31",
               "type": "string"
             }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "Código de moneda a filtrar (opcional)",
+            "schema": {
+              "example": "USD",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -2655,7 +2696,38 @@
     "/api/reports/expenses": {
       "get": {
         "operationId": "reports_getExpensesReport",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Fecha inicial del período (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Fecha final del período (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-12-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Categoría de gasto a filtrar",
+            "schema": {
+              "example": "RENTA",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -2784,7 +2856,28 @@
     "/api/reports/audit-summary": {
       "get": {
         "operationId": "reports_getAuditSummary",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Fecha inicial del período (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Fecha final del período (YYYY-MM-DD)",
+            "schema": {
+              "example": "2026-12-31",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -3284,8 +3377,9 @@
         "parameters": [
           {
             "name": "userId",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Id de usuario para filtrar las licencias asignadas.",
             "schema": {
               "type": "string"
             }
@@ -3569,24 +3663,27 @@
         "parameters": [
           {
             "name": "dateFrom",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Fecha inicial del rango (YYYY-MM-DD). Por defecto: hace 30 días.",
             "schema": {
               "type": "string"
             }
           },
           {
             "name": "dateTo",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Fecha final del rango (YYYY-MM-DD). Por defecto: hoy.",
             "schema": {
               "type": "string"
             }
           },
           {
             "name": "planId",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Id de plan para filtrar las licencias contadas.",
             "schema": {
               "type": "string"
             }
@@ -3618,7 +3715,20 @@
     "/api/admin/reports/platform-series": {
       "get": {
         "operationId": "admin_getPlatformSeries",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "monthsBack",
+            "required": false,
+            "in": "query",
+            "description": "Meses hacia atrás a incluir en la serie. Por defecto: 6.",
+            "schema": {
+              "minimum": 1,
+              "maximum": 24,
+              "example": 6,
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -3893,7 +4003,17 @@
     "/api/admin/licenses/expiring": {
       "get": {
         "operationId": "admin_getExpiringLicenses",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Ventana en días para contar licencias por vencer. Por defecto: 7.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
