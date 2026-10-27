@@ -20,10 +20,10 @@ public struct ProfitReportDto: Codable, JSONEncodable, Hashable {
     public var totalVentas: String
     /** Decimal como string */
     public var netFlow: String
-    public var byCurrency: [String: AnyCodable]
+    public var byCurrency: [String: ProfitByCurrencySummaryDto]
     public var transactions: [ProfitReportTransactionDto]
 
-    public init(period: PeriodReportPeriodDto, totalMarginProfit: String, totalCompras: String, totalVentas: String, netFlow: String, byCurrency: [String: AnyCodable], transactions: [ProfitReportTransactionDto]) {
+    public init(period: PeriodReportPeriodDto, totalMarginProfit: String, totalCompras: String, totalVentas: String, netFlow: String, byCurrency: [String: ProfitByCurrencySummaryDto], transactions: [ProfitReportTransactionDto]) {
         self.period = period
         self.totalMarginProfit = totalMarginProfit
         self.totalCompras = totalCompras

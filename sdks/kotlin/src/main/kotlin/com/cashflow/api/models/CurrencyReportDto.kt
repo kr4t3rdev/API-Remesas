@@ -23,6 +23,7 @@
 
 package com.cashflow.api.models
 
+import com.cashflow.api.models.CurrencyReportRefDto
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -32,10 +33,10 @@ import com.squareup.moshi.JsonClass
  *
  * @param currencyId 
  * @param currency 
- * @param currentBalance 
+ * @param currentBalance Decimal como string
  * @param totalTransactions 
- * @param totalCompras 
- * @param totalVentas 
+ * @param totalCompras Decimal como string
+ * @param totalVentas Decimal como string
  * @param transactions 
  */
 
@@ -46,19 +47,22 @@ data class CurrencyReportDto (
     val currencyId: java.math.BigDecimal,
 
     @Json(name = "currency")
-    val currency: kotlin.collections.Map<kotlin.String, kotlin.Any>?,
+    val currency: CurrencyReportRefDto?,
 
+    /* Decimal como string */
     @Json(name = "currentBalance")
-    val currentBalance: java.math.BigDecimal,
+    val currentBalance: kotlin.String,
 
     @Json(name = "totalTransactions")
     val totalTransactions: java.math.BigDecimal,
 
+    /* Decimal como string */
     @Json(name = "totalCompras")
-    val totalCompras: java.math.BigDecimal,
+    val totalCompras: kotlin.String,
 
+    /* Decimal como string */
     @Json(name = "totalVentas")
-    val totalVentas: java.math.BigDecimal,
+    val totalVentas: kotlin.String,
 
     @Json(name = "transactions")
     val transactions: kotlin.collections.List<kotlin.collections.Map<kotlin.String, kotlin.Any>>

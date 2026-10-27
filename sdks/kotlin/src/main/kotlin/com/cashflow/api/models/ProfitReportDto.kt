@@ -24,6 +24,7 @@
 package com.cashflow.api.models
 
 import com.cashflow.api.models.PeriodReportPeriodDto
+import com.cashflow.api.models.ProfitByCurrencySummaryDto
 import com.cashflow.api.models.ProfitReportTransactionDto
 
 import com.squareup.moshi.Json
@@ -63,7 +64,7 @@ data class ProfitReportDto (
     val netFlow: kotlin.String,
 
     @Json(name = "byCurrency")
-    val byCurrency: kotlin.collections.Map<kotlin.String, kotlin.Any>,
+    val byCurrency: kotlin.collections.Map<kotlin.String, ProfitByCurrencySummaryDto>,
 
     @Json(name = "transactions")
     val transactions: kotlin.collections.List<ProfitReportTransactionDto>

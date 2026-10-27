@@ -24,6 +24,7 @@
 package com.cashflow.api.models
 
 import com.cashflow.api.models.DailyExpenseByCategoryDto
+import com.cashflow.api.models.ExpensesByCurrencySummaryDto
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -60,7 +61,7 @@ data class ExpensesReportDto (
     val byCategory: kotlin.collections.Map<kotlin.String, DailyExpenseByCategoryDto>,
 
     @Json(name = "byCurrency")
-    val byCurrency: kotlin.collections.Map<kotlin.String, kotlin.Any>,
+    val byCurrency: kotlin.collections.Map<kotlin.String, ExpensesByCurrencySummaryDto>,
 
     @Json(name = "expenses")
     val expenses: kotlin.collections.List<kotlin.collections.Map<kotlin.String, kotlin.Any>>

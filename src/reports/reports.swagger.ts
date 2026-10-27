@@ -103,7 +103,45 @@ export class PeriodReportPeriodDto {
   endDate!: string;
 }
 
-@ApiExtraModels(DailyExpenseByCategoryDto)
+export class PeriodTransactionsByCurrencyDto {
+  @ApiProperty({ type: String, description: 'Total CUP de compras (decimal como string)' })
+  compras!: string;
+
+  @ApiProperty({ type: String, description: 'Total CUP de ventas (decimal como string)' })
+  ventas!: string;
+
+  @ApiProperty()
+  count!: number;
+}
+
+export class ProfitByCurrencySummaryDto {
+  @ApiProperty({ type: String, description: 'Margen acumulado (decimal como string)' })
+  marginProfit!: string;
+
+  @ApiProperty()
+  count!: number;
+}
+
+export class ExpensesByCurrencySummaryDto {
+  @ApiProperty({ type: String, description: 'Total del gasto (decimal como string)' })
+  total!: string;
+
+  @ApiProperty()
+  count!: number;
+}
+
+export class CurrencyReportRefDto {
+  @ApiProperty()
+  id!: number;
+
+  @ApiProperty()
+  code!: string;
+
+  @ApiProperty()
+  name!: string;
+}
+
+@ApiExtraModels(DailyExpenseByCategoryDto, PeriodTransactionsByCurrencyDto)
 export class PeriodReportDto {
   @ApiProperty({ type: PeriodReportPeriodDto })
   period!: PeriodReportPeriodDto;
@@ -111,8 +149,11 @@ export class PeriodReportDto {
   summary!: PeriodReportSummaryDto;
   @ApiProperty({ type: [DailyBreakdownItemDto] })
   dailyBreakdown!: DailyBreakdownItemDto[];
-  @ApiProperty({ type: 'object', additionalProperties: true })
-  transactionsByCurrency!: Record<string, { compras: string; ventas: string; count: number }>;
+  @ApiProperty({
+    type: 'object',
+    additionalProperties: { $ref: getSchemaPath(PeriodTransactionsByCurrencyDto) },
+  })
+  transactionsByCurrency!: Record<string, PeriodTransactionsByCurrencyDto>;
   @ApiProperty({
     type: 'object',
     additionalProperties: { $ref: getSchemaPath(DailyExpenseByCategoryDto) },
@@ -139,6 +180,7 @@ export class ProfitReportTransactionDto {
   createdAt!: string;
 }
 
+@ApiExtraModels(ProfitByCurrencySummaryDto)
 export class ProfitReportDto {
   @ApiProperty({ type: PeriodReportPeriodDto })
   period!: PeriodReportPeriodDto;
@@ -150,8 +192,11 @@ export class ProfitReportDto {
   totalVentas!: string;
   @ApiProperty({ description: 'Decimal como string' })
   netFlow!: string;
-  @ApiProperty({ type: 'object', additionalProperties: true })
-  byCurrency!: Record<string, { marginProfit: string; count: number }>;
+  @ApiProperty({
+    type: 'object',
+    additionalProperties: { $ref: getSchemaPath(ProfitByCurrencySummaryDto) },
+  })
+  byCurrency!: Record<string, ProfitByCurrencySummaryDto>;
   @ApiProperty({ type: [ProfitReportTransactionDto] })
   transactions!: ProfitReportTransactionDto[];
 }
@@ -159,21 +204,21 @@ export class ProfitReportDto {
 export class CurrencyReportDto {
   @ApiProperty()
   currencyId!: number;
-  @ApiProperty({ type: 'object', nullable: true, additionalProperties: true })
-  currency!: { id: number; code: string; name: string } | null;
-  @ApiProperty()
-  currentBalance!: number;
+  @ApiProperty({ type: CurrencyReportRefDto, nullable: true })
+  currency!: CurrencyReportRefDto | null;
+  @ApiProperty({ type: String, description: 'Decimal como string' })
+  currentBalance!: string;
   @ApiProperty()
   totalTransactions!: number;
-  @ApiProperty()
-  totalCompras!: number;
-  @ApiProperty()
-  totalVentas!: number;
+  @ApiProperty({ type: String, description: 'Decimal como string' })
+  totalCompras!: string;
+  @ApiProperty({ type: String, description: 'Decimal como string' })
+  totalVentas!: string;
   @ApiProperty({ type: 'array', items: { type: 'object', additionalProperties: true } })
   transactions!: any[];
 }
 
-@ApiExtraModels(DailyExpenseByCategoryDto)
+@ApiExtraModels(DailyExpenseByCategoryDto, ExpensesByCurrencySummaryDto)
 export class ExpensesReportDto {
   @ApiProperty()
   total!: number;
@@ -188,8 +233,11 @@ export class ExpensesReportDto {
     additionalProperties: { $ref: getSchemaPath(DailyExpenseByCategoryDto) },
   })
   byCategory!: Record<string, DailyExpenseByCategoryDto>;
-  @ApiProperty({ type: 'object', additionalProperties: true })
-  byCurrency!: Record<string, { total: string; count: number }>;
+  @ApiProperty({
+    type: 'object',
+    additionalProperties: { $ref: getSchemaPath(ExpensesByCurrencySummaryDto) },
+  })
+  byCurrency!: Record<string, ExpensesByCurrencySummaryDto>;
   @ApiProperty({ type: 'array', items: { type: 'object', additionalProperties: true } })
   expenses!: any[];
 }

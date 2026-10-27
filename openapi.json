@@ -7797,6 +7797,27 @@
           "profit"
         ]
       },
+      "PeriodTransactionsByCurrencyDto": {
+        "type": "object",
+        "properties": {
+          "compras": {
+            "type": "string",
+            "description": "Total CUP de compras (decimal como string)"
+          },
+          "ventas": {
+            "type": "string",
+            "description": "Total CUP de ventas (decimal como string)"
+          },
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "compras",
+          "ventas",
+          "count"
+        ]
+      },
       "PeriodReportPeriodDto": {
         "type": "object",
         "properties": {
@@ -7906,7 +7927,9 @@
           },
           "transactionsByCurrency": {
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": {
+              "$ref": "#/components/schemas/PeriodTransactionsByCurrencyDto"
+            }
           },
           "expensesByCategory": {
             "type": "object",
@@ -7921,6 +7944,22 @@
           "dailyBreakdown",
           "transactionsByCurrency",
           "expensesByCategory"
+        ]
+      },
+      "ProfitByCurrencySummaryDto": {
+        "type": "object",
+        "properties": {
+          "marginProfit": {
+            "type": "string",
+            "description": "Margen acumulado (decimal como string)"
+          },
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "marginProfit",
+          "count"
         ]
       },
       "ProfitReportTransactionDto": {
@@ -7993,7 +8032,9 @@
           },
           "byCurrency": {
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ProfitByCurrencySummaryDto"
+            }
           },
           "transactions": {
             "type": "array",
@@ -8012,6 +8053,25 @@
           "transactions"
         ]
       },
+      "CurrencyReportRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name"
+        ]
+      },
       "CurrencyReportDto": {
         "type": "object",
         "properties": {
@@ -8019,21 +8079,28 @@
             "type": "number"
           },
           "currency": {
-            "type": "object",
             "nullable": true,
-            "additionalProperties": true
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CurrencyReportRefDto"
+              }
+            ]
           },
           "currentBalance": {
-            "type": "number"
+            "type": "string",
+            "description": "Decimal como string"
           },
           "totalTransactions": {
             "type": "number"
           },
           "totalCompras": {
-            "type": "number"
+            "type": "string",
+            "description": "Decimal como string"
           },
           "totalVentas": {
-            "type": "number"
+            "type": "string",
+            "description": "Decimal como string"
           },
           "transactions": {
             "type": "array",
@@ -8168,6 +8235,22 @@
           "positions"
         ]
       },
+      "ExpensesByCurrencySummaryDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "string",
+            "description": "Total del gasto (decimal como string)"
+          },
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "total",
+          "count"
+        ]
+      },
       "ExpensesReportDto": {
         "type": "object",
         "properties": {
@@ -8193,7 +8276,9 @@
           },
           "byCurrency": {
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ExpensesByCurrencySummaryDto"
+            }
           },
           "expenses": {
             "type": "array",

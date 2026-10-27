@@ -52,6 +52,36 @@ const STRING_ARRAY_ALLOWLIST = new Set([
   'CashValuationDto.missingRates',
 ]);
 
+/**
+ * Payloads de interior desconocido que sí son libres a propósito: se
+ * publican como `additionalProperties: true` y el cliente los lee de forma
+ * defensiva. Cualquier mapa o array libre nuevo tiene que entrar aquí a
+ * propósito, no colarse por descuido.
+ */
+const FREE_FORM_ALLOWLIST = new Set([
+  'AdminAuditLogDto.metadata',
+  'AdminAuditLogDto.newValue',
+  'AdminAuditLogDto.previousValue',
+  'AdminExpiringLicenseDto.plan',
+  'AdminExpiringLicenseDto.user',
+  'AuditSummaryReportDtoSwagger.audits[]',
+  'BankAccountTransactionsDto.expenses[]',
+  'CurrencyReportDto.transactions[]',
+  'ExpenseDto.sourceBankAccount',
+  'ExpensesReportDto.expenses[]',
+  'FxOpenPositionResultDto.cashBalance',
+  'FxOpenPositionResultDto.movement',
+  'FxOpenPositionResultDto.position',
+  'FxTransferResultDto.movement',
+  'FxTransferResultDto.position',
+  'NotificationDto.payload',
+  'ObjectiveDto.bankAccount',
+  'ObjectiveProgressDto.bankAccount',
+  'RemittanceDto.movements[]',
+  'RemittanceReconcileDto.primaryCashLedger',
+  'SubscriptionLicenseDto.plan',
+]);
+
 describe('OpenAPI shape contract (the shape the generated SDK has to decode)', () => {
   it('never publishes a property as an opaque object', () => {
     const offenders: string[] = [];
@@ -101,5 +131,23 @@ describe('OpenAPI shape contract (the shape the generated SDK has to decode)', (
     }
 
     expect([...published].sort()).toEqual([...STRING_ARRAY_ALLOWLIST].sort());
+  });
+
+  it('only leaves free-form payloads free on purpose', () => {
+    const published = new Set<string>();
+
+    for (const [schemaName, schema] of Object.entries(contract.components.schemas)) {
+      for (const [propertyName, definition] of Object.entries(schema.properties ?? {})) {
+        const property = definition as SchemaDefinition;
+        if (property.type === 'object' && property.additionalProperties === true) {
+          published.add(`${schemaName}.${propertyName}`);
+        }
+        if (property.type === 'array' && property.items?.additionalProperties === true) {
+          published.add(`${schemaName}.${propertyName}[]`);
+        }
+      }
+    }
+
+    expect([...published].sort()).toEqual([...FREE_FORM_ALLOWLIST].sort());
   });
 });

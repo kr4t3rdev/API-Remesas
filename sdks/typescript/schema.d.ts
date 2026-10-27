@@ -2908,6 +2908,13 @@ export interface components {
             expenses: components["schemas"]["DailyReportExpenseDto"];
             profit: components["schemas"]["DailyReportProfitDto"];
         };
+        PeriodTransactionsByCurrencyDto: {
+            /** @description Total CUP de compras (decimal como string) */
+            compras: string;
+            /** @description Total CUP de ventas (decimal como string) */
+            ventas: string;
+            count: number;
+        };
         PeriodReportPeriodDto: {
             startDate: string;
             endDate: string;
@@ -2940,11 +2947,16 @@ export interface components {
             summary: components["schemas"]["PeriodReportSummaryDto"];
             dailyBreakdown: components["schemas"]["DailyBreakdownItemDto"][];
             transactionsByCurrency: {
-                [key: string]: unknown;
+                [key: string]: components["schemas"]["PeriodTransactionsByCurrencyDto"];
             };
             expensesByCategory: {
                 [key: string]: components["schemas"]["DailyExpenseByCategoryDto"];
             };
+        };
+        ProfitByCurrencySummaryDto: {
+            /** @description Margen acumulado (decimal como string) */
+            marginProfit: string;
+            count: number;
         };
         ProfitReportTransactionDto: {
             id: number;
@@ -2971,19 +2983,25 @@ export interface components {
             /** @description Decimal como string */
             netFlow: string;
             byCurrency: {
-                [key: string]: unknown;
+                [key: string]: components["schemas"]["ProfitByCurrencySummaryDto"];
             };
             transactions: components["schemas"]["ProfitReportTransactionDto"][];
         };
+        CurrencyReportRefDto: {
+            id: number;
+            code: string;
+            name: string;
+        };
         CurrencyReportDto: {
             currencyId: number;
-            currency: {
-                [key: string]: unknown;
-            } | null;
-            currentBalance: number;
+            currency: components["schemas"]["CurrencyReportRefDto"] | null;
+            /** @description Decimal como string */
+            currentBalance: string;
             totalTransactions: number;
-            totalCompras: number;
-            totalVentas: number;
+            /** @description Decimal como string */
+            totalCompras: string;
+            /** @description Decimal como string */
+            totalVentas: string;
             transactions: {
                 [key: string]: unknown;
             }[];
@@ -3019,6 +3037,11 @@ export interface components {
             movements: components["schemas"]["FxPerformanceMovementDto"][];
             positions: components["schemas"]["FxPerformancePositionDto"][];
         };
+        ExpensesByCurrencySummaryDto: {
+            /** @description Total del gasto (decimal como string) */
+            total: string;
+            count: number;
+        };
         ExpensesReportDto: {
             total: number;
             /** @description Decimal como string */
@@ -3029,7 +3052,7 @@ export interface components {
                 [key: string]: components["schemas"]["DailyExpenseByCategoryDto"];
             };
             byCurrency: {
-                [key: string]: unknown;
+                [key: string]: components["schemas"]["ExpensesByCurrencySummaryDto"];
             };
             expenses: {
                 [key: string]: unknown;

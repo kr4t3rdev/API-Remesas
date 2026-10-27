@@ -13,14 +13,17 @@ import AnyCodable
 public struct CurrencyReportDto: Codable, JSONEncodable, Hashable {
 
     public var currencyId: Double
-    public var currency: [String: AnyCodable]?
-    public var currentBalance: Double
+    public var currency: CurrencyReportRefDto?
+    /** Decimal como string */
+    public var currentBalance: String
     public var totalTransactions: Double
-    public var totalCompras: Double
-    public var totalVentas: Double
+    /** Decimal como string */
+    public var totalCompras: String
+    /** Decimal como string */
+    public var totalVentas: String
     public var transactions: [[String: AnyCodable]]
 
-    public init(currencyId: Double, currency: [String: AnyCodable]?, currentBalance: Double, totalTransactions: Double, totalCompras: Double, totalVentas: Double, transactions: [[String: AnyCodable]]) {
+    public init(currencyId: Double, currency: CurrencyReportRefDto?, currentBalance: String, totalTransactions: Double, totalCompras: String, totalVentas: String, transactions: [[String: AnyCodable]]) {
         self.currencyId = currencyId
         self.currency = currency
         self.currentBalance = currentBalance

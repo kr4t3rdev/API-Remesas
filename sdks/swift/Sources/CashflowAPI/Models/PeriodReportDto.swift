@@ -15,10 +15,10 @@ public struct PeriodReportDto: Codable, JSONEncodable, Hashable {
     public var period: PeriodReportPeriodDto
     public var summary: PeriodReportSummaryDto
     public var dailyBreakdown: [DailyBreakdownItemDto]
-    public var transactionsByCurrency: [String: AnyCodable]
+    public var transactionsByCurrency: [String: PeriodTransactionsByCurrencyDto]
     public var expensesByCategory: [String: DailyExpenseByCategoryDto]
 
-    public init(period: PeriodReportPeriodDto, summary: PeriodReportSummaryDto, dailyBreakdown: [DailyBreakdownItemDto], transactionsByCurrency: [String: AnyCodable], expensesByCategory: [String: DailyExpenseByCategoryDto]) {
+    public init(period: PeriodReportPeriodDto, summary: PeriodReportSummaryDto, dailyBreakdown: [DailyBreakdownItemDto], transactionsByCurrency: [String: PeriodTransactionsByCurrencyDto], expensesByCategory: [String: DailyExpenseByCategoryDto]) {
         self.period = period
         self.summary = summary
         self.dailyBreakdown = dailyBreakdown

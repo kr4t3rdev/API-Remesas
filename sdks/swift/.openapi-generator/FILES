@@ -111,6 +111,7 @@ Sources/CashflowAPI/Models/CreateWorkerDto.swift
 Sources/CashflowAPI/Models/CurrenciesWithPrimaryResponseDto.swift
 Sources/CashflowAPI/Models/CurrencyDto.swift
 Sources/CashflowAPI/Models/CurrencyReportDto.swift
+Sources/CashflowAPI/Models/CurrencyReportRefDto.swift
 Sources/CashflowAPI/Models/CurrentUserDto.swift
 Sources/CashflowAPI/Models/DailyBreakdownItemDto.swift
 Sources/CashflowAPI/Models/DailyExpenseByCategoryDto.swift
@@ -130,6 +131,7 @@ Sources/CashflowAPI/Models/ExpenseItemReportDto.swift
 Sources/CashflowAPI/Models/ExpenseItemReportItemDto.swift
 Sources/CashflowAPI/Models/ExpenseItemReportPeriodDto.swift
 Sources/CashflowAPI/Models/ExpenseListDto.swift
+Sources/CashflowAPI/Models/ExpensesByCurrencySummaryDto.swift
 Sources/CashflowAPI/Models/ExpensesReportDto.swift
 Sources/CashflowAPI/Models/ForgotPasswordDto.swift
 Sources/CashflowAPI/Models/FxOpenPositionResultDto.swift
@@ -154,7 +156,9 @@ Sources/CashflowAPI/Models/OpenCurrencyPositionDto.swift
 Sources/CashflowAPI/Models/PeriodReportDto.swift
 Sources/CashflowAPI/Models/PeriodReportPeriodDto.swift
 Sources/CashflowAPI/Models/PeriodReportSummaryDto.swift
+Sources/CashflowAPI/Models/PeriodTransactionsByCurrencyDto.swift
 Sources/CashflowAPI/Models/PlanDto.swift
+Sources/CashflowAPI/Models/ProfitByCurrencySummaryDto.swift
 Sources/CashflowAPI/Models/ProfitReportDto.swift
 Sources/CashflowAPI/Models/ProfitReportTransactionDto.swift
 Sources/CashflowAPI/Models/PushDeviceDto.swift

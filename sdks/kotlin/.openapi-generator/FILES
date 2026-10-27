@@ -121,6 +121,7 @@ src/main/kotlin/com/cashflow/api/models/CreateWorkerDto.kt
 src/main/kotlin/com/cashflow/api/models/CurrenciesWithPrimaryResponseDto.kt
 src/main/kotlin/com/cashflow/api/models/CurrencyDto.kt
 src/main/kotlin/com/cashflow/api/models/CurrencyReportDto.kt
+src/main/kotlin/com/cashflow/api/models/CurrencyReportRefDto.kt
 src/main/kotlin/com/cashflow/api/models/CurrentUserDto.kt
 src/main/kotlin/com/cashflow/api/models/DailyBreakdownItemDto.kt
 src/main/kotlin/com/cashflow/api/models/DailyExpenseByCategoryDto.kt
@@ -140,6 +141,7 @@ src/main/kotlin/com/cashflow/api/models/ExpenseItemReportDto.kt
 src/main/kotlin/com/cashflow/api/models/ExpenseItemReportItemDto.kt
 src/main/kotlin/com/cashflow/api/models/ExpenseItemReportPeriodDto.kt
 src/main/kotlin/com/cashflow/api/models/ExpenseListDto.kt
+src/main/kotlin/com/cashflow/api/models/ExpensesByCurrencySummaryDto.kt
 src/main/kotlin/com/cashflow/api/models/ExpensesReportDto.kt
 src/main/kotlin/com/cashflow/api/models/ForgotPasswordDto.kt
 src/main/kotlin/com/cashflow/api/models/FxOpenPositionResultDto.kt
@@ -164,7 +166,9 @@ src/main/kotlin/com/cashflow/api/models/OpenCurrencyPositionDto.kt
 src/main/kotlin/com/cashflow/api/models/PeriodReportDto.kt
 src/main/kotlin/com/cashflow/api/models/PeriodReportPeriodDto.kt
 src/main/kotlin/com/cashflow/api/models/PeriodReportSummaryDto.kt
+src/main/kotlin/com/cashflow/api/models/PeriodTransactionsByCurrencyDto.kt
 src/main/kotlin/com/cashflow/api/models/PlanDto.kt
+src/main/kotlin/com/cashflow/api/models/ProfitByCurrencySummaryDto.kt
 src/main/kotlin/com/cashflow/api/models/ProfitReportDto.kt
 src/main/kotlin/com/cashflow/api/models/ProfitReportTransactionDto.kt
 src/main/kotlin/com/cashflow/api/models/PushDeviceDto.kt

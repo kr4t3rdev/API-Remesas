@@ -18,10 +18,10 @@ public struct ExpensesReportDto: Codable, JSONEncodable, Hashable {
     public var totalAmountInCup: String?
     public var unconvertedCount: Double
     public var byCategory: [String: DailyExpenseByCategoryDto]
-    public var byCurrency: [String: AnyCodable]
+    public var byCurrency: [String: ExpensesByCurrencySummaryDto]
     public var expenses: [[String: AnyCodable]]
 
-    public init(total: Double, totalAmount: String, totalAmountInCup: String?, unconvertedCount: Double, byCategory: [String: DailyExpenseByCategoryDto], byCurrency: [String: AnyCodable], expenses: [[String: AnyCodable]]) {
+    public init(total: Double, totalAmount: String, totalAmountInCup: String?, unconvertedCount: Double, byCategory: [String: DailyExpenseByCategoryDto], byCurrency: [String: ExpensesByCurrencySummaryDto], expenses: [[String: AnyCodable]]) {
         self.total = total
         self.totalAmount = totalAmount
         self.totalAmountInCup = totalAmountInCup

@@ -27,6 +27,7 @@ import com.cashflow.api.models.DailyBreakdownItemDto
 import com.cashflow.api.models.DailyExpenseByCategoryDto
 import com.cashflow.api.models.PeriodReportPeriodDto
 import com.cashflow.api.models.PeriodReportSummaryDto
+import com.cashflow.api.models.PeriodTransactionsByCurrencyDto
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -54,7 +55,7 @@ data class PeriodReportDto (
     val dailyBreakdown: kotlin.collections.List<DailyBreakdownItemDto>,
 
     @Json(name = "transactionsByCurrency")
-    val transactionsByCurrency: kotlin.collections.Map<kotlin.String, kotlin.Any>,
+    val transactionsByCurrency: kotlin.collections.Map<kotlin.String, PeriodTransactionsByCurrencyDto>,
 
     @Json(name = "expensesByCategory")
     val expensesByCategory: kotlin.collections.Map<kotlin.String, DailyExpenseByCategoryDto>
