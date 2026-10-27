@@ -14,9 +14,9 @@ public struct AdminPlatformSeriesDto: Codable, JSONEncodable, Hashable {
 
     public var monthsBack: Double
     public var series: [AdminPlatformSeriesBucketDto]
-    public var totals: AnyCodable
+    public var totals: AdminPlatformSeriesTotalsDto
 
-    public init(monthsBack: Double, series: [AdminPlatformSeriesBucketDto], totals: AnyCodable) {
+    public init(monthsBack: Double, series: [AdminPlatformSeriesBucketDto], totals: AdminPlatformSeriesTotalsDto) {
         self.monthsBack = monthsBack
         self.series = series
         self.totals = totals

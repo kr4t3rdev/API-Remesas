@@ -32,7 +32,7 @@ class AvatarUserDto {
   @ApiProperty() name!: string;
   @ApiProperty({ enum: ['ADMIN', 'USER'] }) role!: 'ADMIN' | 'USER';
   @ApiProperty() isActive!: boolean;
-  @ApiProperty({ nullable: true }) avatarUrl!: string | null;
+  @ApiProperty({ type: String, nullable: true }) avatarUrl!: string | null;
 }
 
 class AvatarUploadResponseDto {

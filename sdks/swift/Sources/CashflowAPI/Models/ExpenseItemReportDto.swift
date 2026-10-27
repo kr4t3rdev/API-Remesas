@@ -19,9 +19,9 @@ public struct ExpenseItemReportDto: Codable, JSONEncodable, Hashable {
     /** Decimal como string */
     public var average: String
     /** Rango efectivo del período cuando aplica */
-    public var period: AnyCodable?
+    public var period: ExpenseItemReportPeriodDto?
 
-    public init(items: [ExpenseItemReportItemDto], total: String, count: Double, average: String, period: AnyCodable?) {
+    public init(items: [ExpenseItemReportItemDto], total: String, count: Double, average: String, period: ExpenseItemReportPeriodDto?) {
         self.items = items
         self.total = total
         self.count = count

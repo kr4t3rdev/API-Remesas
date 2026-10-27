@@ -24,6 +24,7 @@
 package com.cashflow.api.models
 
 import com.cashflow.api.models.ExpenseItemReportItemDto
+import com.cashflow.api.models.ExpenseItemReportPeriodDto
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -57,7 +58,7 @@ data class ExpenseItemReportDto (
 
     /* Rango efectivo del período cuando aplica */
     @Json(name = "period")
-    val period: kotlin.Any?
+    val period: ExpenseItemReportPeriodDto?
 
 ) {
 

@@ -31,6 +31,14 @@ export class ExpenseItemDto {
 
 export class ExpenseItemReportItemDto extends ExpenseItemDto {}
 
+export class ExpenseItemReportPeriodDto {
+  @ApiProperty({ example: '2026-01-01' })
+  start!: string;
+
+  @ApiProperty({ example: '2026-12-31' })
+  end!: string;
+}
+
 export class ExpenseItemReportDto {
   @ApiProperty({ type: [ExpenseItemReportItemDto] })
   items!: ExpenseItemReportItemDto[];
@@ -44,6 +52,6 @@ export class ExpenseItemReportDto {
   @ApiProperty({ type: String, description: 'Decimal como string' })
   average!: string;
 
-  @ApiProperty({ nullable: true, description: 'Rango efectivo del período cuando aplica' })
-  period!: { start: string; end: string } | null;
+  @ApiProperty({ type: ExpenseItemReportPeriodDto, nullable: true, description: 'Rango efectivo del período cuando aplica' })
+  period!: ExpenseItemReportPeriodDto | null;
 }

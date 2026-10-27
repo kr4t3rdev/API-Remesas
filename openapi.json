@@ -5812,11 +5812,12 @@
           },
           "payload": {
             "type": "object",
+            "additionalProperties": true,
             "nullable": true,
             "description": "Payload libre JSON"
           },
           "readAt": {
-            "type": "object",
+            "type": "string",
             "format": "date-time",
             "nullable": true,
             "description": "Null cuando la notificación no fue leída"
@@ -6506,7 +6507,7 @@
             "description": "Decimal como string"
           },
           "notes": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "operationKind": {
@@ -6521,7 +6522,7 @@
             "example": "CASH"
           },
           "sourceBankAccountId": {
-            "type": "object",
+            "type": "number",
             "nullable": true
           },
           "destinationType": {
@@ -6529,7 +6530,7 @@
             "example": "CASH"
           },
           "destinationBankAccountId": {
-            "type": "object",
+            "type": "number",
             "nullable": true
           },
           "createdAt": {
@@ -6811,11 +6812,11 @@
             "description": "Decimal como string"
           },
           "notes": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "auditorName": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "description": "Nombre del auditor; presente en latestAudits del overview"
           },
@@ -7317,6 +7318,7 @@
           },
           "sourceBankAccount": {
             "type": "object",
+            "additionalProperties": true,
             "nullable": true,
             "description": "Cuenta de origen cuando es BANK_ACCOUNT"
           },
@@ -7504,6 +7506,7 @@
           },
           "bankAccount": {
             "type": "object",
+            "additionalProperties": true,
             "nullable": true,
             "description": "Cuenta destino; null si pertenece a otro tenant"
           },
@@ -7582,6 +7585,7 @@
           },
           "bankAccount": {
             "type": "object",
+            "additionalProperties": true,
             "nullable": true,
             "description": "Cuenta destino; null si pertenece a otro tenant"
           },
@@ -7724,9 +7728,9 @@
             "description": "Suma cruda mezclando currencies (decimal como string)"
           },
           "totalAmountInCup": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
-            "description": "Suma convertida a CUP cuando hay tasa vigente"
+            "description": "Suma convertida a CUP cuando hay tasa vigente (decimal como string)"
           },
           "unconvertedCount": {
             "type": "number"
@@ -7758,7 +7762,7 @@
             "description": "Suma de Transaction.marginProfit (decimal como string)"
           },
           "net": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "description": "Realized FX margin minus CUP-converted expenses; null when conversion is incomplete (decimal como string)"
           }
@@ -8328,6 +8332,96 @@
           "objectives"
         ]
       },
+      "CashFlowReportCurrencyRefDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "USD"
+          },
+          "symbol": {
+            "type": "string",
+            "example": "$"
+          }
+        },
+        "required": [
+          "code",
+          "symbol"
+        ]
+      },
+      "CashFlowReportInflowsDto": {
+        "type": "object",
+        "properties": {
+          "transactions": {
+            "type": "string",
+            "description": "Decimal como string"
+          },
+          "adjustments": {
+            "type": "string",
+            "description": "Decimal como string"
+          },
+          "total": {
+            "type": "string",
+            "description": "Decimal como string"
+          }
+        },
+        "required": [
+          "transactions",
+          "adjustments",
+          "total"
+        ]
+      },
+      "CashFlowReportOutflowsDto": {
+        "type": "object",
+        "properties": {
+          "transactions": {
+            "type": "string",
+            "description": "Decimal como string"
+          },
+          "expenses": {
+            "type": "string",
+            "description": "Decimal como string"
+          },
+          "adjustments": {
+            "type": "string",
+            "description": "Decimal como string"
+          },
+          "total": {
+            "type": "string",
+            "description": "Decimal como string"
+          }
+        },
+        "required": [
+          "transactions",
+          "expenses",
+          "adjustments",
+          "total"
+        ]
+      },
+      "CashFlowReportCurrencyDto": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "$ref": "#/components/schemas/CashFlowReportCurrencyRefDto"
+          },
+          "inflows": {
+            "$ref": "#/components/schemas/CashFlowReportInflowsDto"
+          },
+          "outflows": {
+            "$ref": "#/components/schemas/CashFlowReportOutflowsDto"
+          },
+          "balance": {
+            "type": "string",
+            "description": "Decimal como string"
+          }
+        },
+        "required": [
+          "currency",
+          "inflows",
+          "outflows",
+          "balance"
+        ]
+      },
       "CashFlowReportDtoSwagger": {
         "type": "object",
         "properties": {
@@ -8337,7 +8431,7 @@
           "currencies": {
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/CashFlowReportCurrencyDto"
             }
           }
         },
@@ -8686,6 +8780,28 @@
           }
         }
       },
+      "SubscriptionLicenseUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 2
+          },
+          "email": {
+            "type": "string",
+            "example": "ana@correo.com"
+          },
+          "name": {
+            "type": "string",
+            "example": "Ana"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "name"
+        ]
+      },
       "SubscriptionLicenseDto": {
         "type": "object",
         "properties": {
@@ -8725,22 +8841,22 @@
             "format": "date-time"
           },
           "expiresAt": {
-            "type": "object",
+            "type": "string",
             "format": "date-time",
             "nullable": true
           },
           "graceUntil": {
-            "type": "object",
+            "type": "string",
             "format": "date-time",
             "nullable": true
           },
           "cancelledAt": {
-            "type": "object",
+            "type": "string",
             "format": "date-time",
             "nullable": true
           },
           "lastPaymentAt": {
-            "type": "object",
+            "type": "string",
             "format": "date-time",
             "nullable": true
           },
@@ -8758,9 +8874,14 @@
             "additionalProperties": true
           },
           "user": {
-            "type": "object",
             "nullable": true,
-            "description": "Usuario reducido (id, email, name); presente en listados"
+            "description": "Usuario reducido (id, email, name); presente en listados",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SubscriptionLicenseUserDto"
+              }
+            ]
           }
         },
         "required": [
@@ -8958,7 +9079,7 @@
             "format": "date-time"
           },
           "notes": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "createdAt": {
@@ -9106,6 +9227,28 @@
           "churn"
         ]
       },
+      "AdminPlatformSeriesTotalsDto": {
+        "type": "object",
+        "properties": {
+          "billingCup": {
+            "type": "string",
+            "description": "Facturación acumulada en CUP (decimal como string)"
+          },
+          "newUsers": {
+            "type": "number",
+            "example": 12
+          },
+          "churn": {
+            "type": "number",
+            "example": 4
+          }
+        },
+        "required": [
+          "billingCup",
+          "newUsers",
+          "churn"
+        ]
+      },
       "AdminPlatformSeriesDto": {
         "type": "object",
         "properties": {
@@ -9120,7 +9263,7 @@
             }
           },
           "totals": {
-            "type": "object"
+            "$ref": "#/components/schemas/AdminPlatformSeriesTotalsDto"
           }
         },
         "required": [
@@ -9400,7 +9543,7 @@
             ]
           },
           "expiresAt": {
-            "type": "object",
+            "type": "string",
             "format": "date-time",
             "nullable": true
           },
@@ -9628,7 +9771,7 @@
             ]
           },
           "expiresAt": {
-            "type": "object",
+            "type": "string",
             "format": "date-time",
             "nullable": true
           },
@@ -9671,15 +9814,15 @@
             "description": "Acciones de contraseña"
           },
           "userId": {
-            "type": "object",
+            "type": "number",
             "nullable": true
           },
           "action": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "newPassword": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "description": "Solo RESET_PASSWORD: contraseña temporal generada"
           },
@@ -9690,7 +9833,7 @@
             "description": "Solo REVOKE_ALL_SESSIONS"
           },
           "strategy": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "description": "Solo REVOKE_ALL_SESSIONS"
           },
@@ -9743,7 +9886,7 @@
             ]
           },
           "expiresAt": {
-            "type": "object",
+            "type": "string",
             "format": "date-time",
             "nullable": true
           },
@@ -9834,14 +9977,17 @@
           },
           "metadata": {
             "type": "object",
+            "additionalProperties": true,
             "nullable": true
           },
           "previousValue": {
             "type": "object",
+            "additionalProperties": true,
             "nullable": true
           },
           "newValue": {
             "type": "object",
+            "additionalProperties": true,
             "nullable": true
           },
           "createdAt": {
@@ -9884,7 +10030,7 @@
             "type": "boolean"
           },
           "avatarUrl": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           }
         },
@@ -10018,7 +10164,7 @@
             "description": "Decimal como string"
           },
           "description": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "createdAt": {
@@ -10060,7 +10206,7 @@
             "nullable": true
           },
           "photoUrl": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "initials": {
@@ -10314,6 +10460,23 @@
           "updatedAt"
         ]
       },
+      "ExpenseItemReportPeriodDto": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "string",
+            "example": "2026-01-01"
+          },
+          "end": {
+            "type": "string",
+            "example": "2026-12-31"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ]
+      },
       "ExpenseItemReportDto": {
         "type": "object",
         "properties": {
@@ -10336,9 +10499,14 @@
             "description": "Decimal como string"
           },
           "period": {
-            "type": "object",
             "nullable": true,
-            "description": "Rango efectivo del período cuando aplica"
+            "description": "Rango efectivo del período cuando aplica",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExpenseItemReportPeriodDto"
+              }
+            ]
           }
         },
         "required": [
@@ -10429,19 +10597,27 @@
             "description": "Decimal como string; monto convertido a CUP cuando aplica"
           },
           "sourceType": {
-            "type": "object",
+            "type": "string",
+            "enum": [
+              "CASH",
+              "BANK_ACCOUNT"
+            ],
             "nullable": true
           },
           "destinationType": {
-            "type": "object",
+            "type": "string",
+            "enum": [
+              "CASH",
+              "BANK_ACCOUNT"
+            ],
             "nullable": true
           },
           "sourceBankAccountId": {
-            "type": "object",
+            "type": "number",
             "nullable": true
           },
           "destinationBankAccountId": {
-            "type": "object",
+            "type": "number",
             "nullable": true
           },
           "currency": {
@@ -10615,6 +10791,23 @@
           "name"
         ]
       },
+      "CashClosingActorDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 7
+          },
+          "name": {
+            "type": "string",
+            "example": "Ana"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
       "CashClosingDto": {
         "type": "object",
         "properties": {
@@ -10663,18 +10856,14 @@
             "format": "date-time"
           },
           "notes": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "currency": {
             "$ref": "#/components/schemas/CurrencyDto"
           },
           "closedBy": {
-            "type": "object",
-            "example": {
-              "id": 7,
-              "name": "Ana"
-            }
+            "$ref": "#/components/schemas/CashClosingActorDto"
           }
         },
         "required": [
@@ -10873,7 +11062,7 @@
             "description": "Estados del enum RemittanceStatus"
           },
           "idempotencyKey": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "duplicate": {

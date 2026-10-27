@@ -8,6 +8,17 @@ import { ApiProperty } from '@nestjs/swagger';
  * a reduced user).
  */
 
+export class SubscriptionLicenseUserDto {
+  @ApiProperty({ example: 2 })
+  id!: number;
+
+  @ApiProperty({ example: 'ana@correo.com' })
+  email!: string;
+
+  @ApiProperty({ example: 'Ana' })
+  name!: string;
+}
+
 export class SubscriptionLicenseDto {
   @ApiProperty({ example: 5 })
   id!: number;
@@ -27,16 +38,16 @@ export class SubscriptionLicenseDto {
   @ApiProperty({ format: 'date-time' })
   startedAt!: string;
 
-  @ApiProperty({ format: 'date-time', nullable: true })
+  @ApiProperty({ type: String, format: 'date-time', nullable: true })
   expiresAt!: string | null;
 
-  @ApiProperty({ format: 'date-time', nullable: true })
+  @ApiProperty({ type: String, format: 'date-time', nullable: true })
   graceUntil!: string | null;
 
-  @ApiProperty({ format: 'date-time', nullable: true })
+  @ApiProperty({ type: String, format: 'date-time', nullable: true })
   cancelledAt!: string | null;
 
-  @ApiProperty({ format: 'date-time', nullable: true })
+  @ApiProperty({ type: String, format: 'date-time', nullable: true })
   lastPaymentAt!: string | null;
 
   @ApiProperty({ format: 'date-time' })
@@ -48,8 +59,8 @@ export class SubscriptionLicenseDto {
   @ApiProperty({ description: 'Plan de la licencia', type: 'object', additionalProperties: true })
   plan!: Record<string, unknown>;
 
-  @ApiProperty({ nullable: true, description: 'Usuario reducido (id, email, name); presente en listados' })
-  user?: { id: number; email: string; name: string } | null;
+  @ApiProperty({ type: SubscriptionLicenseUserDto, nullable: true, description: 'Usuario reducido (id, email, name); presente en listados' })
+  user?: SubscriptionLicenseUserDto | null;
 }
 
 export class SubscriptionPaymentDto {
@@ -80,7 +91,7 @@ export class SubscriptionPaymentDto {
   @ApiProperty({ format: 'date-time' })
   paidAt!: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   notes!: string | null;
 
   @ApiProperty({ format: 'date-time' })

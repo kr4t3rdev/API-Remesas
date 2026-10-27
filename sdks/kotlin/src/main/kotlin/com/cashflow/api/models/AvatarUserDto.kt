@@ -57,7 +57,7 @@ data class AvatarUserDto (
     val isActive: kotlin.Boolean,
 
     @Json(name = "avatarUrl")
-    val avatarUrl: kotlin.Any?
+    val avatarUrl: kotlin.String?
 
 ) {
 

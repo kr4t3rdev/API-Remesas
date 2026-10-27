@@ -22,12 +22,12 @@ public struct NotificationDto: Codable, JSONEncodable, Hashable {
     public var title: String
     public var message: String
     /** Payload libre JSON */
-    public var payload: AnyCodable?
+    public var payload: [String: AnyCodable]?
     /** Null cuando la notificación no fue leída */
-    public var readAt: AnyCodable?
+    public var readAt: Date?
     public var createdAt: Date
 
-    public init(id: Double, userId: Double?, type: String, channel: String, title: String, message: String, payload: AnyCodable?, readAt: AnyCodable?, createdAt: Date) {
+    public init(id: Double, userId: Double?, type: String, channel: String, title: String, message: String, payload: [String: AnyCodable]?, readAt: Date?, createdAt: Date) {
         self.id = id
         self.userId = userId
         self.type = type

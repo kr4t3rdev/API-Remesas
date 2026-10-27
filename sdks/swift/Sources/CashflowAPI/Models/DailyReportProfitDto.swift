@@ -17,9 +17,9 @@ public struct DailyReportProfitDto: Codable, JSONEncodable, Hashable {
     /** Suma de Transaction.marginProfit (decimal como string) */
     public var marginProfit: String
     /** Realized FX margin minus CUP-converted expenses; null when conversion is incomplete (decimal como string) */
-    public var net: AnyCodable?
+    public var net: String?
 
-    public init(margin: Double, marginProfit: String, net: AnyCodable?) {
+    public init(margin: Double, marginProfit: String, net: String?) {
         self.margin = margin
         self.marginProfit = marginProfit
         self.net = net

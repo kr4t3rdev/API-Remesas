@@ -71,11 +71,11 @@ data class CashAuditDto (
     val difference: kotlin.String,
 
     @Json(name = "notes")
-    val notes: kotlin.Any?,
+    val notes: kotlin.String?,
 
     /* Nombre del auditor; presente en latestAudits del overview */
     @Json(name = "auditorName")
-    val auditorName: kotlin.Any?,
+    val auditorName: kotlin.String?,
 
     @Json(name = "createdAt")
     val createdAt: java.time.OffsetDateTime

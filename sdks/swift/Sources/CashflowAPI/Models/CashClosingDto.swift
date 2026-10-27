@@ -30,11 +30,11 @@ public struct CashClosingDto: Codable, JSONEncodable, Hashable {
     public var status: Status
     public var closedById: Double
     public var closedAt: Date
-    public var notes: AnyCodable?
+    public var notes: String?
     public var currency: CurrencyDto
-    public var closedBy: AnyCodable
+    public var closedBy: CashClosingActorDto
 
-    public init(id: Double, userId: Double, currencyId: Double, businessDate: String, expectedBalance: String, actualBalance: String, difference: String, status: Status, closedById: Double, closedAt: Date, notes: AnyCodable?, currency: CurrencyDto, closedBy: AnyCodable) {
+    public init(id: Double, userId: Double, currencyId: Double, businessDate: String, expectedBalance: String, actualBalance: String, difference: String, status: Status, closedById: Double, closedAt: Date, notes: String?, currency: CurrencyDto, closedBy: CashClosingActorDto) {
         self.id = id
         self.userId = userId
         self.currencyId = currencyId

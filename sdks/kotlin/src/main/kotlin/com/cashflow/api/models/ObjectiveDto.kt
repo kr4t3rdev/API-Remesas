@@ -83,7 +83,7 @@ data class ObjectiveDto (
 
     /* Cuenta destino; null si pertenece a otro tenant */
     @Json(name = "bankAccount")
-    val bankAccount: kotlin.Any?,
+    val bankAccount: kotlin.collections.Map<kotlin.String, kotlin.Any>?,
 
     @Json(name = "createdAt")
     val createdAt: java.time.OffsetDateTime,

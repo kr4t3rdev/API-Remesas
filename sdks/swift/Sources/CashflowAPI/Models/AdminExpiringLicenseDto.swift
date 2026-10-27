@@ -24,7 +24,7 @@ public struct AdminExpiringLicenseDto: Codable, JSONEncodable, Hashable {
     public var userId: Double
     public var planId: Double
     public var state: State
-    public var expiresAt: AnyCodable?
+    public var expiresAt: Date?
     public var createdAt: Date
     public var updatedAt: Date
     /** Usuario propietario */
@@ -32,7 +32,7 @@ public struct AdminExpiringLicenseDto: Codable, JSONEncodable, Hashable {
     /** Plan de la licencia */
     public var plan: [String: AnyCodable]
 
-    public init(id: Double, userId: Double, planId: Double, state: State, expiresAt: AnyCodable?, createdAt: Date, updatedAt: Date, user: [String: AnyCodable], plan: [String: AnyCodable]) {
+    public init(id: Double, userId: Double, planId: Double, state: State, expiresAt: Date?, createdAt: Date, updatedAt: Date, user: [String: AnyCodable], plan: [String: AnyCodable]) {
         self.id = id
         self.userId = userId
         self.planId = planId

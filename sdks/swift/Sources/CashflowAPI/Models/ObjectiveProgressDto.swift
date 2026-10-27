@@ -30,7 +30,7 @@ public struct ObjectiveProgressDto: Codable, JSONEncodable, Hashable {
     public var status: Status
     public var currency: CurrencyDto
     /** Cuenta destino; null si pertenece a otro tenant */
-    public var bankAccount: AnyCodable?
+    public var bankAccount: [String: AnyCodable]?
     public var createdAt: Date
     public var updatedAt: Date
     /** Porcentaje de avance, acotado a 100 */
@@ -38,7 +38,7 @@ public struct ObjectiveProgressDto: Codable, JSONEncodable, Hashable {
     /** Decimal como string; monto restante */
     public var remaining: String
 
-    public init(id: Double, userId: Double, name: String, description: String?, targetAmount: String, currentAmount: String, currencyId: Double, bankAccountId: Double?, status: Status, currency: CurrencyDto, bankAccount: AnyCodable?, createdAt: Date, updatedAt: Date, percentage: Double, remaining: String) {
+    public init(id: Double, userId: Double, name: String, description: String?, targetAmount: String, currentAmount: String, currencyId: Double, bankAccountId: Double?, status: Status, currency: CurrencyDto, bankAccount: [String: AnyCodable]?, createdAt: Date, updatedAt: Date, percentage: Double, remaining: String) {
         self.id = id
         self.userId = userId
         self.name = name

@@ -22,12 +22,12 @@ public struct CashAuditDto: Codable, JSONEncodable, Hashable {
     public var actualBalance: String
     /** Decimal como string */
     public var difference: String
-    public var notes: AnyCodable?
+    public var notes: String?
     /** Nombre del auditor; presente en latestAudits del overview */
-    public var auditorName: AnyCodable?
+    public var auditorName: String?
     public var createdAt: Date
 
-    public init(id: Double, userId: Double, currencyId: Double, currency: CurrencyDto, expectedBalance: String, actualBalance: String, difference: String, notes: AnyCodable?, auditorName: AnyCodable?, createdAt: Date) {
+    public init(id: Double, userId: Double, currencyId: Double, currency: CurrencyDto, expectedBalance: String, actualBalance: String, difference: String, notes: String?, auditorName: String?, createdAt: Date) {
         self.id = id
         self.userId = userId
         self.currencyId = currencyId

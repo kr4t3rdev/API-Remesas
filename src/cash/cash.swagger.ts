@@ -56,16 +56,16 @@ export class CashMovementDto {
   @ApiProperty({ type: String, nullable: true, description: 'Decimal como string; monto convertido a CUP cuando aplica' })
   totalBase!: string | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ enum: ['CASH', 'BANK_ACCOUNT'], nullable: true })
   sourceType?: string | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ enum: ['CASH', 'BANK_ACCOUNT'], nullable: true })
   destinationType?: string | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: Number, nullable: true })
   sourceBankAccountId?: number | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: Number, nullable: true })
   destinationBankAccountId?: number | null;
 
   @ApiProperty({ type: CurrencyDto })
@@ -97,10 +97,10 @@ export class CashAuditDto {
   @ApiProperty({ type: String, description: 'Decimal como string' })
   difference!: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   notes!: string | null;
 
-  @ApiProperty({ nullable: true, description: 'Nombre del auditor; presente en latestAudits del overview' })
+  @ApiProperty({ type: String, nullable: true, description: 'Nombre del auditor; presente en latestAudits del overview' })
   auditorName?: string | null;
 
   @ApiProperty({ format: 'date-time' })
@@ -157,6 +157,14 @@ export class CashAuditorDto {
   name!: string;
 }
 
+export class CashClosingActorDto {
+  @ApiProperty({ example: 7 })
+  id!: number;
+
+  @ApiProperty({ example: 'Ana' })
+  name!: string;
+}
+
 export class CashClosingDto {
   @ApiProperty({ example: 3 })
   id!: number;
@@ -188,14 +196,14 @@ export class CashClosingDto {
   @ApiProperty({ format: 'date-time' })
   closedAt!: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   notes!: string | null;
 
   @ApiProperty({ type: CurrencyDto })
   currency!: CurrencyDto;
 
-  @ApiProperty({ example: { id: 7, name: 'Ana' } })
-  closedBy!: { id: number; name: string };
+  @ApiProperty({ type: CashClosingActorDto })
+  closedBy!: CashClosingActorDto;
 }
 
 export class CashValuationBreakdownDto {

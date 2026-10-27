@@ -21,9 +21,9 @@ public struct AvatarUserDto: Codable, JSONEncodable, Hashable {
     public var name: String
     public var role: Role
     public var isActive: Bool
-    public var avatarUrl: AnyCodable?
+    public var avatarUrl: String?
 
-    public init(id: Double, email: String, name: String, role: Role, isActive: Bool, avatarUrl: AnyCodable?) {
+    public init(id: Double, email: String, name: String, role: Role, isActive: Bool, avatarUrl: String?) {
         self.id = id
         self.email = email
         self.name = name

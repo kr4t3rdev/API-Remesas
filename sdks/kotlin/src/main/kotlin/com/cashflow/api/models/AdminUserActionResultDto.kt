@@ -54,14 +54,14 @@ data class AdminUserActionResultDto (
     val success: kotlin.Boolean?,
 
     @Json(name = "userId")
-    val userId: kotlin.Any?,
+    val userId: java.math.BigDecimal?,
 
     @Json(name = "action")
-    val action: kotlin.Any?,
+    val action: kotlin.String?,
 
     /* Solo RESET_PASSWORD: contraseña temporal generada */
     @Json(name = "newPassword")
-    val newPassword: kotlin.Any?,
+    val newPassword: kotlin.String?,
 
     /* Solo REVOKE_ALL_SESSIONS */
     @Json(name = "revoked")
@@ -69,7 +69,7 @@ data class AdminUserActionResultDto (
 
     /* Solo REVOKE_ALL_SESSIONS */
     @Json(name = "strategy")
-    val strategy: kotlin.Any?,
+    val strategy: kotlin.String?,
 
     /* Acciones sobre licencias */
     @Json(name = "license")

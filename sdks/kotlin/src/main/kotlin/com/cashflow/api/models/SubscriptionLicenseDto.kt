@@ -23,6 +23,7 @@
 
 package com.cashflow.api.models
 
+import com.cashflow.api.models.SubscriptionLicenseUserDto
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -68,16 +69,16 @@ data class SubscriptionLicenseDto (
     val startedAt: java.time.OffsetDateTime,
 
     @Json(name = "expiresAt")
-    val expiresAt: kotlin.Any?,
+    val expiresAt: java.time.OffsetDateTime?,
 
     @Json(name = "graceUntil")
-    val graceUntil: kotlin.Any?,
+    val graceUntil: java.time.OffsetDateTime?,
 
     @Json(name = "cancelledAt")
-    val cancelledAt: kotlin.Any?,
+    val cancelledAt: java.time.OffsetDateTime?,
 
     @Json(name = "lastPaymentAt")
-    val lastPaymentAt: kotlin.Any?,
+    val lastPaymentAt: java.time.OffsetDateTime?,
 
     @Json(name = "createdAt")
     val createdAt: java.time.OffsetDateTime,
@@ -91,7 +92,7 @@ data class SubscriptionLicenseDto (
 
     /* Usuario reducido (id, email, name); presente en listados */
     @Json(name = "user")
-    val user: kotlin.Any?
+    val user: SubscriptionLicenseUserDto?
 
 ) {
 

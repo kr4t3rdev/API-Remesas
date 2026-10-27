@@ -26,10 +26,10 @@ export class NotificationDto {
   @ApiProperty({ example: 'Tu cuenta se desbloqueará en 30 minutos.' })
   message!: string;
 
-  @ApiProperty({ nullable: true, description: 'Payload libre JSON' })
+  @ApiProperty({ type: 'object', additionalProperties: true, nullable: true, description: 'Payload libre JSON' })
   payload!: Record<string, unknown> | null;
 
-  @ApiProperty({ format: 'date-time', nullable: true, description: 'Null cuando la notificación no fue leída' })
+  @ApiProperty({ type: String, format: 'date-time', nullable: true, description: 'Null cuando la notificación no fue leída' })
   readAt!: string | null;
 
   @ApiProperty({ format: 'date-time' })

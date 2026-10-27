@@ -48,7 +48,7 @@ data class DailyReportProfitDto (
 
     /* Realized FX margin minus CUP-converted expenses; null when conversion is incomplete (decimal como string) */
     @Json(name = "net")
-    val net: kotlin.Any?
+    val net: kotlin.String?
 
 ) {
 

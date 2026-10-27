@@ -29,10 +29,10 @@ public struct SubscriptionPaymentDto: Codable, JSONEncodable, Hashable {
     /** Decimal como string */
     public var amountCup: String
     public var paidAt: Date
-    public var notes: AnyCodable?
+    public var notes: String?
     public var createdAt: Date
 
-    public init(id: Double, userId: Double, userLicenseId: Double?, planId: Double, cycle: Cycle, amountUsd: String, exchangeRateUsed: String, amountCup: String, paidAt: Date, notes: AnyCodable?, createdAt: Date) {
+    public init(id: Double, userId: Double, userLicenseId: Double?, planId: Double, cycle: Cycle, amountUsd: String, exchangeRateUsed: String, amountCup: String, paidAt: Date, notes: String?, createdAt: Date) {
         self.id = id
         self.userId = userId
         self.userLicenseId = userLicenseId

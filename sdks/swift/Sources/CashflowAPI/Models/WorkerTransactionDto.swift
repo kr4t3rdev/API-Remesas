@@ -25,10 +25,10 @@ public struct WorkerTransactionDto: Codable, JSONEncodable, Hashable {
     public var balanceBefore: String
     /** Decimal como string */
     public var balanceAfter: String
-    public var description: AnyCodable?
+    public var description: String?
     public var createdAt: Date
 
-    public init(id: Double, workerId: Double, currencyId: Double, type: String, amount: String, profit: String?, balanceBefore: String, balanceAfter: String, description: AnyCodable?, createdAt: Date) {
+    public init(id: Double, workerId: Double, currencyId: Double, type: String, amount: String, profit: String?, balanceBefore: String, balanceAfter: String, description: String?, createdAt: Date) {
         self.id = id
         self.workerId = workerId
         self.currencyId = currencyId

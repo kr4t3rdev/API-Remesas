@@ -16,18 +16,18 @@ public struct AdminUserActionResultDto: Codable, JSONEncodable, Hashable {
     public var user: AdminUserDto?
     /** Acciones de contraseña */
     public var success: Bool?
-    public var userId: AnyCodable?
-    public var action: AnyCodable?
+    public var userId: Double?
+    public var action: String?
     /** Solo RESET_PASSWORD: contraseña temporal generada */
-    public var newPassword: AnyCodable?
+    public var newPassword: String?
     /** Solo REVOKE_ALL_SESSIONS */
     public var revoked: Bool?
     /** Solo REVOKE_ALL_SESSIONS */
-    public var strategy: AnyCodable?
+    public var strategy: String?
     /** Acciones sobre licencias */
     public var license: AdminLicenseActionDto?
 
-    public init(user: AdminUserDto?, success: Bool?, userId: AnyCodable?, action: AnyCodable?, newPassword: AnyCodable?, revoked: Bool?, strategy: AnyCodable?, license: AdminLicenseActionDto?) {
+    public init(user: AdminUserDto?, success: Bool?, userId: Double?, action: String?, newPassword: String?, revoked: Bool?, strategy: String?, license: AdminLicenseActionDto?) {
         self.user = user
         self.success = success
         self.userId = userId

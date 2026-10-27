@@ -90,7 +90,7 @@ data class TransactionDto (
     val marginProfit: kotlin.String,
 
     @Json(name = "notes")
-    val notes: kotlin.Any?,
+    val notes: kotlin.String?,
 
     @Json(name = "operationKind")
     val operationKind: TransactionDto.OperationKind,
@@ -99,13 +99,13 @@ data class TransactionDto (
     val sourceType: kotlin.String,
 
     @Json(name = "sourceBankAccountId")
-    val sourceBankAccountId: kotlin.Any?,
+    val sourceBankAccountId: java.math.BigDecimal?,
 
     @Json(name = "destinationType")
     val destinationType: kotlin.String,
 
     @Json(name = "destinationBankAccountId")
-    val destinationBankAccountId: kotlin.Any?,
+    val destinationBankAccountId: java.math.BigDecimal?,
 
     @Json(name = "createdAt")
     val createdAt: java.time.OffsetDateTime,

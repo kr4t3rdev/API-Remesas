@@ -67,11 +67,11 @@ data class NotificationDto (
 
     /* Payload libre JSON */
     @Json(name = "payload")
-    val payload: kotlin.Any?,
+    val payload: kotlin.collections.Map<kotlin.String, kotlin.Any>?,
 
     /* Null cuando la notificación no fue leída */
     @Json(name = "readAt")
-    val readAt: kotlin.Any?,
+    val readAt: java.time.OffsetDateTime?,
 
     @Json(name = "createdAt")
     val createdAt: java.time.OffsetDateTime

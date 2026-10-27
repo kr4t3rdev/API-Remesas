@@ -13,9 +13,9 @@ import AnyCodable
 public struct CashFlowReportDtoSwagger: Codable, JSONEncodable, Hashable {
 
     public var period: PeriodReportPeriodDto
-    public var currencies: [String]
+    public var currencies: [CashFlowReportCurrencyDto]
 
-    public init(period: PeriodReportPeriodDto, currencies: [String]) {
+    public init(period: PeriodReportPeriodDto, currencies: [CashFlowReportCurrencyDto]) {
         self.period = period
         self.currencies = currencies
     }

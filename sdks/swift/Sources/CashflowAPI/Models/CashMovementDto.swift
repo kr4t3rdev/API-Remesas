@@ -25,6 +25,14 @@ public struct CashMovementDto: Codable, JSONEncodable, Hashable {
         case _in = "IN"
         case out = "OUT"
     }
+    public enum SourceType: String, Codable, CaseIterable {
+        case cash = "CASH"
+        case bankAccount = "BANK_ACCOUNT"
+    }
+    public enum DestinationType: String, Codable, CaseIterable {
+        case cash = "CASH"
+        case bankAccount = "BANK_ACCOUNT"
+    }
     /** Prefijo de kind + id real */
     public var id: String
     public var kind: Kind
@@ -41,14 +49,14 @@ public struct CashMovementDto: Codable, JSONEncodable, Hashable {
     public var cashAmount: String?
     /** Decimal como string; monto convertido a CUP cuando aplica */
     public var totalBase: String?
-    public var sourceType: AnyCodable?
-    public var destinationType: AnyCodable?
-    public var sourceBankAccountId: AnyCodable?
-    public var destinationBankAccountId: AnyCodable?
+    public var sourceType: SourceType?
+    public var destinationType: DestinationType?
+    public var sourceBankAccountId: Double?
+    public var destinationBankAccountId: Double?
     public var currency: CurrencyDto
     public var createdAt: Date
 
-    public init(id: String, kind: Kind, type: String, operationKind: OperationKind?, direction: Direction, title: String, description: String, amount: String, cashAmount: String?, totalBase: String?, sourceType: AnyCodable?, destinationType: AnyCodable?, sourceBankAccountId: AnyCodable?, destinationBankAccountId: AnyCodable?, currency: CurrencyDto, createdAt: Date) {
+    public init(id: String, kind: Kind, type: String, operationKind: OperationKind?, direction: Direction, title: String, description: String, amount: String, cashAmount: String?, totalBase: String?, sourceType: SourceType?, destinationType: DestinationType?, sourceBankAccountId: Double?, destinationBankAccountId: Double?, currency: CurrencyDto, createdAt: Date) {
         self.id = id
         self.kind = kind
         self.type = type

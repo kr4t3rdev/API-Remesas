@@ -56,7 +56,7 @@ export class WorkerTransactionDto {
   @ApiProperty({ type: String, description: 'Decimal como string' })
   balanceAfter!: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   description!: string | null;
 
   @ApiProperty({ format: 'date-time' })
@@ -76,7 +76,7 @@ export class WorkerDto {
   @ApiProperty({ example: '+53 5xxx xxxx', nullable: true, type: String })
   phone!: string | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   photoUrl!: string | null;
 
   @ApiProperty({ example: 'CAR' })

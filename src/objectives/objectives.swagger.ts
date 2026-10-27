@@ -38,7 +38,7 @@ export class ObjectiveDto {
   @ApiProperty({ type: CurrencyDto })
   currency!: CurrencyDto;
 
-  @ApiProperty({ nullable: true, description: 'Cuenta destino; null si pertenece a otro tenant' })
+  @ApiProperty({ type: 'object', additionalProperties: true, nullable: true, description: 'Cuenta destino; null si pertenece a otro tenant' })
   bankAccount!: Record<string, unknown> | null;
 
   @ApiProperty({ format: 'date-time' })

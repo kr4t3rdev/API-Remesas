@@ -23,6 +23,7 @@
 
 package com.cashflow.api.models
 
+import com.cashflow.api.models.CashClosingActorDto
 import com.cashflow.api.models.CurrencyDto
 
 import com.squareup.moshi.Json
@@ -85,13 +86,13 @@ data class CashClosingDto (
     val closedAt: java.time.OffsetDateTime,
 
     @Json(name = "notes")
-    val notes: kotlin.Any?,
+    val notes: kotlin.String?,
 
     @Json(name = "currency")
     val currency: CurrencyDto,
 
     @Json(name = "closedBy")
-    val closedBy: kotlin.Any
+    val closedBy: CashClosingActorDto
 
 ) {
 

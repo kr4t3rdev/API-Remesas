@@ -39,7 +39,7 @@ export class ExpenseDto {
   @ApiProperty({ type: CurrencyDto })
   currency!: CurrencyDto;
 
-  @ApiProperty({ nullable: true, description: 'Cuenta de origen cuando es BANK_ACCOUNT' })
+  @ApiProperty({ type: 'object', additionalProperties: true, nullable: true, description: 'Cuenta de origen cuando es BANK_ACCOUNT' })
   sourceBankAccount!: Record<string, unknown> | null;
 
   @ApiProperty({ format: 'date-time' })
@@ -108,7 +108,7 @@ export class RemittanceDto {
   @ApiProperty({ enum: ['PENDING', 'COMPLETED', 'FAILED'], description: 'Estados del enum RemittanceStatus' })
   status!: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   idempotencyKey!: string | null;
 
   @ApiProperty({ example: true, description: 'Solo en ingest: true si el evento ya existía' })
@@ -233,7 +233,7 @@ export class TransactionDto {
   @ApiProperty({ type: String, description: 'Decimal como string' })
   marginProfit!: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   notes!: string | null;
 
   @ApiProperty({ enum: ['TRANSFER', 'REMITTANCE'] })
@@ -242,13 +242,13 @@ export class TransactionDto {
   @ApiProperty({ example: 'CASH' })
   sourceType!: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: Number, nullable: true })
   sourceBankAccountId!: number | null;
 
   @ApiProperty({ example: 'CASH' })
   destinationType!: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: Number, nullable: true })
   destinationBankAccountId!: number | null;
 
   @ApiProperty({ format: 'date-time' })

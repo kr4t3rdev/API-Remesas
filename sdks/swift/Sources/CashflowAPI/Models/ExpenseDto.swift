@@ -24,11 +24,11 @@ public struct ExpenseDto: Codable, JSONEncodable, Hashable {
     public var sourceBankAccountId: Double?
     public var currency: CurrencyDto
     /** Cuenta de origen cuando es BANK_ACCOUNT */
-    public var sourceBankAccount: AnyCodable?
+    public var sourceBankAccount: [String: AnyCodable]?
     public var createdAt: Date
     public var updatedAt: Date
 
-    public init(id: Double, userId: Double, description: String, amount: String, currencyId: Double, category: String, date: Date, sourceType: String, sourceBankAccountId: Double?, currency: CurrencyDto, sourceBankAccount: AnyCodable?, createdAt: Date, updatedAt: Date) {
+    public init(id: Double, userId: Double, description: String, amount: String, currencyId: Double, category: String, date: Date, sourceType: String, sourceBankAccountId: Double?, currency: CurrencyDto, sourceBankAccount: [String: AnyCodable]?, createdAt: Date, updatedAt: Date) {
         self.id = id
         self.userId = userId
         self.description = description

@@ -46,6 +46,7 @@ Sources/CashflowAPI/Models/AdminKpisDto.swift
 Sources/CashflowAPI/Models/AdminLicenseActionDto.swift
 Sources/CashflowAPI/Models/AdminPlatformSeriesBucketDto.swift
 Sources/CashflowAPI/Models/AdminPlatformSeriesDto.swift
+Sources/CashflowAPI/Models/AdminPlatformSeriesTotalsDto.swift
 Sources/CashflowAPI/Models/AdminProfileStatsDto.swift
 Sources/CashflowAPI/Models/AdminServiceMetricsDto.swift
 Sources/CashflowAPI/Models/AdminUserActionDto.swift
@@ -71,8 +72,13 @@ Sources/CashflowAPI/Models/CashAdjustmentDto.swift
 Sources/CashflowAPI/Models/CashAuditDto.swift
 Sources/CashflowAPI/Models/CashAuditorDto.swift
 Sources/CashflowAPI/Models/CashBalanceDto.swift
+Sources/CashflowAPI/Models/CashClosingActorDto.swift
 Sources/CashflowAPI/Models/CashClosingDto.swift
+Sources/CashflowAPI/Models/CashFlowReportCurrencyDto.swift
+Sources/CashflowAPI/Models/CashFlowReportCurrencyRefDto.swift
 Sources/CashflowAPI/Models/CashFlowReportDtoSwagger.swift
+Sources/CashflowAPI/Models/CashFlowReportInflowsDto.swift
+Sources/CashflowAPI/Models/CashFlowReportOutflowsDto.swift
 Sources/CashflowAPI/Models/CashMovementDto.swift
 Sources/CashflowAPI/Models/CashOverviewDto.swift
 Sources/CashflowAPI/Models/CashPolicyDetailDto.swift
@@ -122,6 +128,7 @@ Sources/CashflowAPI/Models/ExpenseDto.swift
 Sources/CashflowAPI/Models/ExpenseItemDto.swift
 Sources/CashflowAPI/Models/ExpenseItemReportDto.swift
 Sources/CashflowAPI/Models/ExpenseItemReportItemDto.swift
+Sources/CashflowAPI/Models/ExpenseItemReportPeriodDto.swift
 Sources/CashflowAPI/Models/ExpenseListDto.swift
 Sources/CashflowAPI/Models/ExpensesReportDto.swift
 Sources/CashflowAPI/Models/ForgotPasswordDto.swift
@@ -170,6 +177,7 @@ Sources/CashflowAPI/Models/ResetPasswordDto.swift
 Sources/CashflowAPI/Models/SetPrimaryCurrencyDto.swift
 Sources/CashflowAPI/Models/SetPrimaryCurrencyResponseDto.swift
 Sources/CashflowAPI/Models/SubscriptionLicenseDto.swift
+Sources/CashflowAPI/Models/SubscriptionLicenseUserDto.swift
 Sources/CashflowAPI/Models/SubscriptionPaymentDto.swift
 Sources/CashflowAPI/Models/SuspendLicenseDto.swift
 Sources/CashflowAPI/Models/TransactionDto.swift

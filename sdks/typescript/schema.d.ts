@@ -2013,12 +2013,14 @@ export interface components {
             /** @example Tu cuenta se desbloqueará en 30 minutos. */
             message: string;
             /** @description Payload libre JSON */
-            payload: Record<string, never> | null;
+            payload: {
+                [key: string]: unknown;
+            } | null;
             /**
              * Format: date-time
              * @description Null cuando la notificación no fue leída
              */
-            readAt: Record<string, never> | null;
+            readAt: string | null;
             /** Format: date-time */
             createdAt: string;
         };
@@ -2370,15 +2372,15 @@ export interface components {
             totalCup: string;
             /** @description Decimal como string */
             marginProfit: string;
-            notes: Record<string, never> | null;
+            notes: string | null;
             /** @enum {string} */
             operationKind: "TRANSFER" | "REMITTANCE";
             /** @example CASH */
             sourceType: string;
-            sourceBankAccountId: Record<string, never> | null;
+            sourceBankAccountId: number | null;
             /** @example CASH */
             destinationType: string;
-            destinationBankAccountId: Record<string, never> | null;
+            destinationBankAccountId: number | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -2509,9 +2511,9 @@ export interface components {
             actualBalance: string;
             /** @description Decimal como string */
             difference: string;
-            notes: Record<string, never> | null;
+            notes: string | null;
             /** @description Nombre del auditor; presente en latestAudits del overview */
-            auditorName: Record<string, never> | null;
+            auditorName: string | null;
             /** Format: date-time */
             createdAt: string;
         };
@@ -2714,7 +2716,9 @@ export interface components {
             sourceBankAccountId: number | null;
             currency: components["schemas"]["CurrencyDto"];
             /** @description Cuenta de origen cuando es BANK_ACCOUNT */
-            sourceBankAccount: Record<string, never> | null;
+            sourceBankAccount: {
+                [key: string]: unknown;
+            } | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -2792,7 +2796,9 @@ export interface components {
             status: "ACTIVO" | "COMPLETADO" | "PAUSADO";
             currency: components["schemas"]["CurrencyDto"];
             /** @description Cuenta destino; null si pertenece a otro tenant */
-            bankAccount: Record<string, never> | null;
+            bankAccount: {
+                [key: string]: unknown;
+            } | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -2819,7 +2825,9 @@ export interface components {
             status: "ACTIVO" | "COMPLETADO" | "PAUSADO";
             currency: components["schemas"]["CurrencyDto"];
             /** @description Cuenta destino; null si pertenece a otro tenant */
-            bankAccount: Record<string, never> | null;
+            bankAccount: {
+                [key: string]: unknown;
+            } | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -2878,8 +2886,8 @@ export interface components {
             total: number;
             /** @description Suma cruda mezclando currencies (decimal como string) */
             totalAmount: string;
-            /** @description Suma convertida a CUP cuando hay tasa vigente */
-            totalAmountInCup: Record<string, never> | null;
+            /** @description Suma convertida a CUP cuando hay tasa vigente (decimal como string) */
+            totalAmountInCup: string | null;
             unconvertedCount: number;
             byCategory: {
                 [key: string]: components["schemas"]["DailyExpenseByCategoryDto"];
@@ -2891,7 +2899,7 @@ export interface components {
             /** @description Suma de Transaction.marginProfit (decimal como string) */
             marginProfit: string;
             /** @description Realized FX margin minus CUP-converted expenses; null when conversion is incomplete (decimal como string) */
-            net: Record<string, never> | null;
+            net: string | null;
         };
         DailyReportDto: {
             /** @example 2026-07-22 */
@@ -3060,9 +3068,40 @@ export interface components {
             pausados: number;
             objectives: components["schemas"]["ObjectiveReportItemDto"][];
         };
+        CashFlowReportCurrencyRefDto: {
+            /** @example USD */
+            code: string;
+            /** @example $ */
+            symbol: string;
+        };
+        CashFlowReportInflowsDto: {
+            /** @description Decimal como string */
+            transactions: string;
+            /** @description Decimal como string */
+            adjustments: string;
+            /** @description Decimal como string */
+            total: string;
+        };
+        CashFlowReportOutflowsDto: {
+            /** @description Decimal como string */
+            transactions: string;
+            /** @description Decimal como string */
+            expenses: string;
+            /** @description Decimal como string */
+            adjustments: string;
+            /** @description Decimal como string */
+            total: string;
+        };
+        CashFlowReportCurrencyDto: {
+            currency: components["schemas"]["CashFlowReportCurrencyRefDto"];
+            inflows: components["schemas"]["CashFlowReportInflowsDto"];
+            outflows: components["schemas"]["CashFlowReportOutflowsDto"];
+            /** @description Decimal como string */
+            balance: string;
+        };
         CashFlowReportDtoSwagger: {
             period: components["schemas"]["PeriodReportPeriodDto"];
-            currencies: string[];
+            currencies: components["schemas"]["CashFlowReportCurrencyDto"][];
         };
         AuditSummaryReportDtoSwagger: {
             totalAudits: number;
@@ -3218,6 +3257,14 @@ export interface components {
              */
             annualUsd?: string;
         };
+        SubscriptionLicenseUserDto: {
+            /** @example 2 */
+            id: number;
+            /** @example ana@correo.com */
+            email: string;
+            /** @example Ana */
+            name: string;
+        };
         SubscriptionLicenseDto: {
             /** @example 5 */
             id: number;
@@ -3232,13 +3279,13 @@ export interface components {
             /** Format: date-time */
             startedAt: string;
             /** Format: date-time */
-            expiresAt: Record<string, never> | null;
+            expiresAt: string | null;
             /** Format: date-time */
-            graceUntil: Record<string, never> | null;
+            graceUntil: string | null;
             /** Format: date-time */
-            cancelledAt: Record<string, never> | null;
+            cancelledAt: string | null;
             /** Format: date-time */
-            lastPaymentAt: Record<string, never> | null;
+            lastPaymentAt: string | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -3248,7 +3295,7 @@ export interface components {
                 [key: string]: unknown;
             };
             /** @description Usuario reducido (id, email, name); presente en listados */
-            user: Record<string, never> | null;
+            user: components["schemas"]["SubscriptionLicenseUserDto"] | null;
         };
         AssignLicenseDto: {
             /** @example 1 */
@@ -3331,7 +3378,7 @@ export interface components {
             amountCup: string;
             /** Format: date-time */
             paidAt: string;
-            notes: Record<string, never> | null;
+            notes: string | null;
             /** Format: date-time */
             createdAt: string;
         };
@@ -3395,11 +3442,19 @@ export interface components {
             /** @example 4 */
             churn: number;
         };
+        AdminPlatformSeriesTotalsDto: {
+            /** @description Facturación acumulada en CUP (decimal como string) */
+            billingCup: string;
+            /** @example 12 */
+            newUsers: number;
+            /** @example 4 */
+            churn: number;
+        };
         AdminPlatformSeriesDto: {
             /** @example 6 */
             monthsBack: number;
             series: components["schemas"]["AdminPlatformSeriesBucketDto"][];
-            totals: Record<string, never>;
+            totals: components["schemas"]["AdminPlatformSeriesTotalsDto"];
         };
         AdminProfileStatsDto: {
             /** @example 120 */
@@ -3515,7 +3570,7 @@ export interface components {
             /** @enum {string} */
             state: "TRIAL" | "ACTIVE" | "GRACE" | "EXPIRED" | "CANCELLED" | "SUSPENDED";
             /** Format: date-time */
-            expiresAt: Record<string, never> | null;
+            expiresAt: string | null;
             /** @example 1 */
             planId: number;
         };
@@ -3597,7 +3652,7 @@ export interface components {
             /** @enum {string} */
             state: "TRIAL" | "ACTIVE" | "GRACE" | "EXPIRED" | "CANCELLED" | "SUSPENDED";
             /** Format: date-time */
-            expiresAt: Record<string, never> | null;
+            expiresAt: string | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -3611,17 +3666,17 @@ export interface components {
              * @example true
              */
             success: boolean | null;
-            userId: Record<string, never> | null;
-            action: Record<string, never> | null;
+            userId: number | null;
+            action: string | null;
             /** @description Solo RESET_PASSWORD: contraseña temporal generada */
-            newPassword: Record<string, never> | null;
+            newPassword: string | null;
             /**
              * @description Solo REVOKE_ALL_SESSIONS
              * @example false
              */
             revoked: boolean | null;
             /** @description Solo REVOKE_ALL_SESSIONS */
-            strategy: Record<string, never> | null;
+            strategy: string | null;
             /** @description Acciones sobre licencias */
             license: components["schemas"]["AdminLicenseActionDto"] | null;
         };
@@ -3635,7 +3690,7 @@ export interface components {
             /** @enum {string} */
             state: "TRIAL" | "ACTIVE" | "GRACE" | "EXPIRED" | "CANCELLED" | "SUSPENDED";
             /** Format: date-time */
-            expiresAt: Record<string, never> | null;
+            expiresAt: string | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -3676,9 +3731,15 @@ export interface components {
             action: string;
             /** @example Alta de usuario desde consola admin */
             reason: string | null;
-            metadata: Record<string, never> | null;
-            previousValue: Record<string, never> | null;
-            newValue: Record<string, never> | null;
+            metadata: {
+                [key: string]: unknown;
+            } | null;
+            previousValue: {
+                [key: string]: unknown;
+            } | null;
+            newValue: {
+                [key: string]: unknown;
+            } | null;
             /** Format: date-time */
             createdAt: string;
         };
@@ -3689,7 +3750,7 @@ export interface components {
             /** @enum {string} */
             role: "ADMIN" | "USER";
             isActive: boolean;
-            avatarUrl: Record<string, never> | null;
+            avatarUrl: string | null;
         };
         AvatarUploadResponseDto: {
             /** @example Avatar updated successfully */
@@ -3742,7 +3803,7 @@ export interface components {
             balanceBefore: string;
             /** @description Decimal como string */
             balanceAfter: string;
-            description: Record<string, never> | null;
+            description: string | null;
             /** Format: date-time */
             createdAt: string;
         };
@@ -3755,7 +3816,7 @@ export interface components {
             name: string;
             /** @example +53 5xxx xxxx */
             phone: string | null;
-            photoUrl: Record<string, never> | null;
+            photoUrl: string | null;
             /** @example CAR */
             initials: string;
             /** @description Decimal como string */
@@ -3860,6 +3921,12 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
         };
+        ExpenseItemReportPeriodDto: {
+            /** @example 2026-01-01 */
+            start: string;
+            /** @example 2026-12-31 */
+            end: string;
+        };
         ExpenseItemReportDto: {
             items: components["schemas"]["ExpenseItemReportItemDto"][];
             /** @description Decimal como string */
@@ -3869,7 +3936,7 @@ export interface components {
             /** @description Decimal como string */
             average: string;
             /** @description Rango efectivo del período cuando aplica */
-            period: Record<string, never> | null;
+            period: components["schemas"]["ExpenseItemReportPeriodDto"] | null;
         };
         UpdateExpenseItemDto: {
             /** @example Mantenimiento de Inmuebles */
@@ -3915,10 +3982,12 @@ export interface components {
             cashAmount: string | null;
             /** @description Decimal como string; monto convertido a CUP cuando aplica */
             totalBase: string | null;
-            sourceType: Record<string, never> | null;
-            destinationType: Record<string, never> | null;
-            sourceBankAccountId: Record<string, never> | null;
-            destinationBankAccountId: Record<string, never> | null;
+            /** @enum {string|null} */
+            sourceType: "CASH" | "BANK_ACCOUNT" | null;
+            /** @enum {string|null} */
+            destinationType: "CASH" | "BANK_ACCOUNT" | null;
+            sourceBankAccountId: number | null;
+            destinationBankAccountId: number | null;
             currency: components["schemas"]["CurrencyDto"];
             /** Format: date-time */
             createdAt: string;
@@ -3973,6 +4042,12 @@ export interface components {
             /** @example Ana */
             name: string;
         };
+        CashClosingActorDto: {
+            /** @example 7 */
+            id: number;
+            /** @example Ana */
+            name: string;
+        };
         CashClosingDto: {
             /** @example 3 */
             id: number;
@@ -4000,15 +4075,9 @@ export interface components {
             closedById: number;
             /** Format: date-time */
             closedAt: string;
-            notes: Record<string, never> | null;
+            notes: string | null;
             currency: components["schemas"]["CurrencyDto"];
-            /**
-             * @example {
-             *       "id": 7,
-             *       "name": "Ana"
-             *     }
-             */
-            closedBy: Record<string, never>;
+            closedBy: components["schemas"]["CashClosingActorDto"];
         };
         CreateCashClosingDto: {
             /** @example 1 */
@@ -4087,7 +4156,7 @@ export interface components {
              * @enum {string}
              */
             status: "PENDING" | "COMPLETED" | "FAILED";
-            idempotencyKey: Record<string, never> | null;
+            idempotencyKey: string | null;
             /**
              * @description Solo en ingest: true si el evento ya existía
              * @example true

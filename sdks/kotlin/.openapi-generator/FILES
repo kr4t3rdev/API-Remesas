@@ -56,6 +56,7 @@ src/main/kotlin/com/cashflow/api/models/AdminKpisDto.kt
 src/main/kotlin/com/cashflow/api/models/AdminLicenseActionDto.kt
 src/main/kotlin/com/cashflow/api/models/AdminPlatformSeriesBucketDto.kt
 src/main/kotlin/com/cashflow/api/models/AdminPlatformSeriesDto.kt
+src/main/kotlin/com/cashflow/api/models/AdminPlatformSeriesTotalsDto.kt
 src/main/kotlin/com/cashflow/api/models/AdminProfileStatsDto.kt
 src/main/kotlin/com/cashflow/api/models/AdminServiceMetricsDto.kt
 src/main/kotlin/com/cashflow/api/models/AdminUserActionDto.kt
@@ -81,8 +82,13 @@ src/main/kotlin/com/cashflow/api/models/CashAdjustmentDto.kt
 src/main/kotlin/com/cashflow/api/models/CashAuditDto.kt
 src/main/kotlin/com/cashflow/api/models/CashAuditorDto.kt
 src/main/kotlin/com/cashflow/api/models/CashBalanceDto.kt
+src/main/kotlin/com/cashflow/api/models/CashClosingActorDto.kt
 src/main/kotlin/com/cashflow/api/models/CashClosingDto.kt
+src/main/kotlin/com/cashflow/api/models/CashFlowReportCurrencyDto.kt
+src/main/kotlin/com/cashflow/api/models/CashFlowReportCurrencyRefDto.kt
 src/main/kotlin/com/cashflow/api/models/CashFlowReportDtoSwagger.kt
+src/main/kotlin/com/cashflow/api/models/CashFlowReportInflowsDto.kt
+src/main/kotlin/com/cashflow/api/models/CashFlowReportOutflowsDto.kt
 src/main/kotlin/com/cashflow/api/models/CashMovementDto.kt
 src/main/kotlin/com/cashflow/api/models/CashOverviewDto.kt
 src/main/kotlin/com/cashflow/api/models/CashPolicyDetailDto.kt
@@ -132,6 +138,7 @@ src/main/kotlin/com/cashflow/api/models/ExpenseDto.kt
 src/main/kotlin/com/cashflow/api/models/ExpenseItemDto.kt
 src/main/kotlin/com/cashflow/api/models/ExpenseItemReportDto.kt
 src/main/kotlin/com/cashflow/api/models/ExpenseItemReportItemDto.kt
+src/main/kotlin/com/cashflow/api/models/ExpenseItemReportPeriodDto.kt
 src/main/kotlin/com/cashflow/api/models/ExpenseListDto.kt
 src/main/kotlin/com/cashflow/api/models/ExpensesReportDto.kt
 src/main/kotlin/com/cashflow/api/models/ForgotPasswordDto.kt
@@ -180,6 +187,7 @@ src/main/kotlin/com/cashflow/api/models/ResetPasswordDto.kt
 src/main/kotlin/com/cashflow/api/models/SetPrimaryCurrencyDto.kt
 src/main/kotlin/com/cashflow/api/models/SetPrimaryCurrencyResponseDto.kt
 src/main/kotlin/com/cashflow/api/models/SubscriptionLicenseDto.kt
+src/main/kotlin/com/cashflow/api/models/SubscriptionLicenseUserDto.kt
 src/main/kotlin/com/cashflow/api/models/SubscriptionPaymentDto.kt
 src/main/kotlin/com/cashflow/api/models/SuspendLicenseDto.kt
 src/main/kotlin/com/cashflow/api/models/TransactionDto.kt

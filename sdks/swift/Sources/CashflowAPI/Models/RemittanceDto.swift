@@ -23,14 +23,14 @@ public struct RemittanceDto: Codable, JSONEncodable, Hashable {
     public var sourceId: String
     /** Estados del enum RemittanceStatus */
     public var status: Status
-    public var idempotencyKey: AnyCodable?
+    public var idempotencyKey: String?
     /** Solo en ingest: true si el evento ya existía */
     public var duplicate: Bool
     public var movements: [[String: AnyCodable]]?
     public var createdAt: Date
     public var updatedAt: Date
 
-    public init(id: Double, userId: Double, provider: String, sourceId: String, status: Status, idempotencyKey: AnyCodable?, duplicate: Bool, movements: [[String: AnyCodable]]?, createdAt: Date, updatedAt: Date) {
+    public init(id: Double, userId: Double, provider: String, sourceId: String, status: Status, idempotencyKey: String?, duplicate: Bool, movements: [[String: AnyCodable]]?, createdAt: Date, updatedAt: Date) {
         self.id = id
         self.userId = userId
         self.provider = provider

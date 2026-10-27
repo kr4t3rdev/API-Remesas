@@ -23,6 +23,7 @@
 
 package com.cashflow.api.models
 
+import com.cashflow.api.models.CashFlowReportCurrencyDto
 import com.cashflow.api.models.PeriodReportPeriodDto
 
 import com.squareup.moshi.Json
@@ -42,7 +43,7 @@ data class CashFlowReportDtoSwagger (
     val period: PeriodReportPeriodDto,
 
     @Json(name = "currencies")
-    val currencies: kotlin.collections.List<kotlin.String>
+    val currencies: kotlin.collections.List<CashFlowReportCurrencyDto>
 
 ) {
 

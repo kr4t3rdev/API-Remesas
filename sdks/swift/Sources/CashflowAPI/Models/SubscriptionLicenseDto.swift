@@ -31,18 +31,18 @@ public struct SubscriptionLicenseDto: Codable, JSONEncodable, Hashable {
     public var state: State
     public var cycle: Cycle
     public var startedAt: Date
-    public var expiresAt: AnyCodable?
-    public var graceUntil: AnyCodable?
-    public var cancelledAt: AnyCodable?
-    public var lastPaymentAt: AnyCodable?
+    public var expiresAt: Date?
+    public var graceUntil: Date?
+    public var cancelledAt: Date?
+    public var lastPaymentAt: Date?
     public var createdAt: Date
     public var updatedAt: Date
     /** Plan de la licencia */
     public var plan: [String: AnyCodable]
     /** Usuario reducido (id, email, name); presente en listados */
-    public var user: AnyCodable?
+    public var user: SubscriptionLicenseUserDto?
 
-    public init(id: Double, userId: Double, planId: Double, state: State, cycle: Cycle, startedAt: Date, expiresAt: AnyCodable?, graceUntil: AnyCodable?, cancelledAt: AnyCodable?, lastPaymentAt: AnyCodable?, createdAt: Date, updatedAt: Date, plan: [String: AnyCodable], user: AnyCodable?) {
+    public init(id: Double, userId: Double, planId: Double, state: State, cycle: Cycle, startedAt: Date, expiresAt: Date?, graceUntil: Date?, cancelledAt: Date?, lastPaymentAt: Date?, createdAt: Date, updatedAt: Date, plan: [String: AnyCodable], user: SubscriptionLicenseUserDto?) {
         self.id = id
         self.userId = userId
         self.planId = planId

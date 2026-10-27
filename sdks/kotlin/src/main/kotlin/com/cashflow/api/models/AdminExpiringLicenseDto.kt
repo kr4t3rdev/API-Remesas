@@ -57,7 +57,7 @@ data class AdminExpiringLicenseDto (
     val state: AdminExpiringLicenseDto.State,
 
     @Json(name = "expiresAt")
-    val expiresAt: kotlin.Any?,
+    val expiresAt: java.time.OffsetDateTime?,
 
     @Json(name = "createdAt")
     val createdAt: java.time.OffsetDateTime,

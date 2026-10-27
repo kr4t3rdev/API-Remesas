@@ -24,6 +24,7 @@
 package com.cashflow.api.models
 
 import com.cashflow.api.models.AdminPlatformSeriesBucketDto
+import com.cashflow.api.models.AdminPlatformSeriesTotalsDto
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -46,7 +47,7 @@ data class AdminPlatformSeriesDto (
     val series: kotlin.collections.List<AdminPlatformSeriesBucketDto>,
 
     @Json(name = "totals")
-    val totals: kotlin.Any
+    val totals: AdminPlatformSeriesTotalsDto
 
 ) {
 

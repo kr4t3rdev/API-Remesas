@@ -89,16 +89,16 @@ data class CashMovementDto (
     val totalBase: kotlin.String?,
 
     @Json(name = "sourceType")
-    val sourceType: kotlin.Any?,
+    val sourceType: CashMovementDto.SourceType?,
 
     @Json(name = "destinationType")
-    val destinationType: kotlin.Any?,
+    val destinationType: CashMovementDto.DestinationType?,
 
     @Json(name = "sourceBankAccountId")
-    val sourceBankAccountId: kotlin.Any?,
+    val sourceBankAccountId: java.math.BigDecimal?,
 
     @Json(name = "destinationBankAccountId")
-    val destinationBankAccountId: kotlin.Any?,
+    val destinationBankAccountId: java.math.BigDecimal?,
 
     @Json(name = "currency")
     val currency: CurrencyDto,
@@ -138,6 +138,26 @@ data class CashMovementDto (
     enum class Direction(val value: kotlin.String) {
         @Json(name = "IN") IN("IN"),
         @Json(name = "OUT") OUT("OUT");
+    }
+    /**
+     * 
+     *
+     * Values: CASH,BANK_ACCOUNT
+     */
+    @JsonClass(generateAdapter = false)
+    enum class SourceType(val value: kotlin.String) {
+        @Json(name = "CASH") CASH("CASH"),
+        @Json(name = "BANK_ACCOUNT") BANK_ACCOUNT("BANK_ACCOUNT");
+    }
+    /**
+     * 
+     *
+     * Values: CASH,BANK_ACCOUNT
+     */
+    @JsonClass(generateAdapter = false)
+    enum class DestinationType(val value: kotlin.String) {
+        @Json(name = "CASH") CASH("CASH"),
+        @Json(name = "BANK_ACCOUNT") BANK_ACCOUNT("BANK_ACCOUNT");
     }
 
 }

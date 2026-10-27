@@ -16,12 +16,12 @@ public struct DailyReportExpenseDto: Codable, JSONEncodable, Hashable {
     public var total: Double
     /** Suma cruda mezclando currencies (decimal como string) */
     public var totalAmount: String
-    /** Suma convertida a CUP cuando hay tasa vigente */
-    public var totalAmountInCup: AnyCodable?
+    /** Suma convertida a CUP cuando hay tasa vigente (decimal como string) */
+    public var totalAmountInCup: String?
     public var unconvertedCount: Double
     public var byCategory: [String: DailyExpenseByCategoryDto]
 
-    public init(total: Double, totalAmount: String, totalAmountInCup: AnyCodable?, unconvertedCount: Double, byCategory: [String: DailyExpenseByCategoryDto]) {
+    public init(total: Double, totalAmount: String, totalAmountInCup: String?, unconvertedCount: Double, byCategory: [String: DailyExpenseByCategoryDto]) {
         self.total = total
         self.totalAmount = totalAmount
         self.totalAmountInCup = totalAmountInCup

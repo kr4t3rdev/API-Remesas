@@ -75,7 +75,7 @@ data class WorkerTransactionDto (
     val balanceAfter: kotlin.String,
 
     @Json(name = "description")
-    val description: kotlin.Any?,
+    val description: kotlin.String?,
 
     @Json(name = "createdAt")
     val createdAt: java.time.OffsetDateTime

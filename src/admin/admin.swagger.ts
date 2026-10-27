@@ -106,6 +106,17 @@ export class AdminPlatformSeriesBucketDto {
   churn!: number;
 }
 
+export class AdminPlatformSeriesTotalsDto {
+  @ApiProperty({ type: String, description: 'Facturación acumulada en CUP (decimal como string)' })
+  billingCup!: string;
+
+  @ApiProperty({ example: 12 })
+  newUsers!: number;
+
+  @ApiProperty({ example: 4 })
+  churn!: number;
+}
+
 export class AdminPlatformSeriesDto {
   @ApiProperty({ example: 6 })
   monthsBack!: number;
@@ -113,12 +124,8 @@ export class AdminPlatformSeriesDto {
   @ApiProperty({ type: [AdminPlatformSeriesBucketDto] })
   series!: AdminPlatformSeriesBucketDto[];
 
-  @ApiProperty()
-  totals!: {
-    billingCup: string;
-    newUsers: number;
-    churn: number;
-  };
+  @ApiProperty({ type: AdminPlatformSeriesTotalsDto })
+  totals!: AdminPlatformSeriesTotalsDto;
 }
 
 export class AdminProfileStatsDto {
@@ -148,7 +155,7 @@ export class AdminUserDetailLicenseDto {
   @ApiProperty({ enum: ['TRIAL', 'ACTIVE', 'GRACE', 'EXPIRED', 'CANCELLED', 'SUSPENDED'] })
   state!: string;
 
-  @ApiProperty({ format: 'date-time', nullable: true })
+  @ApiProperty({ type: String, format: 'date-time', nullable: true })
   expiresAt!: string | null;
 
   @ApiProperty({ example: 1 })
@@ -190,7 +197,7 @@ export class AdminLicenseActionDto {
   @ApiProperty({ enum: ['TRIAL', 'ACTIVE', 'GRACE', 'EXPIRED', 'CANCELLED', 'SUSPENDED'] })
   state!: string;
 
-  @ApiProperty({ format: 'date-time', nullable: true })
+  @ApiProperty({ type: String, format: 'date-time', nullable: true })
   expiresAt!: string | null;
 
   @ApiProperty({ format: 'date-time' })
@@ -207,19 +214,19 @@ export class AdminUserActionResultDto {
   @ApiProperty({ example: true, nullable: true, type: Boolean, description: 'Acciones de contraseña' })
   success?: boolean | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: Number, nullable: true })
   userId?: number | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   action?: string | null;
 
-  @ApiProperty({ nullable: true, description: 'Solo RESET_PASSWORD: contraseña temporal generada' })
+  @ApiProperty({ type: String, nullable: true, description: 'Solo RESET_PASSWORD: contraseña temporal generada' })
   newPassword?: string | null;
 
   @ApiProperty({ example: false, nullable: true, type: Boolean, description: 'Solo REVOKE_ALL_SESSIONS' })
   revoked?: boolean | null;
 
-  @ApiProperty({ nullable: true, description: 'Solo REVOKE_ALL_SESSIONS' })
+  @ApiProperty({ type: String, nullable: true, description: 'Solo REVOKE_ALL_SESSIONS' })
   strategy?: string | null;
 
   @ApiProperty({ type: AdminLicenseActionDto, nullable: true, description: 'Acciones sobre licencias' })
@@ -239,7 +246,7 @@ export class AdminExpiringLicenseDto {
   @ApiProperty({ enum: ['TRIAL', 'ACTIVE', 'GRACE', 'EXPIRED', 'CANCELLED', 'SUSPENDED'] })
   state!: string;
 
-  @ApiProperty({ format: 'date-time', nullable: true })
+  @ApiProperty({ type: String, format: 'date-time', nullable: true })
   expiresAt!: string | null;
 
   @ApiProperty({ format: 'date-time' })
@@ -285,13 +292,13 @@ export class AdminAuditLogDto {
   @ApiProperty({ example: 'Alta de usuario desde consola admin', nullable: true, type: String })
   reason!: string | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: 'object', additionalProperties: true, nullable: true })
   metadata!: Record<string, unknown> | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: 'object', additionalProperties: true, nullable: true })
   previousValue!: Record<string, unknown> | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: 'object', additionalProperties: true, nullable: true })
   newValue!: Record<string, unknown> | null;
 
   @ApiProperty({ format: 'date-time' })

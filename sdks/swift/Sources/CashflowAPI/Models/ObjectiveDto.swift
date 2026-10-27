@@ -30,11 +30,11 @@ public struct ObjectiveDto: Codable, JSONEncodable, Hashable {
     public var status: Status
     public var currency: CurrencyDto
     /** Cuenta destino; null si pertenece a otro tenant */
-    public var bankAccount: AnyCodable?
+    public var bankAccount: [String: AnyCodable]?
     public var createdAt: Date
     public var updatedAt: Date
 
-    public init(id: Double, userId: Double, name: String, description: String?, targetAmount: String, currentAmount: String, currencyId: Double, bankAccountId: Double?, status: Status, currency: CurrencyDto, bankAccount: AnyCodable?, createdAt: Date, updatedAt: Date) {
+    public init(id: Double, userId: Double, name: String, description: String?, targetAmount: String, currentAmount: String, currencyId: Double, bankAccountId: Double?, status: Status, currency: CurrencyDto, bankAccount: [String: AnyCodable]?, createdAt: Date, updatedAt: Date) {
         self.id = id
         self.userId = userId
         self.name = name

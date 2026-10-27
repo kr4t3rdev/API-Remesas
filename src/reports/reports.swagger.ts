@@ -28,10 +28,11 @@ export class DailyReportExpenseDto {
   @ApiProperty({ description: 'Suma cruda mezclando currencies (decimal como string)' })
   totalAmount!: string;
   @ApiProperty({
+    type: String,
     nullable: true,
-    description: 'Suma convertida a CUP cuando hay tasa vigente',
+    description: 'Suma convertida a CUP cuando hay tasa vigente (decimal como string)',
   })
-  totalAmountInCup!: number | null;
+  totalAmountInCup!: string | null;
   @ApiProperty()
   unconvertedCount!: number;
   @ApiProperty({
@@ -46,7 +47,7 @@ export class DailyReportProfitDto {
   margin!: number;
   @ApiProperty({ description: 'Suma de Transaction.marginProfit (decimal como string)' })
   marginProfit!: string;
-  @ApiProperty({ nullable: true, description: 'Realized FX margin minus CUP-converted expenses; null when conversion is incomplete (decimal como string)' })
+  @ApiProperty({ type: String, nullable: true, description: 'Realized FX margin minus CUP-converted expenses; null when conversion is incomplete (decimal como string)' })
   net!: string | null;
 }
 
@@ -245,16 +246,58 @@ export class ObjectivesReportDto {
   objectives!: ObjectiveReportItemDto[];
 }
 
+export class CashFlowReportCurrencyRefDto {
+  @ApiProperty({ example: 'USD' })
+  code!: string;
+
+  @ApiProperty({ example: '$' })
+  symbol!: string;
+}
+
+export class CashFlowReportInflowsDto {
+  @ApiProperty({ type: String, description: 'Decimal como string' })
+  transactions!: string;
+
+  @ApiProperty({ type: String, description: 'Decimal como string' })
+  adjustments!: string;
+
+  @ApiProperty({ type: String, description: 'Decimal como string' })
+  total!: string;
+}
+
+export class CashFlowReportOutflowsDto {
+  @ApiProperty({ type: String, description: 'Decimal como string' })
+  transactions!: string;
+
+  @ApiProperty({ type: String, description: 'Decimal como string' })
+  expenses!: string;
+
+  @ApiProperty({ type: String, description: 'Decimal como string' })
+  adjustments!: string;
+
+  @ApiProperty({ type: String, description: 'Decimal como string' })
+  total!: string;
+}
+
+export class CashFlowReportCurrencyDto {
+  @ApiProperty({ type: CashFlowReportCurrencyRefDto })
+  currency!: CashFlowReportCurrencyRefDto;
+
+  @ApiProperty({ type: CashFlowReportInflowsDto })
+  inflows!: CashFlowReportInflowsDto;
+
+  @ApiProperty({ type: CashFlowReportOutflowsDto })
+  outflows!: CashFlowReportOutflowsDto;
+
+  @ApiProperty({ type: String, description: 'Decimal como string' })
+  balance!: string;
+}
+
 export class CashFlowReportDtoSwagger {
   @ApiProperty({ type: PeriodReportPeriodDto })
   period!: PeriodReportPeriodDto;
-  @ApiProperty()
-  currencies!: Array<{
-    currency: { code: string; symbol: string };
-    inflows: { transactions: string; adjustments: string; total: string };
-    outflows: { transactions: string; expenses: string; adjustments: string; total: string };
-    balance: string;
-  }>;
+  @ApiProperty({ type: [CashFlowReportCurrencyDto] })
+  currencies!: CashFlowReportCurrencyDto[];
 }
 
 export class AuditSummaryReportDtoSwagger {

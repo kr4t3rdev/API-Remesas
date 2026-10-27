@@ -62,7 +62,7 @@ data class RemittanceDto (
     val status: RemittanceDto.Status,
 
     @Json(name = "idempotencyKey")
-    val idempotencyKey: kotlin.Any?,
+    val idempotencyKey: kotlin.String?,
 
     /* Solo en ingest: true si el evento ya existía */
     @Json(name = "duplicate")

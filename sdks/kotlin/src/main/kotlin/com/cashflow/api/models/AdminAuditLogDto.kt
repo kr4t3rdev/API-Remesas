@@ -60,13 +60,13 @@ data class AdminAuditLogDto (
     val reason: kotlin.String?,
 
     @Json(name = "metadata")
-    val metadata: kotlin.Any?,
+    val metadata: kotlin.collections.Map<kotlin.String, kotlin.Any>?,
 
     @Json(name = "previousValue")
-    val previousValue: kotlin.Any?,
+    val previousValue: kotlin.collections.Map<kotlin.String, kotlin.Any>?,
 
     @Json(name = "newValue")
-    val newValue: kotlin.Any?,
+    val newValue: kotlin.collections.Map<kotlin.String, kotlin.Any>?,
 
     @Json(name = "createdAt")
     val createdAt: java.time.OffsetDateTime

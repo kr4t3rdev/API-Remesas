@@ -17,12 +17,12 @@ public struct AdminAuditLogDto: Codable, JSONEncodable, Hashable {
     public var targetUserId: Double?
     public var action: String
     public var reason: String?
-    public var metadata: AnyCodable?
-    public var previousValue: AnyCodable?
-    public var newValue: AnyCodable?
+    public var metadata: [String: AnyCodable]?
+    public var previousValue: [String: AnyCodable]?
+    public var newValue: [String: AnyCodable]?
     public var createdAt: Date
 
-    public init(id: Double, actorUserId: Double, targetUserId: Double?, action: String, reason: String?, metadata: AnyCodable?, previousValue: AnyCodable?, newValue: AnyCodable?, createdAt: Date) {
+    public init(id: Double, actorUserId: Double, targetUserId: Double?, action: String, reason: String?, metadata: [String: AnyCodable]?, previousValue: [String: AnyCodable]?, newValue: [String: AnyCodable]?, createdAt: Date) {
         self.id = id
         self.actorUserId = actorUserId
         self.targetUserId = targetUserId

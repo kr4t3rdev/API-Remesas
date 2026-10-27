@@ -82,7 +82,7 @@ data class ExpenseDto (
 
     /* Cuenta de origen cuando es BANK_ACCOUNT */
     @Json(name = "sourceBankAccount")
-    val sourceBankAccount: kotlin.Any?,
+    val sourceBankAccount: kotlin.collections.Map<kotlin.String, kotlin.Any>?,
 
     @Json(name = "createdAt")
     val createdAt: java.time.OffsetDateTime,

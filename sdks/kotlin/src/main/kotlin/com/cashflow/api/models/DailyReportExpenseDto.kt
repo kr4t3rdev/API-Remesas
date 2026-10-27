@@ -33,7 +33,7 @@ import com.squareup.moshi.JsonClass
  *
  * @param total Cantidad de gastos del día
  * @param totalAmount Suma cruda mezclando currencies (decimal como string)
- * @param totalAmountInCup Suma convertida a CUP cuando hay tasa vigente
+ * @param totalAmountInCup Suma convertida a CUP cuando hay tasa vigente (decimal como string)
  * @param unconvertedCount 
  * @param byCategory 
  */
@@ -49,9 +49,9 @@ data class DailyReportExpenseDto (
     @Json(name = "totalAmount")
     val totalAmount: kotlin.String,
 
-    /* Suma convertida a CUP cuando hay tasa vigente */
+    /* Suma convertida a CUP cuando hay tasa vigente (decimal como string) */
     @Json(name = "totalAmountInCup")
-    val totalAmountInCup: kotlin.Any?,
+    val totalAmountInCup: kotlin.String?,
 
     @Json(name = "unconvertedCount")
     val unconvertedCount: java.math.BigDecimal,

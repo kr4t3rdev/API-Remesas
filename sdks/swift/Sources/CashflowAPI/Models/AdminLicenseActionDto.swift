@@ -24,11 +24,11 @@ public struct AdminLicenseActionDto: Codable, JSONEncodable, Hashable {
     public var userId: Double
     public var planId: Double
     public var state: State
-    public var expiresAt: AnyCodable?
+    public var expiresAt: Date?
     public var createdAt: Date
     public var updatedAt: Date
 
-    public init(id: Double, userId: Double, planId: Double, state: State, expiresAt: AnyCodable?, createdAt: Date, updatedAt: Date) {
+    public init(id: Double, userId: Double, planId: Double, state: State, expiresAt: Date?, createdAt: Date, updatedAt: Date) {
         self.id = id
         self.userId = userId
         self.planId = planId

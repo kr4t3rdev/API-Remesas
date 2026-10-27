@@ -16,7 +16,7 @@ public struct WorkerDto: Codable, JSONEncodable, Hashable {
     public var userId: Double
     public var name: String
     public var phone: String?
-    public var photoUrl: AnyCodable?
+    public var photoUrl: String?
     public var initials: String
     /** Decimal como string */
     public var balance: String
@@ -31,7 +31,7 @@ public struct WorkerDto: Codable, JSONEncodable, Hashable {
     /** Con currency en listado/detalle; ausente en update/delete */
     public var transactions: [WorkerTransactionDto]?
 
-    public init(id: Double, userId: Double, name: String, phone: String?, photoUrl: AnyCodable?, initials: String, balance: String, accumulatedProfit: String, totalDelivered: String, createdAt: Date, updatedAt: Date, balances: [WorkerBalanceDto]?, transactions: [WorkerTransactionDto]?) {
+    public init(id: Double, userId: Double, name: String, phone: String?, photoUrl: String?, initials: String, balance: String, accumulatedProfit: String, totalDelivered: String, createdAt: Date, updatedAt: Date, balances: [WorkerBalanceDto]?, transactions: [WorkerTransactionDto]?) {
         self.id = id
         self.userId = userId
         self.name = name

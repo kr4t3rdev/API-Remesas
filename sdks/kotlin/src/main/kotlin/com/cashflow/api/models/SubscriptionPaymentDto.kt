@@ -77,7 +77,7 @@ data class SubscriptionPaymentDto (
     val paidAt: java.time.OffsetDateTime,
 
     @Json(name = "notes")
-    val notes: kotlin.Any?,
+    val notes: kotlin.String?,
 
     @Json(name = "createdAt")
     val createdAt: java.time.OffsetDateTime

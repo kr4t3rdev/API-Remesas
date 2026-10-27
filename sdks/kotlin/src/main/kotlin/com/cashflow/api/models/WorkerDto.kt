@@ -63,7 +63,7 @@ data class WorkerDto (
     val phone: kotlin.String?,
 
     @Json(name = "photoUrl")
-    val photoUrl: kotlin.Any?,
+    val photoUrl: kotlin.String?,
 
     @Json(name = "initials")
     val initials: kotlin.String,

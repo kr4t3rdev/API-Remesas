@@ -46,7 +46,7 @@ data class AdminUserDetailLicenseDto (
     val state: AdminUserDetailLicenseDto.State,
 
     @Json(name = "expiresAt")
-    val expiresAt: kotlin.Any?,
+    val expiresAt: java.time.OffsetDateTime?,
 
     @Json(name = "planId")
     val planId: java.math.BigDecimal
